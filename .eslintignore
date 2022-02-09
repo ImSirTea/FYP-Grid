@@ -1,0 +1,3 @@
+# Don't need to lint these
+node_modules/
+dist/
