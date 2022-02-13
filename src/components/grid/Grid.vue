@@ -55,21 +55,17 @@ export default defineComponent({
   methods: {
     header() {
       // Creates each header cell
-      let leftIncrement = 0;
       const headers = this.gridConfiguration.columns.map((column) => {
         const header = h(
           "div",
           {
             style: {
               width: column.widthWithUnit,
-              left: leftIncrement + "ch",
             },
             class: "grid-header-cell",
           },
           column.name
         );
-
-        leftIncrement += column.width;
 
         return header;
       });
@@ -96,17 +92,13 @@ export default defineComponent({
     body() {
       // For each item, creates a row group with each row-cell inside
       const rows = this.items.map((item, idx) => {
-        let leftIncrement = 0;
-        const top = idx * this.rowHeight + "px";
         const rowGroup = h(
           "div",
           {
             class: "grid-row",
             style: {
               height: this.rowHeight + "px",
-              top,
             },
-            key: `grid-row-${idx}`,
           },
           this.gridConfiguration.columns.map((column) => {
             const rowCell = h(
@@ -114,14 +106,11 @@ export default defineComponent({
               {
                 style: {
                   width: column.widthWithUnit,
-                  left: leftIncrement + "ch",
                 },
                 class: "grid-row-cell",
               },
               column.value(item)
             );
-
-            leftIncrement += column.width;
             return rowCell;
           })
         );
@@ -152,23 +141,24 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.grid-row,
-.grid-header {
-  position: absolute;
-}
-
 .grid-header-cell,
 .grid-row-cell {
-  position: absolute;
+  display: inline-block;
   text-align: left;
   background-color: inherit;
 }
 
 .grid-row:nth-child(even) {
-  background-color: lightgray !important;
+  background-color: lightgray;
 }
 
-.grid-header-container,
+.grid-header-container {
+  position: sticky;
+  top: 0;
+  background-color: magenta;
+  z-index: 1;
+}
+
 .grid-row-container {
   position: relative;
 }
