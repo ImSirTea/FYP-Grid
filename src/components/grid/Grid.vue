@@ -110,9 +110,14 @@ export default defineComponent({
           const rowGroup = h(
             "div",
             {
-              class: "grid-row",
+              class: {
+                "grid-row": true,
+                "grid-row-odd": (this.rowsOffset + idx) % 2,
+              },
               style: {
-                top: (idx + this.rowsOffset) * this.rowHeight + "px",
+                transform: `translateY(${
+                  (idx + this.rowsOffset) * this.rowHeight + "px"
+                })`,
                 height: this.rowHeight + "px",
               },
             },
@@ -177,11 +182,6 @@ export default defineComponent({
   position: absolute;
 }
 
-.grid-row:nth-child(even) {
-  border-top: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
-}
-
 .grid-header-container {
   position: sticky;
   top: 0;
@@ -197,5 +197,11 @@ export default defineComponent({
   width: 200ch;
   height: 300px;
   overflow: auto;
+}
+
+.grid-row-odd {
+  background-color: #e9e9e9;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
 }
 </style>
