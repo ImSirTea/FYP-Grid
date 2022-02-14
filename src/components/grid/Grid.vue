@@ -1,6 +1,7 @@
 <script lang="ts">
 import { GridBuilder } from "@/components/grid/GridBuilder";
-import { PropType, h, VNode, defineComponent } from "vue";
+import { VNode } from "vue";
+import { h, defineComponent, PropType } from "@vue/composition-api";
 
 export default defineComponent({
   name: "Grid",
@@ -30,12 +31,17 @@ export default defineComponent({
       default: 0,
     },
   },
+  data: () => {
+    return {
+      gridOffsetTop: 0,
+    };
+  },
   computed: {
+    rowsOffset(): number {
+      return Math.floor(this.gridOffsetTop / this.rowHeight);
+    },
     maximumVisibleRows(): number {
       return Math.ceil(this.gridHeight / this.rowHeight) + this.bufferRows;
-    },
-    scrollIndexOffset(): number {
-      return Math.floor((this.$refs.grid as HTMLDivElement).scrollTop);
     },
     totalGridWidth(): string {
       return (
@@ -53,6 +59,9 @@ export default defineComponent({
     },
   },
   methods: {
+    gridScroll(e: any) {
+      this.gridOffsetTop = e.target.scrollTop;
+    },
     header() {
       // Creates each header cell
       const headers = this.gridConfiguration.columns.map((column) => {
@@ -80,13 +89,15 @@ export default defineComponent({
             height: this.totalHeaderHeight,
           },
         },
-        h(
-          "div",
-          {
-            class: "grid-header",
-          },
-          headers
-        )
+        [
+          h(
+            "div",
+            {
+              class: "grid-header",
+            },
+            headers
+          ),
+        ]
       );
     },
     body() {
@@ -127,15 +138,20 @@ export default defineComponent({
       );
     },
     table() {
-      return h("div", { class: "grid-container", ref: "grid" }, [
-        this.header(),
-        this.body(),
-      ]);
+      return h(
+        "div",
+        {
+          class: "grid-container",
+          on: {
+            scroll: this.gridScroll,
+          },
+        },
+        [this.header(), this.body()]
+      );
     },
   },
   render(): VNode {
-    console.log(this.gridConfiguration);
-    return h(this.table());
+    return this.table();
   },
 });
 </script>

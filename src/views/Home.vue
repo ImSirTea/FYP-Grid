@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import { GridBuilder } from "@/components/grid/GridBuilder";
-import { defineComponent } from "vue";
+import { defineComponent } from "@vue/composition-api";
 import Grid from "@/components/grid/Grid.vue";
 import { WidthEnum } from "@/components/grid/columns/Column";
 
