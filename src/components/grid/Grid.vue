@@ -18,12 +18,12 @@ export default defineComponent({
     rowHeight: {
       type: Number,
       required: false,
-      default: 20,
+      default: 30,
     },
     gridHeight: {
       type: Number,
       required: false,
-      default: 100,
+      default: 300,
     },
     bufferRows: {
       type: Number,
@@ -50,9 +50,6 @@ export default defineComponent({
           0
         ) + "ch"
       );
-    },
-    totalHeaderHeight(): string {
-      return this.rowHeight + "px";
     },
     totalBodyHeight(): string {
       return this.items.length * this.rowHeight + "px";
@@ -86,7 +83,6 @@ export default defineComponent({
           class: "grid-header-container",
           style: {
             width: this.totalGridWidth,
-            height: this.totalHeaderHeight,
           },
         },
         [
@@ -94,6 +90,9 @@ export default defineComponent({
             "div",
             {
               class: "grid-header",
+              style: {
+                height: this.rowHeight + "px",
+              },
             },
             headers
           ),
@@ -102,31 +101,37 @@ export default defineComponent({
     },
     body() {
       // For each item, creates a row group with each row-cell inside
-      const rows = this.items.map((item, idx) => {
-        const rowGroup = h(
-          "div",
-          {
-            class: "grid-row",
-            style: {
-              height: this.rowHeight + "px",
-            },
-          },
-          this.gridConfiguration.columns.map((column) => {
-            const rowCell = h(
-              "div",
-              {
-                style: {
-                  width: column.widthWithUnit,
-                },
-                class: "grid-row-cell",
+      const rows = this.items
+        .slice(
+          Math.max(this.rowsOffset, 0),
+          Math.min(this.rowsOffset + this.maximumVisibleRows, this.items.length)
+        )
+        .map((item, idx) => {
+          const rowGroup = h(
+            "div",
+            {
+              class: "grid-row",
+              style: {
+                top: (idx + this.rowsOffset) * this.rowHeight + "px",
+                height: this.rowHeight + "px",
               },
-              column.value(item)
-            );
-            return rowCell;
-          })
-        );
-        return rowGroup;
-      });
+            },
+            this.gridConfiguration.columns.map((column) => {
+              const rowCell = h(
+                "div",
+                {
+                  style: {
+                    width: column.widthWithUnit,
+                  },
+                  class: "grid-row-cell",
+                },
+                [h("span", {}, column.value(item))]
+              );
+              return rowCell;
+            })
+          );
+          return rowGroup;
+        });
       // Returns all row groups, inside their container
       return h(
         "div",
@@ -159,13 +164,22 @@ export default defineComponent({
 <style lang="scss">
 .grid-header-cell,
 .grid-row-cell {
-  display: inline-block;
   text-align: left;
-  background-color: inherit;
+}
+
+.grid-row,
+.grid-header {
+  display: flex;
+  align-items: center;
+}
+
+.grid-row {
+  position: absolute;
 }
 
 .grid-row:nth-child(even) {
-  background-color: lightgray;
+  border-top: 1px solid lightgray;
+  border-bottom: 1px solid lightgray;
 }
 
 .grid-header-container {
