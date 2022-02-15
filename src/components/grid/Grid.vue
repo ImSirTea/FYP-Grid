@@ -115,9 +115,7 @@ export default defineComponent({
                 "grid-row-odd": (this.rowsOffset + idx) % 2,
               },
               style: {
-                transform: `translateY(${
-                  (idx + this.rowsOffset) * this.rowHeight + "px"
-                })`,
+                transform: `translateY(${idx * this.rowHeight + "px"})`,
                 height: this.rowHeight + "px",
               },
             },
@@ -142,7 +140,11 @@ export default defineComponent({
         "div",
         {
           class: "grid-row-container",
-          style: { width: this.totalGridWidth, height: this.totalBodyHeight },
+          style: {
+            width: this.totalGridWidth,
+            height: this.totalBodyHeight,
+            "padding-top": this.rowsOffset * this.rowHeight + "px",
+          },
         },
         rows
       );
@@ -190,13 +192,14 @@ export default defineComponent({
 }
 
 .grid-row-container {
-  position: relative;
+  position: absolute;
 }
 
 .grid-container {
   width: 200ch;
   height: 300px;
   overflow: auto;
+  position: relative;
 }
 
 .grid-row-odd {
