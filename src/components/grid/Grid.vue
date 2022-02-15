@@ -18,7 +18,7 @@ export default defineComponent({
     rowHeight: {
       type: Number,
       required: false,
-      default: 30,
+      default: 36,
     },
     gridHeight: {
       type: Number,
@@ -172,6 +172,7 @@ export default defineComponent({
 .grid-header-cell,
 .grid-row-cell {
   text-align: left;
+  padding-left: 1em;
 }
 
 .grid-row,
@@ -187,7 +188,8 @@ export default defineComponent({
 .grid-header-container {
   position: sticky;
   top: 0;
-  background-color: magenta;
+  background-color: white;
+  border-bottom: 2px solid lightgray;
   z-index: 1;
 }
 
@@ -203,7 +205,7 @@ export default defineComponent({
 }
 
 .grid-row-odd {
-  background-color: #e9e9e9;
+  background-color: #f3f3f3;
   border-top: 1px solid lightgray;
   border-bottom: 1px solid lightgray;
 }
