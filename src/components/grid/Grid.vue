@@ -191,6 +191,7 @@ export default defineComponent({
   background-color: white;
   border-bottom: 2px solid lightgray;
   z-index: 1;
+  cursor: pointer;
 }
 
 .grid-row-container {
