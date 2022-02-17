@@ -12,18 +12,18 @@ export interface ColumnOptions {
   width: WidthEnum | number;
 }
 
-export class Column<T, U> {
-  name: string;
+export abstract class Column<T, U> {
+  key: string;
   itemValue: ValueExtractor<T, U>;
   options?: Partial<ColumnOptions>;
   defaultWidth: WidthEnum = WidthEnum.MEDIUM;
 
   constructor(
-    name: string,
+    key: string,
     itemValue: ValueExtractor<T, U>,
     options?: Partial<ColumnOptions>
   ) {
-    this.name = name;
+    this.key = key;
     this.itemValue = itemValue;
     this.options = options;
   }

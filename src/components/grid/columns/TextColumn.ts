@@ -18,11 +18,11 @@ export class TextColumn<T> extends Column<T, string> {
   declare options?: Partial<TextColumnOptions>;
 
   constructor(
-    name: string,
+    key: string,
     itemValue: ValueExtractor<T, string>,
     options?: Partial<TextColumnOptions>
   ) {
-    super(name, itemValue, options);
+    super(key, itemValue, options);
   }
 
   override value(item: T): string {

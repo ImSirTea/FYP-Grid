@@ -1,5 +1,6 @@
 <script lang="ts">
 import { GridBuilder } from "@/components/grid/GridBuilder";
+import { GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import { h, defineComponent, PropType } from "@vue/composition-api";
 
@@ -34,7 +35,12 @@ export default defineComponent({
   data: () => {
     return {
       gridOffsetTop: 0,
+      internalItems: [] as any[],
+      gridState: new GridState(),
     };
+  },
+  created() {
+    this.internalItems = [...this.items];
   },
   computed: {
     rowsOffset(): number {
@@ -52,7 +58,7 @@ export default defineComponent({
       );
     },
     totalBodyHeight(): string {
-      return this.items.length * this.rowHeight + "px";
+      return this.internalItems.length * this.rowHeight + "px";
     },
   },
   methods: {
@@ -69,8 +75,22 @@ export default defineComponent({
               width: column.widthWithUnit,
             },
             class: "grid-header-cell",
+            on: {
+              click: () => {
+                // Toggle our sorting behaviours
+                this.gridState.toggleSort(column.key);
+
+                // Now apply the sort, or reset
+                if (this.gridState.canSort) {
+                  console.log(this.gridState.sortBy);
+                  this.internalItems.sort(this.gridState.sortBy);
+                } else {
+                  this.internalItems = [...this.items];
+                }
+              },
+            },
           },
-          column.name
+          column.key
         );
 
         return header;
@@ -101,10 +121,13 @@ export default defineComponent({
     },
     body() {
       // For each item, creates a row group with each row-cell inside
-      const rows = this.items
+      const rows = this.internalItems
         .slice(
           Math.max(this.rowsOffset, 0),
-          Math.min(this.rowsOffset + this.maximumVisibleRows, this.items.length)
+          Math.min(
+            this.rowsOffset + this.maximumVisibleRows,
+            this.internalItems.length
+          )
         )
         .map((item, idx) => {
           const rowGroup = h(

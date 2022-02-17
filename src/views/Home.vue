@@ -19,13 +19,18 @@ export default defineComponent({
   components: { Grid },
   data: () => {
     return {
-      items: Array(100)
-        .fill(0)
-        .map((_, idx) => ({
-          first: `Adam${idx}`,
-          last: `Lansley${idx}`,
-          age: idx,
-        })),
+      // items: Array(100)
+      //   .fill(0)
+      //   .map((_, idx) => ({
+      //     first: `Adam${idx}`,
+      //     last: `Lansley${idx}`,
+      //     age: idx,
+      //   })),
+      items: [
+        { first: "Adam0", last: "Lansley0", age: 22 },
+        { first: "Adam1", last: "Lansley0", age: 22 },
+        { first: "Adam0", last: "Lansley0", age: 23 },
+      ] as Item[],
     };
   },
   setup(props, context) {

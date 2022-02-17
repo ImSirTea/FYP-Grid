@@ -17,11 +17,11 @@ export class NumberColumn<T> extends Column<T, number> {
   declare options?: Partial<NumberColumnOptions>;
 
   constructor(
-    name: string,
+    key: string,
     itemValue: ValueExtractor<T, number>,
     options?: Partial<NumberColumnOptions>
   ) {
-    super(name, itemValue, options);
+    super(key, itemValue, options);
 
     this.defaultWidth = WidthEnum.SMALL;
   }
