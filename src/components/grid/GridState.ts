@@ -20,13 +20,13 @@ export class GridState {
 
   get sortBy() {
     // If we have anything to sort by
-    const sortBy = firstBy(
+    let sortBy = firstBy(
       this.#sortingOptions[0].key,
       this.#sortingOptions[0].options
     );
 
     this.#sortingOptions.slice(1).forEach((opt) => {
-      sortBy.thenBy(opt.key, opt.options);
+      sortBy = sortBy.thenBy(opt.key, opt.options);
     });
 
     return sortBy;

@@ -197,6 +197,9 @@ export default defineComponent({
 .grid-row-cell {
   text-align: left;
   padding-left: 1em;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .grid-row,
