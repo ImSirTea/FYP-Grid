@@ -141,7 +141,6 @@ export default defineComponent({
         {
           class: "grid-row-container",
           style: {
-            width: this.totalGridWidth,
             height: this.totalBodyHeight,
             "padding-top": this.rowsOffset * this.rowHeight + "px",
           },
@@ -154,6 +153,10 @@ export default defineComponent({
         "div",
         {
           class: "grid-container",
+          style: {
+            width: this.totalGridWidth,
+            height: this.gridHeight + "px",
+          },
           on: {
             scroll: this.gridScroll,
           },
@@ -199,8 +202,6 @@ export default defineComponent({
 }
 
 .grid-container {
-  width: 200ch;
-  height: 300px;
   overflow: auto;
   position: relative;
 }
