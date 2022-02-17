@@ -82,7 +82,6 @@ export default defineComponent({
 
                 // Now apply the sort, or reset
                 if (this.gridState.canSort) {
-                  console.log(this.gridState.sortBy);
                   this.internalItems.sort(this.gridState.sortBy);
                 } else {
                   this.internalItems = [...this.items];
@@ -177,7 +176,6 @@ export default defineComponent({
         {
           class: "grid-container",
           style: {
-            width: this.totalGridWidth,
             height: this.gridHeight + "px",
           },
           on: {
