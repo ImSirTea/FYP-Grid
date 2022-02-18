@@ -1,11 +1,15 @@
 <script lang="ts">
 import { GridBuilder } from "@/components/grid/GridBuilder";
+import GridHeader from "@/components/grid/GridHeader.vue";
 import { GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import { h, defineComponent, PropType } from "@vue/composition-api";
 
+type AnyWithGridIdx = { "_grid-idx": number };
+
 export default defineComponent({
   name: "Grid",
+  components: { GridHeader },
   props: {
     items: {
       type: Array as PropType<any[]>,
@@ -35,12 +39,16 @@ export default defineComponent({
   data: () => {
     return {
       gridOffsetTop: 0,
-      internalItems: [] as any[],
+      internalItems: [] as AnyWithGridIdx[],
       gridState: new GridState(),
     };
   },
   created() {
-    this.internalItems = [...this.items];
+    // Create a local copy we can mutate, and inject the grid items idx for sort resetting
+    this.internalItems = this.items.map((item, idx) => ({
+      "_grid-idx": idx,
+      ...item,
+    }));
   },
   computed: {
     rowsOffset(): number {
@@ -64,59 +72,6 @@ export default defineComponent({
   methods: {
     gridScroll(e: any) {
       this.gridOffsetTop = e.target.scrollTop;
-    },
-    header() {
-      // Creates each header cell
-      const headers = this.gridConfiguration.columns.map((column) => {
-        const header = h(
-          "div",
-          {
-            style: {
-              width: column.widthWithUnit,
-            },
-            class: "grid-header-cell",
-            on: {
-              click: () => {
-                // Toggle our sorting behaviours
-                this.gridState.toggleSort(column.key);
-
-                // Now apply the sort, or reset
-                if (this.gridState.canSort) {
-                  this.internalItems.sort(this.gridState.sortBy);
-                } else {
-                  this.internalItems = [...this.items];
-                }
-              },
-            },
-          },
-          column.key
-        );
-
-        return header;
-      });
-
-      // Returns them has a group, inside their container
-      return h(
-        "div",
-        {
-          class: "grid-header-container",
-          style: {
-            width: this.totalGridWidth,
-          },
-        },
-        [
-          h(
-            "div",
-            {
-              class: "grid-header",
-              style: {
-                height: this.rowHeight + "px",
-              },
-            },
-            headers
-          ),
-        ]
-      );
     },
     body() {
       // For each item, creates a row group with each row-cell inside
@@ -171,6 +126,17 @@ export default defineComponent({
       );
     },
     table() {
+      const header = h(GridHeader, {
+        props: {
+          gridState: this.gridState,
+          gridConfiguration: this.gridConfiguration,
+        },
+        on: {
+          "update-sort": () => {
+            this.internalItems.sort(this.gridState.sortBy);
+          },
+        },
+      });
       return h(
         "div",
         {
@@ -182,7 +148,7 @@ export default defineComponent({
             scroll: this.gridScroll,
           },
         },
-        [this.header(), this.body()]
+        [header, this.body()]
       );
     },
   },
@@ -193,46 +159,5 @@ export default defineComponent({
 </script>
 
 <style lang="scss">
-.grid-header-cell,
-.grid-row-cell {
-  text-align: left;
-  padding-left: 1em;
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.grid-row,
-.grid-header {
-  display: flex;
-  align-items: center;
-}
-
-.grid-row {
-  position: absolute;
-}
-
-.grid-header-container {
-  position: sticky;
-  top: 0;
-  background-color: white;
-  border-bottom: 2px solid lightgray;
-  z-index: 1;
-  cursor: pointer;
-}
-
-.grid-row-container {
-  position: absolute;
-}
-
-.grid-container {
-  overflow: auto;
-  position: relative;
-}
-
-.grid-row-odd {
-  background-color: #f3f3f3;
-  border-top: 1px solid lightgray;
-  border-bottom: 1px solid lightgray;
-}
+@import "@/styles/_grid.scss";
 </style>

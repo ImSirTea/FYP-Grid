@@ -12,45 +12,53 @@ interface SortingOptions {
 }
 
 export class GridState {
-  #sortingOptions: SortingOptions[] = [];
-
-  get canSort() {
-    return !!this.#sortingOptions.length;
-  }
+  sortingOptions: SortingOptions[] = [];
 
   get sortBy() {
-    // If we have anything to sort by
-    let sortBy = firstBy(
-      this.#sortingOptions[0].key,
-      this.#sortingOptions[0].options
-    );
+    if (this.sortingOptions.length) {
+      // If we have anything to sort by
+      let sortBy = firstBy(
+        this.sortingOptions[0].key,
+        this.sortingOptions[0].options
+      );
 
-    this.#sortingOptions.slice(1).forEach((opt) => {
-      sortBy = sortBy.thenBy(opt.key, opt.options);
-    });
+      this.sortingOptions.forEach((opt) => {
+        sortBy = sortBy.thenBy(opt.key, opt.options);
+      });
 
-    return sortBy;
+      sortBy = sortBy.thenBy("_grid-idx");
+
+      return sortBy;
+    }
+
+    // Otherwise, default to original order
+    return firstBy("_grid-idx");
   }
 
   toggleSort(key: string) {
-    const existingOptionIdx = this.#sortingOptions.findIndex(
+    const existingOptionIdx = this.sortingOptions.findIndex(
       (option) => option.key === key
     );
 
     if (existingOptionIdx === -1) {
       // Creates a new sorting option if we don't have one
-      this.#sortingOptions.push({
+      this.sortingOptions.push({
         key,
         options: { direction: "asc" },
       });
       return;
     }
     // Otherwise, progresses or removes
-    const existingOption = this.#sortingOptions[existingOptionIdx];
+    const existingOption = this.sortingOptions[existingOptionIdx];
     if (existingOption.options.direction === "asc") {
       existingOption.options.direction = "desc";
     } else {
-      this.#sortingOptions.splice(existingOptionIdx, 1);
+      this.sortingOptions.splice(existingOptionIdx, 1);
     }
+  }
+
+  isSortingOnKey(key: string) {
+    const index = this.sortingOptions.findIndex((option) => option.key === key);
+    return index !== -1 ? { ...this.sortingOptions[index], index } : null;
   }
 }
