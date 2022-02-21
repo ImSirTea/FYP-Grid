@@ -36,9 +36,18 @@ export default defineComponent({
       default: 5,
     },
   },
+  watch: {
+    items: {
+      handler: function () {
+        this.indexedItems = this.gridState.injectGridIndexes(this.items);
+      },
+      immediate: true,
+    },
+  },
   data: () => {
     return {
       gridState: new GridState(),
+      indexedItems: [] as AnyWithGridIdx[], // A copy of our prop.items with original indexes injected
       gridOffsetTop: 0,
       gridOffsetLeft: 0,
     };

@@ -92,17 +92,14 @@ export class GridState {
   /**
    * @param items The items to filter and sort by
    * @param gridConfiguration The grid configuration, used to get item values
-   * @returns Items with grid sorting indexes, then applies filtering and sorting
+   * @returns Items with filtering and sorting
    */
   filterAndSortItems(
     items: any[],
     gridConfiguration: GridConfiguration<any>
   ): AnyWithGridIdx[] {
     return items
-      .map((item, idx) => ({
-        [gridIndexId]: idx,
-        ...item,
-      }))
+
       .filter((item) =>
         gridConfiguration.columns.reduce(
           (isValid, column) => {
@@ -120,5 +117,12 @@ export class GridState {
         )
       )
       .sort(this.sortBy);
+  }
+
+  injectGridIndexes(items: any[]) {
+    return items.map((item, idx) => ({
+      [gridIndexId]: idx,
+      ...item,
+    }));
   }
 }
