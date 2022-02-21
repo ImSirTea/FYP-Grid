@@ -1,14 +1,11 @@
 <script lang="ts">
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import GridHeader from "@/components/grid/GridHeader.vue";
-import { GridState } from "@/components/grid/GridState";
+import { AnyWithGridIdx, GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import { h, defineComponent, PropType } from "@vue/composition-api";
 import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/GridControlPanel.vue";
-
-const gridIndexId = "_grid-idx";
-type AnyWithGridIdx = { [gridIndexId]: number };
 
 export default defineComponent({
   name: "Grid",
@@ -47,43 +44,10 @@ export default defineComponent({
     };
   },
   computed: {
-    totalGridWidth(): string {
-      return (
-        this.gridConfiguration.columns.reduce(
-          (totalWidth, column) => totalWidth + column.width,
-          0
-        ) + "ch"
-      );
-    },
     internalItems(): AnyWithGridIdx[] {
-      return (
-        this.items
-          // Append our sorting ID
-          .map((item, idx) => ({
-            [gridIndexId]: idx,
-            ...item,
-          }))
-          // Remove our unwanted values
-          .filter((item) =>
-            this.gridConfiguration.columns.reduce(
-              (isValid, column) => {
-                const itemValueForColumn = column
-                  .value(item)
-                  .toString()
-                  .toLowerCase()
-                  .trim();
-
-                const searchByValue = this.gridState.searchValue
-                  .toLowerCase()
-                  .trim();
-
-                return isValid || itemValueForColumn.includes(searchByValue);
-              },
-              false as boolean // ??? Thanks TypeScript
-            )
-          )
-          // Order by
-          .sort(this.gridState.sortBy)
+      return this.gridState.filterAndSortItems(
+        this.items,
+        this.gridConfiguration
       );
     },
   },
@@ -113,7 +77,6 @@ export default defineComponent({
           gridConfiguration: this.gridConfiguration,
           gridState: this.gridState,
           rowHeight: this.rowHeight,
-          totalGridWidth: this.totalGridWidth,
           gridOffsetLeft: this.gridOffsetLeft,
         },
       });

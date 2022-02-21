@@ -19,6 +19,9 @@
 import { GridState } from "@/components/grid/GridState";
 import { defineComponent, PropType } from "@vue/composition-api";
 
+/**
+ * Parent component to all (mostly state) management functions
+ */
 export default defineComponent({
   name: "GridControlPanel",
   props: {

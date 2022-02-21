@@ -21,16 +21,20 @@ export default defineComponent({
       required: false,
       default: 36,
     },
-    totalGridWidth: {
-      type: String,
-      required: true,
-    },
     gridOffsetLeft: {
       type: Number,
       required: true,
     },
   },
   computed: {
+    totalGridWidth(): string {
+      return (
+        this.gridConfiguration.columns.reduce(
+          (totalWidth, column) => totalWidth + column.width,
+          0
+        ) + "ch"
+      );
+    },
     headerCells(): VNode[] {
       return this.gridConfiguration.columns.map((column) => {
         const isSortingOn = this.gridState.isSortingOnKey(column.key);
