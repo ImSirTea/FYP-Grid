@@ -16,6 +16,9 @@ export interface NumberColumnOptions extends ColumnOptions {}
 export class NumberColumn<T> extends Column<T, number> {
   declare options?: Partial<NumberColumnOptions>;
 
+  override sortAscIcon = "mdi-sort-numeric-ascending";
+  override sortDescIcon = "mdi-sort-numeric-descending";
+
   constructor(
     key: string,
     itemValue: ValueExtractor<T, number>,

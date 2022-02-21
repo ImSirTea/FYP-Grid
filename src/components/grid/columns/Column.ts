@@ -17,6 +17,8 @@ export abstract class Column<T, U> {
   itemValue: ValueExtractor<T, U>;
   options?: Partial<ColumnOptions>;
   defaultWidth: WidthEnum = WidthEnum.MEDIUM;
+  sortAscIcon = "mdi-sort-ascending";
+  sortDescIcon = "mdi-sort-descending";
 
   constructor(
     key: string,

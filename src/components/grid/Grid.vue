@@ -1,11 +1,13 @@
 <script lang="ts">
-import { GridBuilder } from "@/components/grid/GridBuilder";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import GridHeader from "@/components/grid/GridHeader.vue";
 import { GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import { h, defineComponent, PropType } from "@vue/composition-api";
+import { debounce } from "lodash";
 
-type AnyWithGridIdx = { "_grid-idx": number };
+const gridIndexId = "_grid-idx";
+type AnyWithGridIdx = { [gridIndexId]: number };
 
 export default defineComponent({
   name: "Grid",
@@ -17,7 +19,7 @@ export default defineComponent({
       default: () => [],
     },
     gridConfiguration: {
-      type: Object as PropType<GridBuilder<any>>,
+      type: Object as PropType<GridConfiguration<any>>,
       required: true,
     },
     rowHeight: {
@@ -33,7 +35,7 @@ export default defineComponent({
     bufferRows: {
       type: Number,
       required: false,
-      default: 0,
+      default: 5,
     },
   },
   data: () => {
@@ -46,7 +48,7 @@ export default defineComponent({
   created() {
     // Create a local copy we can mutate, and inject the grid items idx for sort resetting
     this.internalItems = this.items.map((item, idx) => ({
-      "_grid-idx": idx,
+      [gridIndexId]: idx,
       ...item,
     }));
   },
@@ -71,15 +73,16 @@ export default defineComponent({
   },
   methods: {
     gridScroll(e: any) {
+      // You could _potentially_ add a debounce here, but it might be a little jarring
       this.gridOffsetTop = e.target.scrollTop;
     },
     body() {
       // For each item, creates a row group with each row-cell inside
       const rows = this.internalItems
         .slice(
-          Math.max(this.rowsOffset, 0),
+          Math.max(this.rowsOffset - this.bufferRows, 0),
           Math.min(
-            this.rowsOffset + this.maximumVisibleRows,
+            this.rowsOffset + this.maximumVisibleRows + this.bufferRows,
             this.internalItems.length
           )
         )
@@ -119,6 +122,7 @@ export default defineComponent({
           class: "grid-row-container",
           style: {
             height: this.totalBodyHeight,
+            width: this.totalGridWidth,
             "padding-top": this.rowsOffset * this.rowHeight + "px",
           },
         },
@@ -130,6 +134,9 @@ export default defineComponent({
         props: {
           gridState: this.gridState,
           gridConfiguration: this.gridConfiguration,
+        },
+        style: {
+          width: this.totalGridWidth,
         },
         on: {
           "update-sort": () => {

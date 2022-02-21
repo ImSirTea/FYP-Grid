@@ -12,7 +12,7 @@ import {
   TextColumnOptions,
 } from "@/components/grid/columns/TextColumn";
 
-export class GridBuilder<T> {
+export class GridConfiguration<T> {
   #columns: Column<T, any>[] = [];
 
   get columns() {

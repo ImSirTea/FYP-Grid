@@ -60,10 +60,6 @@
   animation: transform 0.5s;
 }
 
-.grid-sort-desc {
-  transform: rotateX(180deg);
-}
-
 .grid-header-cell:hover .grid-sort-icon,
 .grid-sort-active {
   display: inline-block;

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { GridBuilder } from "@/components/grid/GridBuilder";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridState } from "@/components/grid/GridState";
 import { defineComponent, PropType, h } from "@vue/composition-api";
 import { VNode } from "vue";
@@ -9,7 +9,7 @@ export default defineComponent({
   name: "GridHeader",
   props: {
     gridConfiguration: {
-      type: Object as PropType<GridBuilder<any>>,
+      type: Object as PropType<GridConfiguration<any>>,
       required: true,
     },
     gridState: {
@@ -26,6 +26,10 @@ export default defineComponent({
     headerCells(): VNode[] {
       return this.gridConfiguration.columns.map((column) => {
         const isSortingOn = this.gridState.isSortingOnKey(column.key);
+        const sortingIcon =
+          isSortingOn?.options.direction === "desc"
+            ? column.sortDescIcon
+            : column.sortAscIcon;
 
         const header = h(
           "div",
@@ -51,11 +55,10 @@ export default defineComponent({
                 class: {
                   "grid-sort-icon": true,
                   "grid-sort-active": !!isSortingOn,
-                  "grid-sort-desc": isSortingOn?.options.direction === "desc",
                 },
                 props: { small: true },
               },
-              ["mdi-chevron-up"]
+              sortingIcon
             ),
             h(
               "span",
@@ -76,7 +79,6 @@ export default defineComponent({
       {
         class: "grid-header-container",
         style: {
-          width: this.totalGridWidth,
           height: this.rowHeight + "px",
         },
       },

@@ -8,7 +8,7 @@
 
 <script lang="ts">
 import { defineComponent } from "@vue/composition-api";
-import { GridBuilder } from "@/components/grid/GridBuilder";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid from "@/components/grid/Grid.vue";
 import { WidthEnum } from "@/components/grid/columns/Column";
 
@@ -35,7 +35,7 @@ export default defineComponent({
     };
   },
   setup(props, context) {
-    const builder = new GridBuilder<Item>();
+    const builder = new GridConfiguration<Item>();
 
     builder.addNumberColumn("idx", (item) => item.idx);
     builder.addTextColumn("first", (item) => item.first);
@@ -53,3 +53,7 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="scss">
+@import "@/styles/_main.scss";
+</style>
