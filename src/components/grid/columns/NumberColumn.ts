@@ -25,6 +25,6 @@ export class NumberColumn<T> extends Column<T, number> {
 
     this.defaultWidth = WidthEnum.SMALL;
     this.ascIcon = "mdi-sort-numeric-ascending";
-    this.descIcon = "mdi-sort-numeric-ascending";
+    this.descIcon = "mdi-sort-numeric-descending";
   }
 }

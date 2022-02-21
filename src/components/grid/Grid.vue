@@ -4,14 +4,14 @@ import GridHeader from "@/components/grid/GridHeader.vue";
 import { GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import { h, defineComponent, PropType } from "@vue/composition-api";
-import { debounce } from "lodash";
+import GridBody from "@/components/grid/GridBody.vue";
 
 const gridIndexId = "_grid-idx";
 type AnyWithGridIdx = { [gridIndexId]: number };
 
 export default defineComponent({
   name: "Grid",
-  components: { GridHeader },
+  components: { GridHeader, GridBody },
   props: {
     items: {
       type: Array as PropType<any[]>,
@@ -53,12 +53,6 @@ export default defineComponent({
     }));
   },
   computed: {
-    rowsOffset(): number {
-      return Math.floor(this.gridOffsetTop / this.rowHeight);
-    },
-    maximumVisibleRows(): number {
-      return Math.ceil(this.gridHeight / this.rowHeight) + this.bufferRows;
-    },
     totalGridWidth(): string {
       return (
         this.gridConfiguration.columns.reduce(
@@ -67,7 +61,7 @@ export default defineComponent({
         ) + "ch"
       );
     },
-    totalBodyHeight(): string {
+    totalGridHeight(): string {
       return this.internalItems.length * this.rowHeight + "px";
     },
   },
@@ -77,60 +71,23 @@ export default defineComponent({
       this.gridOffsetTop = e.target.scrollTop;
     },
     body() {
-      // For each item, creates a row group with each row-cell inside
-      const rows = this.internalItems
-        .slice(
-          Math.max(this.rowsOffset - this.bufferRows, 0),
-          Math.min(
-            this.rowsOffset + this.maximumVisibleRows + this.bufferRows,
-            this.internalItems.length
-          )
-        )
-        .map((item, idx) => {
-          const rowGroup = h(
-            "div",
-            {
-              class: {
-                "grid-row": true,
-                "grid-row-odd": (this.rowsOffset + idx) % 2,
-              },
-              style: {
-                transform: `translateY(${idx * this.rowHeight + "px"})`,
-                height: this.rowHeight + "px",
-              },
-            },
-            this.gridConfiguration.columns.map((column) => {
-              const rowCell = h(
-                "div",
-                {
-                  style: {
-                    width: column.widthWithUnit,
-                  },
-                  class: "grid-row-cell",
-                },
-                [h("span", {}, column.value(item))]
-              );
-              return rowCell;
-            })
-          );
-          return rowGroup;
-        });
-      // Returns all row groups, inside their container
-      return h(
-        "div",
-        {
-          class: "grid-row-container",
-          style: {
-            height: this.totalBodyHeight,
-            width: this.totalGridWidth,
-            "padding-top": this.rowsOffset * this.rowHeight + "px",
-          },
+      return h(GridBody, {
+        props: {
+          internalItems: this.internalItems,
+          gridConfiguration: this.gridConfiguration,
+          gridOffsetTop: this.gridOffsetTop,
+          rowHeight: this.rowHeight,
+          gridHeight: this.gridHeight,
+          bufferRows: this.bufferRows,
         },
-        rows
-      );
+        style: {
+          height: this.totalGridHeight,
+          width: this.totalGridWidth,
+        },
+      });
     },
-    table() {
-      const header = h(GridHeader, {
+    header() {
+      return h(GridHeader, {
         props: {
           gridState: this.gridState,
           gridConfiguration: this.gridConfiguration,
@@ -144,6 +101,8 @@ export default defineComponent({
           },
         },
       });
+    },
+    table() {
       return h(
         "div",
         {
@@ -155,7 +114,7 @@ export default defineComponent({
             scroll: this.gridScroll,
           },
         },
-        [header, this.body()]
+        [this.header(), this.body()]
       );
     },
   },

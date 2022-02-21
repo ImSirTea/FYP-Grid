@@ -23,6 +23,6 @@ export class TextColumn<T> extends Column<T, string> {
     super(key, itemValue, options);
 
     this.ascIcon = "mdi-sort-alphabetical-ascending";
-    this.descIcon = "mdi-sort-alphabetical-ascending";
+    this.descIcon = "mdi-sort-alphabetical-descending";
   }
 }

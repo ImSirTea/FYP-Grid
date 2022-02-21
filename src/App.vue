@@ -24,7 +24,7 @@ export default defineComponent({
   components: { Grid },
   data: () => {
     return {
-      items: Array(100000)
+      items: Array(10000)
         .fill(0)
         .map((_, idx) => ({
           idx,
