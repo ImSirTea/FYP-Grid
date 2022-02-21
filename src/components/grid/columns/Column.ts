@@ -8,6 +8,18 @@ export enum WidthEnum {
   XLARGE = 200,
 }
 
+export enum SortDirection {
+  NONE,
+  ASCENDING,
+  DESCENDING,
+}
+
+export interface SortOptions {
+  ascIcon: string;
+  descIcon: string;
+  direction: SortDirection;
+}
+
 export interface ColumnOptions {
   width: WidthEnum | number;
 }
@@ -17,8 +29,8 @@ export abstract class Column<T, U> {
   itemValue: ValueExtractor<T, U>;
   options?: Partial<ColumnOptions>;
   defaultWidth: WidthEnum = WidthEnum.MEDIUM;
-  sortAscIcon = "mdi-sort-ascending";
-  sortDescIcon = "mdi-sort-descending";
+  ascIcon = "mdi-sort-ascending";
+  descIcon = "mdi-sort-descending";
 
   constructor(
     key: string,

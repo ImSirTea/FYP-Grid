@@ -40,14 +40,15 @@ export class GridState {
       (option) => option.key === key
     );
 
+    // Creates a new sorting option if we don't have one
     if (existingOptionIdx === -1) {
-      // Creates a new sorting option if we don't have one
       this.sortingOptions.push({
         key,
         options: { direction: "asc" },
       });
       return;
     }
+
     // Otherwise, progresses or removes
     const existingOption = this.sortingOptions[existingOptionIdx];
     if (existingOption.options.direction === "asc") {

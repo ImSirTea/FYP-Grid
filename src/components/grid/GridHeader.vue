@@ -28,8 +28,8 @@ export default defineComponent({
         const isSortingOn = this.gridState.isSortingOnKey(column.key);
         const sortingIcon =
           isSortingOn?.options.direction === "desc"
-            ? column.sortDescIcon
-            : column.sortAscIcon;
+            ? column.descIcon
+            : column.ascIcon;
 
         const header = h(
           "div",
