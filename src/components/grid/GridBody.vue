@@ -4,6 +4,11 @@ import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { defineComponent, h, PropType } from "@vue/composition-api";
 import { VNode } from "vue";
 
+export interface GridScrollEvent {
+  gridOffsetTop: number;
+  gridOffsetLeft: number;
+}
+
 export default defineComponent({
   name: "GridBody",
   props: {
@@ -14,10 +19,6 @@ export default defineComponent({
     },
     gridConfiguration: {
       type: Object as PropType<GridConfiguration<any>>,
-      required: true,
-    },
-    gridOffsetTop: {
-      type: Number,
       required: true,
     },
     rowHeight: {
@@ -35,8 +36,19 @@ export default defineComponent({
       required: false,
       default: 5,
     },
+    gridOffsetTop: {
+      type: Number,
+      required: true,
+    },
   },
   methods: {
+    gridScroll(e: any) {
+      // You could _potentially_ add a debounce here, but it might be a little jarring
+      this.$emit("update:scroll", {
+        gridOffsetTop: e.target.scrollTop,
+        gridOffsetLeft: e.target.scrollLeft,
+      } as GridScrollEvent);
+    },
     buildCell(item: any, column: Column<any, any>) {
       return h(
         "div",
@@ -69,6 +81,9 @@ export default defineComponent({
     },
   },
   computed: {
+    totalGridHeight(): string {
+      return this.internalItems.length * this.rowHeight + "px";
+    },
     rowsOffset(): number {
       return Math.floor(this.gridOffsetTop / this.rowHeight);
     },
@@ -95,10 +110,25 @@ export default defineComponent({
       {
         class: "grid-row-container",
         style: {
-          "padding-top": this.rowsOffset * this.rowHeight + "px",
+          height: this.gridHeight + "px",
+        },
+        on: {
+          scroll: this.gridScroll,
         },
       },
-      this.rows
+      [
+        h(
+          "div",
+          {
+            class: "grid-row-height-wrapper",
+            style: {
+              height: this.totalGridHeight,
+              "padding-top": this.rowsOffset * this.rowHeight + "px",
+            },
+          },
+          this.rows
+        ),
+      ]
     );
   },
 });

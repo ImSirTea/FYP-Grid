@@ -24,9 +24,11 @@ export interface ColumnOptions {
   width: WidthEnum | number;
 }
 
-export abstract class Column<T, U> {
+export type RenderableType = string | number | boolean; // Could be { toString(): string }?
+
+export abstract class Column<T, RenderableType> {
   key: string;
-  itemValue: ValueExtractor<T, U>;
+  #itemValue: ValueExtractor<T, RenderableType>;
   options?: Partial<ColumnOptions>;
   defaultWidth: WidthEnum = WidthEnum.MEDIUM;
   ascIcon = "mdi-sort-ascending";
@@ -34,16 +36,16 @@ export abstract class Column<T, U> {
 
   constructor(
     key: string,
-    itemValue: ValueExtractor<T, U>,
+    itemValue: ValueExtractor<T, RenderableType>,
     options?: Partial<ColumnOptions>
   ) {
     this.key = key;
-    this.itemValue = itemValue;
+    this.#itemValue = itemValue;
     this.options = options;
   }
 
-  value(item: T): U {
-    return this.itemValue(item);
+  value(item: T): RenderableType {
+    return this.#itemValue(item);
   }
 
   get width() {

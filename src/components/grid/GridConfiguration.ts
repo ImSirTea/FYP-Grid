@@ -1,6 +1,7 @@
 import {
   Column,
   ColumnOptions,
+  RenderableType,
   ValueExtractor,
 } from "@/components/grid/columns/Column";
 import {
@@ -13,7 +14,7 @@ import {
 } from "@/components/grid/columns/TextColumn";
 
 export class GridConfiguration<T> {
-  #columns: Column<T, any>[] = [];
+  #columns: Column<T, RenderableType>[] = [];
 
   get columns() {
     return this.#columns;

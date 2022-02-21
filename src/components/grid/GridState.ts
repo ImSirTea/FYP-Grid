@@ -1,4 +1,6 @@
 import { firstBy } from "thenby";
+import AnyWithGridIdx from "@/components/grid/Grid.vue";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 
 type SortOrder = "asc" | "desc" | -1 | 1;
 interface ThenByOpts {
@@ -13,6 +15,7 @@ interface SortingOptions {
 
 export class GridState {
   sortingOptions: SortingOptions[] = [];
+  searchValue: string = "";
 
   get sortBy() {
     if (this.sortingOptions.length) {
@@ -60,6 +63,12 @@ export class GridState {
 
   isSortingOnKey(key: string) {
     const index = this.sortingOptions.findIndex((option) => option.key === key);
-    return index !== -1 ? { ...this.sortingOptions[index], index } : null;
+    return index !== -1
+      ? { ...this.sortingOptions[index], index: index + 1 }
+      : null;
+  }
+
+  setSearchValue(newValue: string) {
+    this.searchValue = newValue;
   }
 }

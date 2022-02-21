@@ -4,14 +4,15 @@ import GridHeader from "@/components/grid/GridHeader.vue";
 import { GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import { h, defineComponent, PropType } from "@vue/composition-api";
-import GridBody from "@/components/grid/GridBody.vue";
+import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
+import GridControlPanel from "@/components/GridControlPanel.vue";
 
 const gridIndexId = "_grid-idx";
 type AnyWithGridIdx = { [gridIndexId]: number };
 
 export default defineComponent({
   name: "Grid",
-  components: { GridHeader, GridBody },
+  components: { GridHeader, GridBody, GridControlPanel },
   props: {
     items: {
       type: Array as PropType<any[]>,
@@ -40,17 +41,10 @@ export default defineComponent({
   },
   data: () => {
     return {
-      gridOffsetTop: 0,
-      internalItems: [] as AnyWithGridIdx[],
       gridState: new GridState(),
+      gridOffsetTop: 0,
+      gridOffsetLeft: 0,
     };
-  },
-  created() {
-    // Create a local copy we can mutate, and inject the grid items idx for sort resetting
-    this.internalItems = this.items.map((item, idx) => ({
-      [gridIndexId]: idx,
-      ...item,
-    }));
   },
   computed: {
     totalGridWidth(): string {
@@ -61,15 +55,39 @@ export default defineComponent({
         ) + "ch"
       );
     },
-    totalGridHeight(): string {
-      return this.internalItems.length * this.rowHeight + "px";
+    internalItems(): AnyWithGridIdx[] {
+      return (
+        this.items
+          // Append our sorting ID
+          .map((item, idx) => ({
+            [gridIndexId]: idx,
+            ...item,
+          }))
+          // Remove our unwanted values
+          .filter((item) =>
+            this.gridConfiguration.columns.reduce(
+              (isValid, column) => {
+                const itemValueForColumn = column
+                  .value(item)
+                  .toString()
+                  .toLowerCase()
+                  .trim();
+
+                const searchByValue = this.gridState.searchValue
+                  .toLowerCase()
+                  .trim();
+
+                return isValid || itemValueForColumn.includes(searchByValue);
+              },
+              false as boolean // ??? Thanks TypeScript
+            )
+          )
+          // Order by
+          .sort(this.gridState.sortBy)
+      );
     },
   },
   methods: {
-    gridScroll(e: any) {
-      // You could _potentially_ add a debounce here, but it might be a little jarring
-      this.gridOffsetTop = e.target.scrollTop;
-    },
     body() {
       return h(GridBody, {
         props: {
@@ -80,26 +98,29 @@ export default defineComponent({
           gridHeight: this.gridHeight,
           bufferRows: this.bufferRows,
         },
-        style: {
-          height: this.totalGridHeight,
-          width: this.totalGridWidth,
+        on: {
+          // We want the scrolling to be within the rows, not the entire grid, so listen for these events
+          "update:scroll": (scroll: GridScrollEvent) => {
+            this.gridOffsetTop = scroll.gridOffsetTop;
+            this.gridOffsetLeft = scroll.gridOffsetLeft;
+          },
         },
       });
     },
     header() {
       return h(GridHeader, {
         props: {
-          gridState: this.gridState,
           gridConfiguration: this.gridConfiguration,
+          gridState: this.gridState,
+          rowHeight: this.rowHeight,
+          totalGridWidth: this.totalGridWidth,
+          gridOffsetLeft: this.gridOffsetLeft,
         },
-        style: {
-          width: this.totalGridWidth,
-        },
-        on: {
-          "update-sort": () => {
-            this.internalItems.sort(this.gridState.sortBy);
-          },
-        },
+      });
+    },
+    controlPanel(): VNode {
+      return h(GridControlPanel, {
+        props: { gridState: this.gridState },
       });
     },
     table() {
@@ -107,14 +128,8 @@ export default defineComponent({
         "div",
         {
           class: "grid-container",
-          style: {
-            height: this.gridHeight + "px",
-          },
-          on: {
-            scroll: this.gridScroll,
-          },
         },
-        [this.header(), this.body()]
+        [this.controlPanel(), this.header(), this.body()]
       );
     },
   },

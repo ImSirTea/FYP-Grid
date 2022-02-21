@@ -21,6 +21,14 @@ export default defineComponent({
       required: false,
       default: 36,
     },
+    totalGridWidth: {
+      type: String,
+      required: true,
+    },
+    gridOffsetLeft: {
+      type: Number,
+      required: true,
+    },
   },
   computed: {
     headerCells(): VNode[] {
@@ -43,7 +51,6 @@ export default defineComponent({
               click: () => {
                 // Toggle our sorting behaviours
                 this.gridState.toggleSort(column.key);
-                this.$emit("update-sort");
               },
             },
           },
@@ -61,7 +68,7 @@ export default defineComponent({
               sortingIcon
             ),
             h(
-              "span",
+              "sup",
               { class: "grid-sorting-index" },
               isSortingOn?.index.toString() ?? ""
             ),
@@ -78,15 +85,17 @@ export default defineComponent({
       "div",
       {
         class: "grid-header-container",
-        style: {
-          height: this.rowHeight + "px",
-        },
       },
       [
         h(
           "div",
           {
             class: "grid-header",
+            style: {
+              width: this.totalGridWidth,
+              height: this.rowHeight + "px",
+              transform: `translateX(${-this.gridOffsetLeft + "px"}`,
+            },
           },
           this.headerCells
         ),

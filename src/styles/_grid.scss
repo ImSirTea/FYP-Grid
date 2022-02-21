@@ -1,28 +1,24 @@
 .grid-header-cell,
 .grid-row-cell {
-  text-align: left;
   padding-left: 1em;
   display: flex;
   align-items: center;
-  height: 100%;
 }
 
 .grid-row,
 .grid-header {
   display: flex;
-  align-items: center;
+}
+
+.grid-row {
   position: absolute;
-  height: 100%;
 }
 
 .grid-header-container {
-  position: sticky;
-  top: 0;
-  background-color: white;
   border-bottom: 2px solid lightgray;
-  z-index: 1;
   cursor: pointer;
   user-select: none;
+  overflow: hidden;
 }
 
 .grid-header-cell:hover {
@@ -34,10 +30,6 @@
 }
 
 .grid-row-container {
-  position: absolute;
-}
-
-.grid-container {
   overflow: auto;
   position: relative;
 }
@@ -63,8 +55,4 @@
 .grid-header-cell:hover .grid-sort-icon,
 .grid-sort-active {
   display: inline-block;
-}
-
-.grid-sorting-index {
-  font-size: 75%;
 }
