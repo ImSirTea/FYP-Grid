@@ -99,7 +99,6 @@ export class GridState {
     gridConfiguration: GridConfiguration<any>
   ): AnyWithGridIdx[] {
     return items
-
       .filter((item) =>
         gridConfiguration.columns.reduce(
           (isValid, column) => {

@@ -118,6 +118,7 @@ export default defineComponent({
       gridScroll,
       rowsOffset,
       rows,
+      totalGridHeight,
     };
   },
   render(): VNode {

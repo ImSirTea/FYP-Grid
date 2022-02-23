@@ -2,12 +2,15 @@
   <v-app>
     <v-main>
       <grid :grid-configuration="builder" :items="items" />
+      <v-btn class="mr-2" @click="() => (numberOfItems += 100)">Add 100</v-btn>
+      <v-btn class="mr-2" @click="() => (numberOfItems += 500)">Add 500</v-btn>
+      <v-btn @click="() => (numberOfItems += 1000)">Add 1000</v-btn>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/composition-api";
+import { defineComponent, ref, computed } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid from "@/components/grid/Grid.vue";
 import { WidthEnum } from "@/components/grid/columns/Column";
@@ -22,19 +25,21 @@ interface Item {
 export default defineComponent({
   name: "App",
   components: { Grid },
-  data: () => {
-    return {
-      items: Array(100000)
-        .fill(0)
-        .map((_, idx) => ({
-          idx,
-          first: `Adam${idx % 20}`,
-          last: `Lansley${idx % 20}`,
-          age: idx % 20,
-        })) as Item[],
-    };
-  },
   setup(props, context) {
+    const numberOfItems = ref(1000);
+
+    const items = computed(
+      () =>
+        Array(numberOfItems.value)
+          .fill(0)
+          .map((_, idx) => ({
+            idx,
+            first: `Adam${idx % 20}`,
+            last: `Lansley${idx % 20}`,
+            age: idx % 20,
+          })) as Item[]
+    );
+
     const builder = new GridConfiguration<Item>();
 
     builder.addNumberColumn("idx", (item) => item.idx);
@@ -49,6 +54,8 @@ export default defineComponent({
 
     return {
       builder,
+      items,
+      numberOfItems,
     };
   },
 });

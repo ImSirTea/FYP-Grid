@@ -1,16 +1,14 @@
 <script lang="ts">
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import GridHeader from "@/components/grid/GridHeader.vue";
-import { AnyWithGridIdx, GridState } from "@/components/grid/GridState";
+import { GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import {
   h,
   defineComponent,
   PropType,
-  watch,
   computed,
   reactive,
-  ref,
 } from "@vue/composition-api";
 import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/GridControlPanel.vue";
@@ -34,7 +32,7 @@ export default defineComponent({
     rowHeight: {
       type: Number,
       required: false,
-      default: 36,
+      default: 35,
     },
     gridHeight: {
       type: Number,
@@ -58,20 +56,16 @@ export default defineComponent({
 
     // Copy our items, with inserted indexes of their original sorting order
     // Pulled out seperately to prevent iterating over the same list of items and injecting what existed
-    let indexedItems: AnyWithGridIdx[] = [];
-
-    const internalItems = computed(() =>
-      gridState.filterAndSortItems(indexedItems, props.gridConfiguration)
+    const indexedItems = computed(() =>
+      gridState.injectGridIndexes(props.items)
     );
 
-    // Should help to prevent us iterating over the items multiple times to inject the origin indexes
-    watch(
-      () => props.items,
-      () => {
-        indexedItems = gridState.injectGridIndexes(props.items);
-      },
-      { immediate: true }
-    );
+    const internalItems = computed(() => {
+      return gridState.filterAndSortItems(
+        indexedItems.value,
+        props.gridConfiguration
+      );
+    });
 
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
     const buildBody = () => {
@@ -126,6 +120,7 @@ export default defineComponent({
 
     return {
       buildTable,
+      internalItems,
     };
   },
   render(): VNode {
