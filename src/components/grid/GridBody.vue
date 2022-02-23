@@ -1,7 +1,7 @@
 <script lang="ts">
 import { Column } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import { defineComponent, h, PropType } from "@vue/composition-api";
+import { defineComponent, h, PropType, computed } from "@vue/composition-api";
 import { VNode } from "vue";
 
 export interface GridScrollEvent {
@@ -9,6 +9,9 @@ export interface GridScrollEvent {
   gridOffsetLeft: number;
 }
 
+/**
+ * Container for all grid rows, handling scroll events, offsets, and rendering
+ */
 export default defineComponent({
   name: "GridBody",
   props: {
@@ -41,15 +44,55 @@ export default defineComponent({
       required: true,
     },
   },
-  methods: {
-    gridScroll(e: any) {
-      // You could _potentially_ add a debounce here, but it might be a little jarring
-      this.$emit("update:scroll", {
-        gridOffsetTop: e.target.scrollTop,
-        gridOffsetLeft: e.target.scrollLeft,
-      } as GridScrollEvent);
-    },
-    buildCell(item: any, column: Column<any, any>) {
+  setup(props, context) {
+    // Total height of all rows, used for scrolling
+    const totalGridHeight = computed((): string => {
+      return props.internalItems.length * props.rowHeight + "px";
+    });
+
+    // How many rows have we scrolled passed
+    const rowsOffset = computed((): number => {
+      return Math.floor(props.gridOffsetTop / props.rowHeight);
+    });
+
+    // Maximum number of rows visible within the grid's height
+    const maximumVisibleRows = computed((): number => {
+      return Math.ceil(props.gridHeight / props.rowHeight) + props.bufferRows;
+    });
+
+    // Visible and offset grid row nodes
+    const rows = computed((): VNode[] => {
+      return props.internalItems
+        .slice(
+          Math.max(rowsOffset.value - props.bufferRows, 0),
+          Math.min(
+            rowsOffset.value + maximumVisibleRows.value + props.bufferRows,
+            props.internalItems.length
+          )
+        )
+        .map((item, idx) => buildRow(item, idx));
+    });
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildRow = (item: any, idx: number) => {
+      return h(
+        "div",
+        {
+          class: {
+            "grid-row": true,
+            "grid-row-odd": (rowsOffset.value + idx) % 2,
+          },
+          style: {
+            transform: `translateY(${idx * props.rowHeight + "px"})`,
+            height: props.rowHeight + "px",
+          },
+        },
+        props.gridConfiguration.columns.map((column) => buildCell(item, column))
+      );
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildCell = (item: any, column: Column<any, any>) => {
       return h(
         "div",
         {
@@ -60,49 +103,22 @@ export default defineComponent({
         },
         [h("span", {}, column.value(item))]
       );
-    },
-    buildRow(item: any, idx: number) {
-      return h(
-        "div",
-        {
-          class: {
-            "grid-row": true,
-            "grid-row-odd": (this.rowsOffset + idx) % 2,
-          },
-          style: {
-            transform: `translateY(${idx * this.rowHeight + "px"})`,
-            height: this.rowHeight + "px",
-          },
-        },
-        this.gridConfiguration.columns.map((column) => {
-          return this.buildCell(item, column);
-        })
-      );
-    },
-  },
-  computed: {
-    totalGridHeight(): string {
-      return this.internalItems.length * this.rowHeight + "px";
-    },
-    rowsOffset(): number {
-      return Math.floor(this.gridOffsetTop / this.rowHeight);
-    },
-    maximumVisibleRows(): number {
-      return Math.ceil(this.gridHeight / this.rowHeight) + this.bufferRows;
-    },
-    rows(): VNode[] {
-      return this.internalItems
-        .slice(
-          Math.max(this.rowsOffset - this.bufferRows, 0),
-          Math.min(
-            this.rowsOffset + this.maximumVisibleRows + this.bufferRows,
-            this.internalItems.length
-          )
-        )
-        .map((item, idx) => {
-          return this.buildRow(item, idx);
-        });
-    },
+    };
+
+    // Manages scroll events passthrough
+    const gridScroll = (e: any) => {
+      // You could _potentially_ add a debounce here, but it might be a little jarring
+      context.emit("update:scroll", {
+        gridOffsetTop: e.target.scrollTop,
+        gridOffsetLeft: e.target.scrollLeft,
+      } as GridScrollEvent);
+    };
+
+    return {
+      gridScroll,
+      rowsOffset,
+      rows,
+    };
   },
   render(): VNode {
     return h(

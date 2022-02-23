@@ -1,7 +1,8 @@
 <script lang="ts">
+import { Column } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridState } from "@/components/grid/GridState";
-import { defineComponent, PropType, h } from "@vue/composition-api";
+import { defineComponent, PropType, h, computed } from "@vue/composition-api";
 import { VNode } from "vue";
 import { VIcon } from "vuetify/lib/components";
 
@@ -26,62 +27,88 @@ export default defineComponent({
       required: true,
     },
   },
-  computed: {
-    totalGridWidth(): string {
-      return (
-        this.gridConfiguration.columns.reduce(
+  setup(props) {
+    // How wide should our header row should be to align with the grid
+    const totalGridWidth = computed(
+      () =>
+        props.gridConfiguration.columns.reduce(
           (totalWidth, column) => totalWidth + column.width,
           0
         ) + "ch"
-      );
-    },
-    headerCells(): VNode[] {
-      return this.gridConfiguration.columns.map((column) => {
-        const isSortingOn = this.gridState.isSortingOnKey(column.key);
-        const sortingIcon =
-          isSortingOn?.options.direction === "desc"
-            ? column.descIcon
-            : column.ascIcon;
+    );
 
-        const header = h(
-          "div",
-          {
-            style: {
-              width: column.widthWithUnit,
-              height: this.rowHeight,
-            },
-            class: "grid-header-cell",
-            on: {
-              click: () => {
-                // Toggle our sorting behaviours
-                this.gridState.toggleSort(column.key);
-              },
+    // Generate our header rows
+    const headers = computed(() => [buildRow()]);
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildRow = () => {
+      return h(
+        "div",
+        {
+          class: "grid-header",
+          style: {
+            width: totalGridWidth.value,
+            height: props.rowHeight + "px",
+            transform: `translateX(${-props.gridOffsetLeft + "px"}`,
+          },
+        },
+        props.gridConfiguration.columns.map((column) => buildCell(column))
+      );
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildCell = (column: Column<any, any>) => {
+      return h(
+        "div",
+        {
+          style: {
+            width: column.widthWithUnit,
+            height: props.rowHeight,
+          },
+          class: "grid-header-cell",
+          on: {
+            click: () => {
+              // Toggle our sorting behaviours
+              props.gridState.toggleSort(column.key);
             },
           },
-          [
-            column.key,
-            h(
-              VIcon,
-              {
-                class: {
-                  "grid-sort-icon": true,
-                  "grid-sort-active": !!isSortingOn,
-                },
-                props: { small: true },
-              },
-              sortingIcon
-            ),
-            h(
-              "sup",
-              { class: "grid-sorting-index" },
-              isSortingOn?.index.toString() ?? ""
-            ),
-          ]
-        );
+        },
+        [column.key, buildSortIcon(column)]
+      );
+    };
 
-        return header;
-      });
-    },
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildSortIcon = (column: Column<any, any>) => {
+      const isSortingOn = props.gridState.isSortingOnKey(column.key);
+      const sortingIcon =
+        isSortingOn?.options.direction === "desc"
+          ? column.descIcon
+          : column.ascIcon;
+
+      return [
+        h(
+          VIcon,
+          {
+            class: {
+              "grid-sort-icon": true,
+              "grid-sort-active": !!isSortingOn,
+            },
+            props: { small: true },
+          },
+          sortingIcon
+        ),
+        h(
+          "sup",
+          { class: "grid-sorting-index" },
+          isSortingOn?.index.toString() ?? ""
+        ),
+      ];
+    };
+
+    return {
+      headers,
+      totalGridWidth,
+    };
   },
   render(): VNode {
     // Returns them has a group, inside their container
@@ -90,20 +117,7 @@ export default defineComponent({
       {
         class: "grid-header-container",
       },
-      [
-        h(
-          "div",
-          {
-            class: "grid-header",
-            style: {
-              width: this.totalGridWidth,
-              height: this.rowHeight + "px",
-              transform: `translateX(${-this.gridOffsetLeft + "px"}`,
-            },
-          },
-          this.headerCells
-        ),
-      ]
+      this.headers
     );
   },
 });

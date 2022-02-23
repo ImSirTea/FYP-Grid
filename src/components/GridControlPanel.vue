@@ -30,10 +30,14 @@ export default defineComponent({
       required: true,
     },
   },
-  methods: {
-    updateSearchValue(newValue: string) {
-      this.gridState.setSearchValue(newValue);
-    },
+  setup(props) {
+    const updateSearchValue = (newValue: string) => {
+      props.gridState.setSearchValue(newValue);
+    };
+
+    return {
+      updateSearchValue,
+    };
   },
 });
 </script>

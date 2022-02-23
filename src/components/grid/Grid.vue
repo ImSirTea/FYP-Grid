@@ -3,10 +3,21 @@ import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import GridHeader from "@/components/grid/GridHeader.vue";
 import { AnyWithGridIdx, GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
-import { h, defineComponent, PropType } from "@vue/composition-api";
+import {
+  h,
+  defineComponent,
+  PropType,
+  watch,
+  computed,
+  reactive,
+  ref,
+} from "@vue/composition-api";
 import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/GridControlPanel.vue";
 
+/**
+ * Manages creating a grid with given specifications
+ */
 export default defineComponent({
   name: "Grid",
   components: { GridHeader, GridBody, GridControlPanel },
@@ -36,77 +47,89 @@ export default defineComponent({
       default: 5,
     },
   },
-  watch: {
-    items: {
-      handler: function () {
-        this.indexedItems = this.gridState.injectGridIndexes(this.items);
+  setup(props) {
+    const gridState = reactive(new GridState());
+
+    // Scroll offsets
+    const gridOffsets = reactive({
+      top: 0,
+      left: 0,
+    });
+
+    // Copy our items, with inserted indexes of their original sorting order
+    // Pulled out seperately to prevent iterating over the same list of items and injecting what existed
+    let indexedItems: AnyWithGridIdx[] = [];
+
+    const internalItems = computed(() =>
+      gridState.filterAndSortItems(indexedItems, props.gridConfiguration)
+    );
+
+    // Should help to prevent us iterating over the items multiple times to inject the origin indexes
+    watch(
+      () => props.items,
+      () => {
+        indexedItems = gridState.injectGridIndexes(props.items);
       },
-      immediate: true,
-    },
-  },
-  data: () => {
-    return {
-      gridState: new GridState(),
-      indexedItems: [] as AnyWithGridIdx[], // A copy of our prop.items with original indexes injected
-      gridOffsetTop: 0,
-      gridOffsetLeft: 0,
-    };
-  },
-  computed: {
-    internalItems(): AnyWithGridIdx[] {
-      return this.gridState.filterAndSortItems(
-        this.items,
-        this.gridConfiguration
-      );
-    },
-  },
-  methods: {
-    body() {
+      { immediate: true }
+    );
+
+    // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
+    const buildBody = () => {
       return h(GridBody, {
         props: {
-          internalItems: this.internalItems,
-          gridConfiguration: this.gridConfiguration,
-          gridOffsetTop: this.gridOffsetTop,
-          rowHeight: this.rowHeight,
-          gridHeight: this.gridHeight,
-          bufferRows: this.bufferRows,
+          internalItems: internalItems.value,
+          gridConfiguration: props.gridConfiguration,
+          gridOffsetTop: gridOffsets.top,
+          rowHeight: props.rowHeight,
+          gridHeight: props.gridHeight,
+          bufferRows: props.bufferRows,
         },
         on: {
           // We want the scrolling to be within the rows, not the entire grid, so listen for these events
           "update:scroll": (scroll: GridScrollEvent) => {
-            this.gridOffsetTop = scroll.gridOffsetTop;
-            this.gridOffsetLeft = scroll.gridOffsetLeft;
+            gridOffsets.top = scroll.gridOffsetTop;
+            gridOffsets.left = scroll.gridOffsetLeft;
           },
         },
       });
-    },
-    header() {
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildHeader = () => {
       return h(GridHeader, {
         props: {
-          gridConfiguration: this.gridConfiguration,
-          gridState: this.gridState,
-          rowHeight: this.rowHeight,
-          gridOffsetLeft: this.gridOffsetLeft,
+          gridConfiguration: props.gridConfiguration,
+          gridState: gridState,
+          rowHeight: props.rowHeight,
+          gridOffsetLeft: gridOffsets.left,
         },
       });
-    },
-    controlPanel(): VNode {
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildControlPanel = (): VNode => {
       return h(GridControlPanel, {
-        props: { gridState: this.gridState },
+        props: { gridState: gridState },
       });
-    },
-    table() {
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildTable = () => {
       return h(
         "div",
         {
           class: "grid-container",
         },
-        [this.controlPanel(), this.header(), this.body()]
+        [buildControlPanel(), buildHeader(), buildBody()]
       );
-    },
+    };
+
+    return {
+      buildTable,
+    };
   },
   render(): VNode {
-    return this.table();
+    return this.buildTable();
   },
 });
 </script>

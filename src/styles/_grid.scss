@@ -44,12 +44,9 @@
   display: none;
 }
 
-.grid-header-cell > * {
-  padding-left: 0.5ch;
-}
-
 .grid-header-cell .grid-sort-icon {
   animation: transform 0.5s;
+  padding-left: 0.5ch;
 }
 
 .grid-header-cell:hover .grid-sort-icon,
