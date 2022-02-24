@@ -150,4 +150,10 @@ export class GridState {
     this.filterOptions[column.key].splice(index, 1);
     console.log(index);
   }
+
+  get filterBy() {
+    return Object.entries(this.filterOptions).map(([key, options]) => {
+      return options.reduce((chain, option) => )
+    });
+  }
 }

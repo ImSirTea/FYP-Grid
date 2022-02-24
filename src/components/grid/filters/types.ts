@@ -7,7 +7,7 @@ export interface FilterCondition<T> {
 
 export interface FilterConnection {
   name: string;
-  operator: string;
+  filterFunction: (conditionA: boolean, conditionB: boolean) => boolean;
 }
 
 export interface FilterOption<T> {
@@ -22,11 +22,11 @@ export abstract class FilterOptions<T> {
   public connections: FilterConnection[] = [
     {
       name: $tc.and,
-      operator: "&&",
+      filterFunction: (conditionA, conditionB) => conditionA && conditionB,
     },
     {
       name: $tc.or,
-      operator: "||",
+      filterFunction: (conditionA, conditionB) => conditionA || conditionB,
     },
   ];
 }
