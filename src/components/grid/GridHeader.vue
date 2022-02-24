@@ -2,21 +2,13 @@
 import { Column } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridState } from "@/components/grid/GridState";
-import { defineComponent, PropType, h, computed } from "@vue/composition-api";
+import { defineComponent, inject, h, computed } from "@vue/composition-api";
 import { VNode } from "vue";
 import { VIcon } from "vuetify/lib/components";
 
 export default defineComponent({
   name: "GridHeader",
   props: {
-    gridConfiguration: {
-      type: Object as PropType<GridConfiguration<any>>,
-      required: true,
-    },
-    gridState: {
-      type: Object as PropType<GridState>,
-      required: true,
-    },
     rowHeight: {
       type: Number,
       required: false,
@@ -28,10 +20,14 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const gridConfiguration =
+      inject<GridConfiguration<any>>("gridConfiguration")!;
+    const gridState = inject<GridState>("gridState")!;
+
     // How wide should our header row should be to align with the grid
     const totalGridWidth = computed(
       () =>
-        props.gridConfiguration.columns.reduce(
+        gridConfiguration.columns.reduce(
           (totalWidth, column) => totalWidth + column.width,
           0
         ) + "ch"
@@ -52,7 +48,7 @@ export default defineComponent({
             transform: `translateX(${-props.gridOffsetLeft + "px"}`,
           },
         },
-        props.gridConfiguration.columns.map((column) => buildCell(column))
+        gridConfiguration.columns.map((column) => buildCell(column))
       );
     };
 
@@ -69,7 +65,7 @@ export default defineComponent({
           on: {
             click: () => {
               // Toggle our sorting behaviours
-              props.gridState.toggleSort(column.key);
+              gridState.toggleSort(column.key);
             },
           },
         },
@@ -79,7 +75,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildSortIcon = (column: Column<any, any>) => {
-      const isSortingOn = props.gridState.isSortingOnKey(column.key);
+      const isSortingOn = gridState.isSortingOnKey(column.key);
       const sortingIcon =
         isSortingOn?.options.direction === "desc"
           ? column.descIcon

@@ -13,7 +13,7 @@
 import { defineComponent, ref, computed } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid from "@/components/grid/Grid.vue";
-import { WidthEnum } from "@/components/grid/columns/Column";
+import { GridWidthEnum } from "@/components/grid/columns/Column";
 
 interface Item {
   first: string;
@@ -49,7 +49,7 @@ export default defineComponent({
     builder.addTextColumn(
       "wide",
       (item) => (item.first + item.last).repeat(8),
-      { width: WidthEnum.XLARGE }
+      { width: GridWidthEnum.XLARGE }
     );
 
     return {

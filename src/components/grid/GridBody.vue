@@ -1,7 +1,13 @@
 <script lang="ts">
 import { Column } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import { defineComponent, h, PropType, computed } from "@vue/composition-api";
+import {
+  defineComponent,
+  h,
+  PropType,
+  computed,
+  inject,
+} from "@vue/composition-api";
 import { VNode } from "vue";
 
 export interface GridScrollEvent {
@@ -19,10 +25,6 @@ export default defineComponent({
       type: Array as PropType<any[]>,
       required: true,
       default: () => [],
-    },
-    gridConfiguration: {
-      type: Object as PropType<GridConfiguration<any>>,
-      required: true,
     },
     rowHeight: {
       type: Number,
@@ -45,6 +47,9 @@ export default defineComponent({
     },
   },
   setup(props, context) {
+    const gridConfiguration =
+      inject<GridConfiguration<any>>("gridConfiguration")!;
+
     // Total height of all rows, used for scrolling
     const totalGridHeight = computed((): string => {
       return props.internalItems.length * props.rowHeight + "px";
@@ -87,7 +92,7 @@ export default defineComponent({
             height: props.rowHeight + "px",
           },
         },
-        props.gridConfiguration.columns.map((column) => buildCell(item, column))
+        gridConfiguration.columns.map((column) => buildCell(item, column))
       );
     };
 

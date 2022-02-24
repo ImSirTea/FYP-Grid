@@ -9,6 +9,7 @@ import {
   PropType,
   computed,
   reactive,
+  provide,
 } from "@vue/composition-api";
 import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/GridControlPanel.vue";
@@ -47,6 +48,8 @@ export default defineComponent({
   },
   setup(props) {
     const gridState = reactive(new GridState());
+    provide("gridState", gridState);
+    provide("gridConfiguration", props.gridConfiguration);
 
     // Scroll offsets
     const gridOffsets = reactive({
@@ -103,7 +106,10 @@ export default defineComponent({
     // ONLY USE IN CONTEXT OF RENDERING
     const buildControlPanel = (): VNode => {
       return h(GridControlPanel, {
-        props: { gridState: gridState },
+        props: {
+          gridState: gridState,
+          gridConfiguration: props.gridConfiguration,
+        },
       });
     };
 

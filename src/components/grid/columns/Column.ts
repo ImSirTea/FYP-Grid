@@ -1,7 +1,9 @@
+import { FilterOptions } from "@/components/grid/filters/types";
+
 /** General Types */
 export type ValueExtractor<T, U> = (item: T) => U;
 
-export enum WidthEnum {
+export enum GridWidthEnum {
   SMALL = 20,
   MEDIUM = 50,
   LARGE = 100,
@@ -21,7 +23,7 @@ export interface SortOptions {
 }
 
 export interface ColumnOptions {
-  width: WidthEnum | number;
+  width: GridWidthEnum | number;
 }
 
 export type RenderableType = string | number | boolean; // Could be { toString(): string }?
@@ -30,9 +32,12 @@ export abstract class Column<T, RenderableType> {
   key: string;
   #itemValue: ValueExtractor<T, RenderableType>;
   options?: Partial<ColumnOptions>;
-  defaultWidth: WidthEnum = WidthEnum.MEDIUM;
+  defaultWidth: GridWidthEnum = GridWidthEnum.MEDIUM;
   ascIcon = "mdi-sort-ascending";
   descIcon = "mdi-sort-descending";
+
+  abstract component: Vue.Component;
+  abstract filterOptions: FilterOptions<any>;
 
   constructor(
     key: string,
