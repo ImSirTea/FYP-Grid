@@ -9,7 +9,6 @@ class TextFilterOptions extends FilterOptions<string> {
     {
       name: $tc.contains,
       filterFunction: (item: string, value: string) => {
-        console.log(item, value);
         return item.trim().toLowerCase().includes(value.trim().toLowerCase());
       },
     },

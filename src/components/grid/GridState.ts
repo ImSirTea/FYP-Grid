@@ -141,7 +141,6 @@ export class GridState {
 
           if (typeof filterChain !== "undefined") {
             if (!filterChain(itemValueForColumn)) {
-              console.log(filterChain);
               return false;
             }
           }
@@ -216,14 +215,11 @@ export class GridState {
     const filterChain = options?.reduceRight(
       (chain, option, index) => {
         if (this.isValidFilterOption(option, options.length, index)) {
-          console.log(option.operator);
           if (option.operator === FilterOperator.or) {
-            console.log("ororor");
             return (itemValue: any) =>
               chain(itemValue) ||
               option.filterFunction!(itemValue, option.value);
           }
-          console.log("anannaan");
           return (itemValue: any) =>
             chain(itemValue) && option.filterFunction!(itemValue, option.value);
         }

@@ -69,7 +69,6 @@ export default defineComponent({
     watch(
       () => [props.gridConfiguration, gridState, indexedItems],
       () => {
-        console.log("updatesese");
         internalItems.value = gridState.filterAndSortItems(
           indexedItems.value,
           props.gridConfiguration

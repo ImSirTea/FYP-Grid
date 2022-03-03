@@ -111,7 +111,6 @@ export default defineComponent({
     };
 
     const updateOperator = (newOperator: FilterConnection) => {
-      console.log("we setting op", newOperator);
       gridState.setFilterProperty(
         props.filter,
         "operator",
