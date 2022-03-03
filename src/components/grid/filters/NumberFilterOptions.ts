@@ -11,13 +11,13 @@ class NumberFilterOptions extends FilterOptions<number> {
     {
       name: $tc.lessThan,
       filterFunction: (item: number, value: number) => {
-        return item < value;
+        return item <= value;
       },
     },
     {
       name: $tc.greaterThan,
       filterFunction: (item: number, value: number) => {
-        return item > value;
+        return item >= value;
       },
     },
   ];
