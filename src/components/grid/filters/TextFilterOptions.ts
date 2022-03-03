@@ -8,8 +8,10 @@ class TextFilterOptions extends FilterOptions<string> {
   public conditions: FilterCondition<string>[] = [
     {
       name: $tc.contains,
-      filterFunction: (item: string, value: string) =>
-        item.trim().toLowerCase().includes(value.trim().toLowerCase()),
+      filterFunction: (item: string, value: string) => {
+        console.log(item, value);
+        return item.trim().toLowerCase().includes(value.trim().toLowerCase());
+      },
     },
   ];
 }

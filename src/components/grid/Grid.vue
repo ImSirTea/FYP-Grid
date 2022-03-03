@@ -10,6 +10,8 @@ import {
   computed,
   reactive,
   provide,
+  watch,
+  ref,
 } from "@vue/composition-api";
 import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/GridControlPanel.vue";
@@ -48,6 +50,7 @@ export default defineComponent({
   },
   setup(props) {
     const gridState = reactive(new GridState());
+    const internalItems = ref<any[]>([]);
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
 
@@ -63,12 +66,17 @@ export default defineComponent({
       gridState.injectGridIndexes(props.items)
     );
 
-    const internalItems = computed(() => {
-      return gridState.filterAndSortItems(
-        indexedItems.value,
-        props.gridConfiguration
-      );
-    });
+    watch(
+      () => [props.gridConfiguration, gridState, indexedItems],
+      () => {
+        console.log("updatesese");
+        internalItems.value = gridState.filterAndSortItems(
+          indexedItems.value,
+          props.gridConfiguration
+        );
+      },
+      { immediate: true, deep: true }
+    );
 
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
     const buildBody = () => {

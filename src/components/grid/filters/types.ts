@@ -1,32 +1,39 @@
 import $tc from "@/textConstants";
 
+export type FilterFunction<T> = (item: T, value: T) => boolean;
+
+export enum FilterOperator {
+  and,
+  or,
+}
+
 export interface FilterCondition<T> {
   name: string;
-  filterFunction: (item: T, value: T) => boolean;
+  filterFunction: FilterFunction<T>;
 }
 
 export interface FilterConnection {
   name: string;
-  filterFunction: (conditionA: boolean, conditionB: boolean) => boolean;
+  operator: FilterOperator;
 }
 
 export interface FilterOption<T> {
-  condition?: FilterCondition<T>;
+  filterFunction?: FilterFunction<T>;
   value?: any;
-  connection?: FilterConnection;
+  operator?: FilterOperator;
 }
 
 export abstract class FilterOptions<T> {
   abstract conditions: FilterCondition<T>[];
 
-  public connections: FilterConnection[] = [
+  public operators: FilterConnection[] = [
     {
       name: $tc.and,
-      filterFunction: (conditionA, conditionB) => conditionA && conditionB,
+      operator: FilterOperator.and,
     },
     {
       name: $tc.or,
-      filterFunction: (conditionA, conditionB) => conditionA || conditionB,
+      operator: FilterOperator.or,
     },
   ];
 }

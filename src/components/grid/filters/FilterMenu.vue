@@ -27,7 +27,18 @@
         :key="column.key"
       >
         <v-expansion-panel-header>
-          {{ column.key }}
+          <v-container class="pa-0" fluid>
+            <v-row align="center" no-gutters>
+              <v-col cols="auto">
+                {{ column.key }}
+              </v-col>
+              <v-col class="pl-2" cols="auto">
+                <v-chip small pill v-if="numberOfFiltersForColumn(column)">
+                  {{ numberOfFiltersForColumn(column) }}
+                </v-chip>
+              </v-col>
+            </v-row>
+          </v-container>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
           <filter-group :column="column" />
@@ -43,6 +54,8 @@ import { defineComponent, inject } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import FilterGroup from "@/components/grid/filters/FilterGroup.vue";
+import { GridState } from "@/components/grid/GridState";
+import { Column } from "@/components/grid/columns/Column";
 
 export default defineComponent({
   name: "FilterMenu",
@@ -58,10 +71,13 @@ export default defineComponent({
   setup(props, context) {
     const gridConfiguration =
       inject<GridConfiguration<any>>("gridConfiguration")!;
+    const gridState = inject<GridState>("gridState")!;
 
     return {
       gridConfiguration,
       toggleMenu: (isVisible) => context.emit("input", isVisible),
+      numberOfFiltersForColumn: (column: Column<any, any>) =>
+        gridState.filterOptions[column.key]?.length ?? 0,
       $tc,
     };
   },

@@ -7,10 +7,12 @@ export default {
   and: "And",
   or: "Or",
   lessThan: "Less Than",
+  greaterThan: "Greater Than",
   add: "Add",
   new: "New",
   remove: "Remove",
   condition: "Condition",
   value: "Value",
   connection: "Connection",
+  required: "Value is required",
 };

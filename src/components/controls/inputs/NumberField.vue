@@ -34,8 +34,8 @@ export default defineComponent({
   setup(props, context) {
     const internalValue = ref(props.value);
 
-    const updateValue = () => {
-      context.emit("");
+    const updateValue = (newValue: string) => {
+      context.emit("input", Number(newValue));
     };
 
     return {

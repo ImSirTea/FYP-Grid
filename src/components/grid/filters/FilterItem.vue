@@ -7,7 +7,9 @@
           :value="filter.condition"
           :label="$tc.condition"
           :items="column.filterOptions.conditions"
+          :rules="[required]"
           item-text="name"
+          return-object
           dense
           @input="updateCondition"
         />
@@ -25,24 +27,26 @@
           :is="column.component"
           :value="filter.value"
           :label="$tc.value"
+          :rules="[required]"
           dense
           @input="updateValue"
         />
       </v-col>
 
-      <!-- Connection -->
+      <!-- Operator -->
       <v-col v-if="!isLast" cols="auto">
         <v-radio-group
-          :value="filter.connection"
+          :value="filter.operator"
+          :rules="[required]"
           dense
           row
-          @input="updateConnection"
+          @change="updateOperator"
         >
           <v-radio
-            v-for="connection in column.filterOptions.connections"
-            :key="column.key + connection.name"
-            :label="connection.name"
-            :value="connection"
+            v-for="operator in column.filterOptions.operators"
+            :key="column.key + operator.name"
+            :label="operator.name"
+            :value="operator"
           />
         </v-radio-group>
       </v-col>
@@ -88,16 +92,32 @@ export default defineComponent({
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
 
-    const updateCondition = (newCondition: FilterCondition<any>) => {
-      gridState.setFilter(props.filter, { condition: newCondition });
+    const updateCondition = (newFilter: FilterCondition<any>) => {
+      gridState.setFilterProperty(
+        props.filter,
+        "filterFunction",
+        newFilter.filterFunction,
+        props.column.key
+      );
     };
 
     const updateValue = (newValue: any) => {
-      gridState.setFilter(props.filter, { value: newValue });
+      gridState.setFilterProperty(
+        props.filter,
+        "value",
+        newValue,
+        props.column.key
+      );
     };
 
-    const updateConnection = (newConnection: FilterConnection) => {
-      gridState.setFilter(props.filter, { connection: newConnection });
+    const updateOperator = (newOperator: FilterConnection) => {
+      console.log("we setting op", newOperator);
+      gridState.setFilterProperty(
+        props.filter,
+        "operator",
+        newOperator.operator,
+        props.column.key
+      );
     };
 
     const removeFilter = () => {
@@ -109,9 +129,10 @@ export default defineComponent({
     );
 
     return {
+      required: (value: any) => typeof value !== "undefined" || $tc.required,
       updateCondition,
       updateValue,
-      updateConnection,
+      updateOperator,
       removeFilter,
       isLast,
       $tc,

@@ -1,6 +1,13 @@
 import { Column, RenderableType } from "@/components/grid/columns/Column";
-import { FilterOption } from "@/components/grid/filters/types";
+import NumberFilterOptions from "@/components/grid/filters/NumberFilterOptions";
+import {
+  FilterFunction,
+  FilterOperator,
+  FilterOption,
+} from "@/components/grid/filters/types";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { hasAllProperties } from "@/components/util/helpers";
+import { isArguments } from "lodash";
 import { firstBy } from "thenby";
 import Vue from "vue";
 
@@ -20,8 +27,11 @@ interface SortOptions {
 export class GridState {
   sortOptions: SortOptions[] = [];
   searchValue: string = "";
-  filterOptions: { [key: string]: FilterOption<RenderableType>[] } = {};
+  filterOptions: Record<string, FilterOption<RenderableType>[]> = {};
+  filterChains: Record<string, (itemValue: any) => boolean> = {};
 
+  // Instead of a getter, you could build this function only when it changes
+  // Not done as it just adds pointless complexity for something that shouldn't be slow anyway
   get sortBy() {
     if (this.sortOptions.length) {
       // If we have anything to sort by
@@ -101,23 +111,44 @@ export class GridState {
     items: any[],
     gridConfiguration: GridConfiguration<any>
   ): AnyWithGridIdx[] {
+    if (
+      this.searchValue === "" &&
+      Object.entries(this.filterChains).length === 0
+    ) {
+      return items;
+    }
+
     return items
-      .filter((item) =>
-        gridConfiguration.columns.reduce(
-          (isValid, column) => {
-            const itemValueForColumn = column
-              .value(item)
-              .toString()
-              .toLowerCase()
-              .trim();
+      .filter((item) => {
+        // !searchValue allows for being true if we don't have a search value to check against
+        let searchPassed = !this.searchValue;
 
-            const searchByValue = this.searchValue.toLowerCase().trim();
+        for (const column of gridConfiguration.columns) {
+          const itemValueForColumn = column
+            .value(item)
+            .toString()
+            .toLowerCase()
+            .trim();
 
-            return isValid || itemValueForColumn.includes(searchByValue);
-          },
-          false as boolean // ??? Thanks TypeScript
-        )
-      )
+          const searchByValue = this.searchValue.toLowerCase().trim();
+
+          // If our item value matches our search term, just return true
+          if (this.searchValue && itemValueForColumn.includes(searchByValue)) {
+            searchPassed = true;
+          }
+
+          const filterChain = this.filterChains[column.key];
+
+          if (typeof filterChain !== "undefined") {
+            if (!filterChain(itemValueForColumn)) {
+              console.log(filterChain);
+              return false;
+            }
+          }
+        }
+
+        return searchPassed;
+      })
       .sort(this.sortBy);
   }
 
@@ -136,24 +167,71 @@ export class GridState {
     }
 
     this.filterOptions[column.key].push({
-      condition: undefined,
+      filterFunction: undefined,
       value: undefined,
-      connection: undefined,
+      operator: undefined,
     });
   }
 
-  setFilter(filter: FilterOption<any>, newFilter: Partial<FilterOption<any>>) {
-    Object.assign(filter, newFilter);
+  setFilterProperty(
+    filter: FilterOption<RenderableType>,
+    propertyName: keyof FilterOption<RenderableType>,
+    value: any,
+    columnKey: string
+  ) {
+    Vue.set(filter, propertyName, value);
+    this.buildFilterFunctionsForColumn(columnKey);
   }
 
+  // Deletes a filter at a given pos
   removeFilter(column: Column<any, any>, index: number) {
     this.filterOptions[column.key].splice(index, 1);
-    console.log(index);
+    this.buildFilterFunctionsForColumn(column.key);
   }
 
-  get filterBy() {
-    return Object.entries(this.filterOptions).map(([key, options]) => {
-      return options.reduce((chain, option) => )
-    });
+  // Only valid if all properties are defined, except for the final filter option
+  // where "operator" isn't required
+  isValidFilterOption(
+    options: FilterOption<RenderableType>,
+    totalNumberOfOptions: number,
+    index: number
+  ) {
+    if (totalNumberOfOptions === index + 1) {
+      return (
+        typeof options.filterFunction !== "undefined" &&
+        typeof options.value !== "undefined"
+      );
+    }
+
+    return hasAllProperties(options);
+  }
+
+  buildFilterFunctionsForColumn(key: string) {
+    const options = this.filterOptions[key];
+
+    if (typeof options === "undefined") {
+      return null;
+    }
+
+    const filterChain = options?.reduceRight(
+      (chain, option, index) => {
+        if (this.isValidFilterOption(option, options.length, index)) {
+          console.log(option.operator);
+          if (option.operator === FilterOperator.or) {
+            console.log("ororor");
+            return (itemValue: any) =>
+              chain(itemValue) ||
+              option.filterFunction!(itemValue, option.value);
+          }
+          console.log("anannaan");
+          return (itemValue: any) =>
+            chain(itemValue) && option.filterFunction!(itemValue, option.value);
+        }
+        return chain;
+      },
+      (itemValue: any) => true
+    );
+
+    Vue.set(this.filterChains, key, filterChain);
   }
 }
