@@ -24,15 +24,19 @@ interface SortOptions {
   key: string;
   options: ThenByOpts;
 }
+
+type SortFunction = IThenBy<{
+  [x: string]: Record<string, unknown>;
+}>;
 export class GridState {
   sortOptions: SortOptions[] = [];
   searchValue: string = "";
   filterOptions: Record<string, FilterOption<RenderableType>[]> = {};
   filterChains: Record<string, (itemValue: any) => boolean> = {};
+  sortFunction: SortFunction = firstBy("_grid-idx");
 
-  // Instead of a getter, you could build this function only when it changes
-  // Not done as it just adds pointless complexity for something that shouldn't be slow anyway
-  get sortBy() {
+  // Build the function only when we update sorting options
+  buildSortFunction() {
     if (this.sortOptions.length) {
       // If we have anything to sort by
       let sortBy = firstBy(
@@ -44,13 +48,12 @@ export class GridState {
         sortBy = sortBy.thenBy(opt.key, opt.options);
       });
 
-      sortBy = sortBy.thenBy("_grid-idx");
-
-      return sortBy;
+      this.sortFunction = sortBy.thenBy("_grid-idx");
+      return;
     }
 
     // Otherwise, default to original order
-    return firstBy("_grid-idx");
+    this.sortFunction = firstBy("_grid-idx");
   }
 
   /**
@@ -69,6 +72,7 @@ export class GridState {
         key,
         options: { direction: "asc" },
       });
+      this.buildSortFunction();
       return;
     }
 
@@ -79,6 +83,8 @@ export class GridState {
     } else {
       this.sortOptions.splice(existingOptionIdx, 1);
     }
+
+    this.buildSortFunction();
   }
 
   /**
@@ -115,7 +121,7 @@ export class GridState {
       this.searchValue === "" &&
       Object.entries(this.filterChains).length === 0
     ) {
-      return items;
+      return items.sort(this.sortFunction);
     }
 
     return items
@@ -148,7 +154,7 @@ export class GridState {
 
         return searchPassed;
       })
-      .sort(this.sortBy);
+      .sort(this.sortFunction);
   }
 
   // Inserts a grid idx as a property to all items, with the value of their original index
@@ -172,6 +178,8 @@ export class GridState {
     });
   }
 
+  // Filter properties should be updated in a "Vue" way to provide correct reactivity, and allow us to rebuild
+  // our filters for the column
   setFilterProperty(
     filter: FilterOption<RenderableType>,
     propertyName: keyof FilterOption<RenderableType>,
@@ -205,6 +213,7 @@ export class GridState {
     return hasAllProperties(options);
   }
 
+  // Build filter chains as and when a column's filters are changed, rather than rebuild on use
   buildFilterFunctionsForColumn(key: string) {
     const options = this.filterOptions[key];
 

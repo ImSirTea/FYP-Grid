@@ -26,7 +26,7 @@ export default defineComponent({
   name: "App",
   components: { Grid },
   setup(props, context) {
-    const numberOfItems = ref(5);
+    const numberOfItems = ref(10000);
 
     const items = computed(
       () =>
