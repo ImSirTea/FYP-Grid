@@ -1,19 +1,22 @@
 <template>
-  <v-text-field
+  <text-field
     v-bind="$attrs"
-    :value="value"
+    :value="value.toString()"
     :min="min"
     :max="max"
     type="number"
     @input="updateValue"
+    @dblclick="$emit('dblclick')"
   />
 </template>
 
 <script lang="ts">
+import TextField from "@/components/controls/inputs/TextField.vue";
 import { defineComponent, ref } from "@vue/composition-api";
 
 export default defineComponent({
   name: "NumberField",
+  components: { TextField },
   props: {
     value: {
       type: Number,

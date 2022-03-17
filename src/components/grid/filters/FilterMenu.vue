@@ -22,10 +22,7 @@
 
     <!-- Build all of our filter controls -->
     <v-expansion-panels accordion flat multiple>
-      <v-expansion-panel
-        v-for="column in gridConfiguration.columns"
-        :key="column.key"
-      >
+      <v-expansion-panel v-for="column in filterableColumns" :key="column.key">
         <v-expansion-panel-header>
           <v-container class="pa-0" fluid>
             <v-row align="center" no-gutters>
@@ -70,14 +67,19 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridConfiguration =
-      inject<GridConfiguration<any>>("gridConfiguration")!;
+      inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
+
+    const filterableColumns = gridConfiguration.columns.filter(
+      (column) => column.options?.filterable
+    );
 
     return {
       gridConfiguration,
       toggleMenu: (isVisible) => context.emit("input", isVisible),
-      numberOfFiltersForColumn: (column: Column<any, any>) =>
+      numberOfFiltersForColumn: (column: Column<Record<string, any>, any>) =>
         gridState.filterOptions[column.key]?.length ?? 0,
+      filterableColumns,
       $tc,
     };
   },

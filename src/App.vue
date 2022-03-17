@@ -19,7 +19,7 @@ interface Item {
   first: string;
   last: string;
   age: number;
-  idx: number;
+  index: number;
 }
 
 export default defineComponent({
@@ -32,17 +32,17 @@ export default defineComponent({
       () =>
         Array(numberOfItems.value)
           .fill(0)
-          .map((_, idx) => ({
-            idx,
-            first: `Adam${idx % 20}`,
-            last: `Lansley${idx % 20}`,
-            age: idx % 20,
+          .map((_, index) => ({
+            index,
+            first: `Adam${index % 20}`,
+            last: `Lansley${index % 20}`,
+            age: index % 20,
           })) as Item[]
     );
 
     const builder = new GridConfiguration<Item>();
 
-    builder.addNumberColumn("idx", (item) => item.idx);
+    builder.addNumberColumn("index", (item) => item.index);
     builder.addTextColumn("first", (item) => item.first);
     builder.addTextColumn("last", (item) => item.last);
     builder.addNumberColumn("age", (item) => item.age);

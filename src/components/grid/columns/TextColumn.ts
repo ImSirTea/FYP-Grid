@@ -15,7 +15,7 @@ export interface TextColumnOptions extends ColumnOptions {}
  * TextColumn type, used when building grids using string fields
  */
 export class TextColumn<T> extends Column<T, string> {
-  declare options?: Partial<TextColumnOptions>;
+  declare options: Partial<TextColumnOptions>;
   public component = TextField;
   public filterOptions = TextFilterOptions;
 
@@ -26,7 +26,8 @@ export class TextColumn<T> extends Column<T, string> {
   ) {
     super(key, itemValue, options);
 
-    this.ascIcon = "mdi-sort-alphabetical-ascending";
-    this.descIcon = "mdi-sort-alphabetical-descending";
+    // Apply defaults
+    this.options.ascIcon ??= "mdi-sort-alphabetical-ascending";
+    this.options.descIcon ??= "mdi-sort-alphabetical-descending";
   }
 }

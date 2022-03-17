@@ -53,3 +53,11 @@
 .grid-sort-active {
   display: inline-block;
 }
+
+.grid-row-cell-edit {
+  display: none;
+}
+
+.grid-row-cell:hover .grid-row-cell-edit {
+  display: inline-flex;
+}

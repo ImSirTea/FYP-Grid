@@ -16,7 +16,7 @@ export interface NumberColumnOptions extends ColumnOptions {}
  * NumberColumn type, used when building grids using number fields
  */
 export class NumberColumn<T> extends Column<T, number> {
-  declare options?: Partial<NumberColumnOptions>;
+  declare options: Partial<NumberColumnOptions>;
   public component = NumberField;
   public filterOptions = NumberFilterOptions;
 
@@ -27,8 +27,9 @@ export class NumberColumn<T> extends Column<T, number> {
   ) {
     super(key, itemValue, options);
 
-    this.defaultWidth = GridWidthEnum.SMALL;
-    this.ascIcon = "mdi-sort-numeric-ascending";
-    this.descIcon = "mdi-sort-numeric-descending";
+    // Apply defaults
+    this.options.width ??= GridWidthEnum.SMALL;
+    this.options.ascIcon ??= "mdi-sort-numeric-ascending";
+    this.options.descIcon ??= "mdi-sort-numeric-descending";
   }
 }

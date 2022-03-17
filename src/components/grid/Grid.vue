@@ -24,12 +24,12 @@ export default defineComponent({
   components: { GridHeader, GridBody, GridControlPanel },
   props: {
     items: {
-      type: Array as PropType<any[]>,
+      type: Array as PropType<Record<string, any>[]>,
       required: true,
       default: () => [],
     },
     gridConfiguration: {
-      type: Object as PropType<GridConfiguration<any>>,
+      type: Object as PropType<GridConfiguration<Record<string, any>>>,
       required: true,
     },
     rowHeight: {
@@ -42,15 +42,10 @@ export default defineComponent({
       required: false,
       default: 300,
     },
-    bufferRows: {
-      type: Number,
-      required: false,
-      default: 5,
-    },
   },
   setup(props) {
     const gridState = reactive(new GridState());
-    const internalItems = ref<any[]>([]);
+    const internalItems = ref<Record<string, any>[]>([]);
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
 
@@ -86,7 +81,6 @@ export default defineComponent({
           gridOffsetTop: gridOffsets.top,
           rowHeight: props.rowHeight,
           gridHeight: props.gridHeight,
-          bufferRows: props.bufferRows,
         },
         on: {
           // We want the scrolling to be within the rows, not the entire grid, so listen for these events

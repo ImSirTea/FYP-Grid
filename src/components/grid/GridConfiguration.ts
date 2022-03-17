@@ -1,4 +1,8 @@
 import {
+  ActionColumn,
+  ActionColumnOptions,
+} from "@/components/grid/columns/ActionColumn";
+import {
   Column,
   ColumnOptions,
   RenderableType,
@@ -15,8 +19,13 @@ import {
 
 export class GridConfiguration<T> {
   #columns: Column<T, RenderableType>[] = [];
+  #actionColumn?: ActionColumn;
 
   get columns() {
+    if (this.#actionColumn) {
+      return this.#columns.concat(this.#actionColumn);
+    }
+
     return this.#columns;
   }
 
@@ -36,5 +45,13 @@ export class GridConfiguration<T> {
   ) {
     const numberColumn = new NumberColumn(name, itemValue, options);
     this.#columns.push(numberColumn);
+  }
+
+  withActionColumn(options?: Partial<ActionColumnOptions>) {
+    if (this.#actionColumn) {
+      throw Error("Action column has already been defined.");
+    }
+
+    //const actionColumn = new ActionColumn("actions", itemValue, options);
   }
 }

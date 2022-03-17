@@ -1,10 +1,13 @@
 <template>
   <v-text-field
+    v-if="!readonly"
     v-bind="$attrs"
     :value="value"
-    type="text"
+    :type="$attrs.type || 'text'"
     @input="updateValue"
+    @dblclick="$emit('dblclick')"
   />
+  <span v-else> {{ value }} </span>
 </template>
 
 <script lang="ts">
@@ -17,6 +20,11 @@ export default defineComponent({
       type: String,
       required: false,
       default: "",
+    },
+    readonly: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   setup(props, context) {

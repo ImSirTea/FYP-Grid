@@ -77,7 +77,7 @@ export default defineComponent({
   components: { NumberField, TextField },
   props: {
     column: {
-      type: Object as PropType<Column<any, any>>,
+      type: Object as PropType<Column<Record<string, any>, any>>,
       required: true,
     },
     filter: {

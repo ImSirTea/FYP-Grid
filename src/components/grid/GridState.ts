@@ -11,8 +11,8 @@ import { isArguments } from "lodash";
 import { firstBy } from "thenby";
 import Vue from "vue";
 
-const gridIndexId = "_grid-idx";
-export type AnyWithGridIdx = { [gridIndexId]: number };
+const gridIndexId = "_grid-index";
+export type AnyWithGridIndex = { [gridIndexId]: number };
 
 type SortOrder = "asc" | "desc" | -1 | 1;
 interface ThenByOpts {
@@ -32,8 +32,8 @@ export class GridState {
   sortOptions: SortOptions[] = [];
   searchValue: string = "";
   filterOptions: Record<string, FilterOption<RenderableType>[]> = {};
-  filterChains: Record<string, (itemValue: any) => boolean> = {};
-  sortFunction: SortFunction = firstBy("_grid-idx");
+  filterChains: Record<string, (itemValue: RenderableType) => boolean> = {};
+  sortFunction: SortFunction = firstBy("_grid-index");
 
   // Build the function only when we update sorting options
   buildSortFunction() {
@@ -48,12 +48,12 @@ export class GridState {
         sortBy = sortBy.thenBy(opt.key, opt.options);
       });
 
-      this.sortFunction = sortBy.thenBy("_grid-idx");
+      this.sortFunction = sortBy.thenBy("_grid-index");
       return;
     }
 
     // Otherwise, default to original order
-    this.sortFunction = firstBy("_grid-idx");
+    this.sortFunction = firstBy("_grid-index");
   }
 
   /**
@@ -62,12 +62,12 @@ export class GridState {
    * @param key The column key to toggle sorting behaviours for
    */
   toggleSort(key: string) {
-    const existingOptionIdx = this.sortOptions.findIndex(
+    const existingOptionIndex = this.sortOptions.findIndex(
       (option) => option.key === key
     );
 
     // Creates a new sorting option if we don't have one
-    if (existingOptionIdx === -1) {
+    if (existingOptionIndex === -1) {
       this.sortOptions.push({
         key,
         options: { direction: "asc" },
@@ -77,11 +77,11 @@ export class GridState {
     }
 
     // Otherwise, progresses or removes
-    const existingOption = this.sortOptions[existingOptionIdx];
+    const existingOption = this.sortOptions[existingOptionIndex];
     if (existingOption.options.direction === "asc") {
       existingOption.options.direction = "desc";
     } else {
-      this.sortOptions.splice(existingOptionIdx, 1);
+      this.sortOptions.splice(existingOptionIndex, 1);
     }
 
     this.buildSortFunction();
@@ -116,7 +116,7 @@ export class GridState {
   filterAndSortItems(
     items: any[],
     gridConfiguration: GridConfiguration<any>
-  ): AnyWithGridIdx[] {
+  ): AnyWithGridIndex[] {
     if (
       this.searchValue === "" &&
       Object.entries(this.filterChains).length === 0
@@ -157,16 +157,16 @@ export class GridState {
       .sort(this.sortFunction);
   }
 
-  // Inserts a grid idx as a property to all items, with the value of their original index
-  injectGridIndexes(items: any[]) {
-    return items.map((item, idx) => ({
-      [gridIndexId]: idx,
+  // Inserts a grid index as a property to all items, with the value of their original index
+  injectGridIndexes(items: Record<string, any>[]) {
+    return items.map((item, index) => ({
+      [gridIndexId]: index,
       ...item,
     }));
   }
 
   // Creates a new filter
-  addNewFilter(column: Column<any, any>) {
+  addNewFilter(column: Column<Record<string, any>, any>) {
     if (!this.filterOptions[column.key]) {
       Vue.set(this.filterOptions, column.key, []);
     }
@@ -191,7 +191,7 @@ export class GridState {
   }
 
   // Deletes a filter at a given pos
-  removeFilter(column: Column<any, any>, index: number) {
+  removeFilter(column: Column<Record<string, any>, any>, index: number) {
     this.filterOptions[column.key].splice(index, 1);
     this.buildFilterFunctionsForColumn(column.key);
   }

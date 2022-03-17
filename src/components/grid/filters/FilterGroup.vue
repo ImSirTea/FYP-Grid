@@ -45,7 +45,7 @@ export default defineComponent({
   components: { FilterItem },
   props: {
     column: {
-      type: Object as PropType<Column<any, any>>,
+      type: Object as PropType<Column<Record<string, any>, any>>,
       required: true,
     },
   },

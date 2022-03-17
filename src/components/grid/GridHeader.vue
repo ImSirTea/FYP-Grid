@@ -21,7 +21,7 @@ export default defineComponent({
   },
   setup(props) {
     const gridConfiguration =
-      inject<GridConfiguration<any>>("gridConfiguration")!;
+      inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
 
     // How wide should our header row should be to align with the grid
@@ -53,7 +53,7 @@ export default defineComponent({
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildCell = (column: Column<any, any>) => {
+    const buildCell = (column: Column<Record<string, any>, any>) => {
       return h(
         "div",
         {
@@ -74,7 +74,7 @@ export default defineComponent({
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildSortIcon = (column: Column<any, any>) => {
+    const buildSortIcon = (column: Column<Record<string, any>, any>) => {
       const isSortingOn = gridState.isSortingOnKey(column.key);
       const sortingIcon =
         isSortingOn?.options.direction === "desc"
