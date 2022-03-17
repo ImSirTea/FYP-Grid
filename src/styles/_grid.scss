@@ -3,10 +3,12 @@
   padding-left: 1em;
   display: flex;
   align-items: center;
+  background-color: inherit;
 }
 
 .grid-row,
 .grid-header {
+  background-color: #fff;
   display: flex;
 }
 

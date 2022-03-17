@@ -45,12 +45,12 @@ export default defineComponent({
     builder.addNumberColumn("index", (item) => item.index);
     builder.addTextColumn("first", (item) => item.first);
     builder.addTextColumn("last", (item) => item.last);
-    builder.addNumberColumn("age", (item) => item.age);
     builder.addTextColumn(
       "wide",
       (item) => (item.first + item.last).repeat(8),
       { width: GridWidthEnum.XLARGE }
     );
+    builder.addNumberColumn("age", (item) => item.age);
 
     return {
       builder,
