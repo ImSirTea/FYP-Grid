@@ -1,7 +1,7 @@
 <template>
   <text-field
     v-bind="$attrs"
-    :value="value.toString()"
+    :value="internalValue"
     :min="min"
     :max="max"
     type="number"
