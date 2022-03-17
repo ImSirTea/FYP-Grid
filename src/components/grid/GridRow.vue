@@ -31,7 +31,7 @@ export default defineComponent({
           width: column.widthWithUnit,
         },
         class: "grid-row-cell",
-        attrs: { readonly: true },
+        attrs: { readonly: true, role: "gridcell" },
         props: { component: column.component, item: this.item, column },
       })
     );

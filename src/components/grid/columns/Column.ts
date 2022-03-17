@@ -65,7 +65,7 @@ export abstract class Column<T, RenderableType> {
   }
 
   get descIcon() {
-    return this.options.ascIcon ?? "mdi-sort-descending";
+    return this.options.descIcon ?? "mdi-sort-descending";
   }
 
   get widthWithUnit() {

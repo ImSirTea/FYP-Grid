@@ -42,6 +42,11 @@ export default defineComponent({
       required: false,
       default: 300,
     },
+    bufferRows: {
+      type: Number,
+      required: false,
+      default: 15,
+    },
   },
   setup(props) {
     const gridState = reactive(new GridState());
@@ -81,6 +86,7 @@ export default defineComponent({
           gridOffsetTop: gridOffsets.top,
           rowHeight: props.rowHeight,
           gridHeight: props.gridHeight,
+          bufferRows: props.bufferRows,
         },
         on: {
           // We want the scrolling to be within the rows, not the entire grid, so listen for these events

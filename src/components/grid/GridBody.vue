@@ -1,6 +1,13 @@
 <script lang="ts">
 import GridRow from "@/components/grid/GridRow.vue";
-import { defineComponent, h, PropType, computed } from "@vue/composition-api";
+import {
+  defineComponent,
+  h,
+  PropType,
+  computed,
+  reactive,
+  watch,
+} from "@vue/composition-api";
 import { VNode } from "vue";
 import { debounce } from "lodash";
 
@@ -33,6 +40,10 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    bufferRows: {
+      type: Number,
+      required: true,
+    },
   },
   setup(props, context) {
     // Total height of all rows, used for scrolling
@@ -40,7 +51,7 @@ export default defineComponent({
       return props.internalItems.length * props.rowHeight + "px";
     });
 
-    // How many rows have we scrolled passed
+    // How many rows have we scrolled passed (effectively the topmost id of visible rows)
     const rowsOffset = computed((): number => {
       return Math.floor(props.gridOffsetTop / props.rowHeight);
     });
@@ -52,26 +63,52 @@ export default defineComponent({
       return Math.min(viewportMax, props.internalItems.length);
     });
 
-    // Visible and offset grid row nodes
-    const rows = computed((): VNode[] => {
-      const min = Math.max(rowsOffset.value, 0);
-      const max = Math.min(
-        rowsOffset.value + maximumVisibleRows.value,
-        props.internalItems.length
-      );
-
-      const rows: VNode[] = [];
-
-      for (let i = min; i < max; i++) {
-        rows.push(buildRow(props.internalItems[i], i));
-      }
-
-      return rows;
+    // Row boundaries to build rows between
+    const rowIndexBoundaries = reactive({
+      min: -1,
+      max: -1,
     });
+
+    // Keep a small copy of our rows to interate over regularly
+    const rowData = computed(() =>
+      props.internalItems.slice(rowIndexBoundaries.min, rowIndexBoundaries.max)
+    );
+
+    // Watch for if we try to peep out of bounds, and then force an update
+    // Intersection observers could be used here, but they're more finnicky
+    watch(
+      rowsOffset,
+      (newValue) => {
+        const needsNewBoundaries =
+          newValue + maximumVisibleRows.value >= rowIndexBoundaries.max ||
+          newValue <= rowIndexBoundaries.min;
+
+        if (needsNewBoundaries) {
+          Object.assign(rowIndexBoundaries, {
+            min: Math.max(0, rowsOffset.value - props.bufferRows),
+            max: Math.min(
+              props.internalItems.length,
+              rowsOffset.value +
+                maximumVisibleRows.value +
+                props.bufferRows +
+                Math.max(0, props.bufferRows - rowsOffset.value)
+            ),
+          });
+        }
+      },
+      { immediate: true }
+    );
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildRow = (item: any, index: number) => {
+      const needsObserver =
+        index === rowIndexBoundaries.min ||
+        index === rowIndexBoundaries.max - 1;
+
       return h(GridRow, {
+        attrs: {
+          role: "row",
+        },
         class: {
           "grid-row": true,
           "grid-row-odd": index % 2,
@@ -83,6 +120,7 @@ export default defineComponent({
         props: {
           item,
           index,
+          needsObserver,
         },
       });
     };
@@ -96,9 +134,10 @@ export default defineComponent({
     };
 
     return {
+      buildRow,
       gridScroll,
+      rowData,
       rowsOffset,
-      rows,
       totalGridHeight,
     };
   },
@@ -122,8 +161,13 @@ export default defineComponent({
             style: {
               height: this.totalGridHeight,
             },
+            attrs: {
+              role: "grid",
+            },
           },
-          this.rows
+          this.rowData.map((row, index) =>
+            this.buildRow(row, index + this.rowsOffset)
+          )
         ),
       ]
     );

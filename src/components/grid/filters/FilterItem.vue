@@ -71,6 +71,7 @@ import {
   computed,
 } from "@vue/composition-api";
 import $tc from "@/textConstants";
+import { debounce } from "lodash";
 
 export default defineComponent({
   name: "FilterItem",
@@ -101,14 +102,15 @@ export default defineComponent({
       );
     };
 
-    const updateValue = (newValue: any) => {
+    // Debounce value changes to allow for inputs to be typed
+    const updateValue = debounce((newValue: any) => {
       gridState.setFilterProperty(
         props.filter,
         "value",
         newValue,
         props.column.key
       );
-    };
+    }, 250);
 
     const updateOperator = (newOperator: FilterConnection) => {
       gridState.setFilterProperty(
