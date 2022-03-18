@@ -24,7 +24,7 @@ export default defineComponent({
   components: { GridRow },
   props: {
     internalItems: {
-      type: Array as PropType<any[]>,
+      type: Array as PropType<Record<string, any>[]>,
       required: true,
       default: () => [],
     },
@@ -47,8 +47,8 @@ export default defineComponent({
   },
   setup(props, context) {
     // Total height of all rows, used for scrolling
-    const totalGridHeight = computed((): string => {
-      return props.internalItems.length * props.rowHeight + "px";
+    const totalGridHeight = computed((): number => {
+      return props.internalItems.length * props.rowHeight;
     });
 
     // How many rows have we scrolled passed (effectively the topmost id of visible rows)
@@ -63,19 +63,20 @@ export default defineComponent({
       return Math.min(viewportMax, props.internalItems.length);
     });
 
-    // Row boundaries to build rows between
-    const rowIndexBoundaries = reactive({
+    // Row boundaries to build rows between, defaults to -1 so our watcher can compute them correctly in a single place
+    const rowIndexBoundaries = reactive<{ min: number; max: number }>({
       min: -1,
       max: -1,
     });
 
-    // Keep a small copy of our rows to interate over regularly
-    const rowData = computed(() =>
-      props.internalItems.slice(rowIndexBoundaries.min, rowIndexBoundaries.max)
+    // Calculates and builds rows within bounds
+    const rows = computed((): VNode[] =>
+      props.internalItems
+        .slice(rowIndexBoundaries.min, rowIndexBoundaries.max)
+        .map((row, index) => buildRow(row, index + rowsOffset.value))
     );
 
-    // Watch for if we try to peep out of bounds, and then force an update
-    // Intersection observers could be used here, but they're more finnicky
+    // Watch for if we try to peep out of bounds, and then force an update our bounds to force grouped refreshes
     watch(
       rowsOffset,
       (newValue) => {
@@ -133,12 +134,25 @@ export default defineComponent({
       } as GridScrollEvent);
     };
 
+    watch(
+      () => props.internalItems,
+      () => {
+        // TODO: This should probably not be hard coded
+        if (totalGridHeight.value > 33554400) {
+          console.error(
+            "Too many rows for the grid to process due to HTML pixel value maximums."
+          );
+        }
+      },
+      { immediate: true }
+    );
+
     return {
       buildRow,
       gridScroll,
-      rowData,
       rowsOffset,
       totalGridHeight,
+      rows,
     };
   },
   render(): VNode {
@@ -159,15 +173,13 @@ export default defineComponent({
           {
             class: "grid-row-height-wrapper",
             style: {
-              height: this.totalGridHeight,
+              height: this.totalGridHeight + "px",
             },
             attrs: {
               role: "grid",
             },
           },
-          this.rowData.map((row, index) =>
-            this.buildRow(row, index + this.rowsOffset)
-          )
+          this.rows
         ),
       ]
     );
