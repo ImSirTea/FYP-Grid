@@ -1,5 +1,6 @@
 <script lang="ts">
 import GridRow from "@/components/grid/GridRow.vue";
+import { GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
   h,
@@ -7,6 +8,8 @@ import {
   computed,
   reactive,
   watch,
+  inject,
+  shallowRef,
 } from "@vue/composition-api";
 import { VNode } from "vue";
 export interface GridScrollEvent {
@@ -44,6 +47,8 @@ export default defineComponent({
     },
   },
   setup(props, context) {
+    const gridState = inject<GridState>("gridState")!;
+    const key = shallowRef(1);
     // Total height of all rows, used for scrolling
     const totalGridHeight = computed((): number => {
       return props.internalItems.length * props.rowHeight;
@@ -138,12 +143,25 @@ export default defineComponent({
       { immediate: true }
     );
 
+    // Whenever our gridstate changes, update our key to force a re-render
+    // This is a little magical, Vue isn't reactive to props.internalItems updating
+    // So we have to manually force it here by setting our key to 1/0 when it changes
+    watch(
+      () => gridState,
+      () => {
+        key.value = 1 - key.value;
+      },
+      { deep: true }
+    );
+
     return {
       buildRow,
       gridScroll,
       rowsOffset,
       totalGridHeight,
       rowIndexBoundaries,
+      gridState,
+      key,
     };
   },
   render(): VNode {
@@ -163,6 +181,7 @@ export default defineComponent({
         on: {
           scroll: this.gridScroll,
         },
+        key: this.key,
       },
       [
         h(
