@@ -34,10 +34,10 @@ export default defineComponent({
     );
 
     // Generate our header rows
-    const headers = computed(() => [buildRow()]);
+    const headers = computed(() => [buildHeaderRow()]);
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildRow = () => {
+    const buildHeaderRow = () => {
       return h(
         "div",
         {
@@ -104,6 +104,7 @@ export default defineComponent({
     return {
       headers,
       totalGridWidth,
+      gridConfiguration,
     };
   },
   render(): VNode {

@@ -42,15 +42,11 @@ export default defineComponent({
       required: false,
       default: 300,
     },
-    bufferRows: {
-      type: Number,
-      required: false,
-      default: 15,
-    },
   },
   setup(props) {
-    const gridState = reactive(new GridState());
+    // Desperately avoid using ref here, it's painfully slow
     const internalItems = shallowRef<Record<string, any>[]>([]);
+    const gridState = reactive(new GridState());
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
 
@@ -66,16 +62,14 @@ export default defineComponent({
       gridState.injectGridIndexes(props.items)
     );
 
+    // If our indexes, config, or state has changed, we should re-filter and sort
     watch(
       () => [props.gridConfiguration, gridState, indexedItems.value],
       () => {
-        Object.assign(
-          internalItems.value,
-          gridState.filterAndSortItems(
-            indexedItems.value,
-            props.gridConfiguration
-          )
-        );
+        internalItems.value.length = 0;
+        internalItems.value = gridState
+          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
+          .slice(); // Create a clone
       },
       { immediate: true, deep: true }
     );
@@ -88,7 +82,6 @@ export default defineComponent({
           gridOffsetTop: gridOffsets.top,
           rowHeight: props.rowHeight,
           gridHeight: props.gridHeight,
-          bufferRows: props.bufferRows,
         },
         on: {
           // We want the scrolling to be within the rows, not the entire grid, so listen for these events
@@ -135,6 +128,8 @@ export default defineComponent({
 
     return {
       buildTable,
+      indexedItems,
+      internalItems,
     };
   },
   render(): VNode {

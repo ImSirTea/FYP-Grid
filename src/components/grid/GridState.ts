@@ -158,6 +158,7 @@ export class GridState {
   }
 
   // Inserts a grid index as a property to all items, with the value of their original index
+  // TODO: This is probably wasteful
   injectGridIndexes(items: Record<string, any>[]) {
     return items.map((item, index) => ({
       [gridIndexId]: index,

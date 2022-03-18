@@ -2,6 +2,7 @@
   <v-app>
     <v-main>
       <grid :grid-configuration="builder" :items="items" />
+      <v-btn @click="updateItems">Change Rows</v-btn>
     </v-main>
   </v-app>
 </template>
@@ -45,10 +46,27 @@ export default defineComponent({
       { width: GridWidthEnum.XLARGE }
     );
     builder.addNumberColumn("age", (item) => item.age);
+    builder.addTextColumn(
+      "updated",
+      (item) => "updated" + item.index + item.first
+    );
+
+    const updateItems = () => {
+      const base = Math.floor(Math.random() * 1000000);
+      items.value = Array(base)
+        .fill(0)
+        .map((_, index) => ({
+          index,
+          first: `Adam-(${base})-${index % 20}`,
+          last: `Lansley-(${base})-${index % 20}`,
+          age: index % 20,
+        })) as Item[];
+    };
 
     return {
       builder,
       items,
+      updateItems,
     };
   },
 });
