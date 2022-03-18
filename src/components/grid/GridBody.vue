@@ -9,8 +9,6 @@ import {
   watch,
 } from "@vue/composition-api";
 import { VNode } from "vue";
-import { debounce } from "lodash";
-
 export interface GridScrollEvent {
   gridOffsetTop: number;
   gridOffsetLeft: number;
