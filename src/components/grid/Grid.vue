@@ -69,9 +69,12 @@ export default defineComponent({
     watch(
       () => [props.gridConfiguration, gridState, indexedItems.value],
       () => {
-        internalItems.value = gridState.filterAndSortItems(
-          indexedItems.value,
-          props.gridConfiguration
+        Object.assign(
+          internalItems.value,
+          gridState.filterAndSortItems(
+            indexedItems.value,
+            props.gridConfiguration
+          )
         );
       },
       { immediate: true, deep: true }
@@ -133,7 +136,6 @@ export default defineComponent({
 
     return {
       buildTable,
-      internalItems,
     };
   },
   render(): VNode {

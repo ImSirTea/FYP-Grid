@@ -67,13 +67,6 @@ export default defineComponent({
       max: -1,
     });
 
-    // Calculates and builds rows within bounds
-    const rows = computed((): VNode[] =>
-      props.internalItems
-        .slice(rowIndexBoundaries.min, rowIndexBoundaries.max)
-        .map((row, index) => buildRow(row, index + rowsOffset.value))
-    );
-
     // Watch for if we try to peep out of bounds, and then force an update our bounds to force grouped refreshes
     watch(
       rowsOffset,
@@ -150,10 +143,16 @@ export default defineComponent({
       gridScroll,
       rowsOffset,
       totalGridHeight,
-      rows,
+      rowIndexBoundaries,
     };
   },
   render(): VNode {
+    const { min, max } = this.rowIndexBoundaries;
+    const rows: VNode[] = [];
+    for (let i = min; i < max; i++) {
+      rows.push(this.buildRow(this.internalItems[i], i));
+    }
+
     return h(
       "div",
       {
@@ -177,7 +176,7 @@ export default defineComponent({
               role: "grid",
             },
           },
-          this.rows
+          rows
         ),
       ]
     );
