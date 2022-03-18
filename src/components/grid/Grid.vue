@@ -11,7 +11,7 @@ import {
   reactive,
   provide,
   watch,
-  ref,
+  shallowRef,
 } from "@vue/composition-api";
 import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/GridControlPanel.vue";
@@ -50,7 +50,7 @@ export default defineComponent({
   },
   setup(props) {
     const gridState = reactive(new GridState());
-    const internalItems = ref<Record<string, any>[]>([]);
+    const internalItems = shallowRef<Record<string, any>[]>([]);
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
 
@@ -67,7 +67,7 @@ export default defineComponent({
     );
 
     watch(
-      () => [props.gridConfiguration, gridState, indexedItems],
+      () => [props.gridConfiguration, gridState, indexedItems.value],
       () => {
         internalItems.value = gridState.filterAndSortItems(
           indexedItems.value,
