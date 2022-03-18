@@ -85,7 +85,6 @@ export default defineComponent({
       return h(GridBody, {
         props: {
           internalItems: internalItems.value,
-          gridConfiguration: props.gridConfiguration,
           gridOffsetTop: gridOffsets.top,
           rowHeight: props.rowHeight,
           gridHeight: props.gridHeight,
