@@ -2,15 +2,12 @@
   <v-app>
     <v-main>
       <grid :grid-configuration="builder" :items="items" />
-      <v-btn class="mr-2" @click="() => (numberOfItems += 100)">Add 100</v-btn>
-      <v-btn class="mr-2" @click="() => (numberOfItems += 500)">Add 500</v-btn>
-      <v-btn @click="() => (numberOfItems += 1000)">Add 1000</v-btn>
     </v-main>
   </v-app>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "@vue/composition-api";
+import { defineComponent, shallowRef } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid from "@/components/grid/Grid.vue";
 import { GridWidthEnum } from "@/components/grid/columns/Column";
@@ -26,18 +23,15 @@ export default defineComponent({
   name: "App",
   components: { Grid },
   setup(props, context) {
-    const numberOfItems = ref(10000);
-
-    const items = computed(
-      () =>
-        Array(numberOfItems.value)
-          .fill(0)
-          .map((_, index) => ({
-            index,
-            first: `Adam${index % 20}`,
-            last: `Lansley${index % 20}`,
-            age: index % 20,
-          })) as Item[]
+    const items = shallowRef(
+      Array(1000000)
+        .fill(0)
+        .map((_, index) => ({
+          index,
+          first: `Adam${index % 20}`,
+          last: `Lansley${index % 20}`,
+          age: index % 20,
+        })) as Item[]
     );
 
     const builder = new GridConfiguration<Item>();
@@ -55,7 +49,6 @@ export default defineComponent({
     return {
       builder,
       items,
-      numberOfItems,
     };
   },
 });
