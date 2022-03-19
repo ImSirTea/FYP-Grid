@@ -43,7 +43,7 @@ export default defineComponent({
     builder.addTextColumn(
       "wide",
       (item) => (item.first + item.last).repeat(8),
-      { width: GridWidthEnum.XLARGE }
+      { defaultWidth: GridWidthEnum.XLARGE }
     );
     builder.addNumberColumn("age", (item) => item.age);
     builder.addTextColumn(

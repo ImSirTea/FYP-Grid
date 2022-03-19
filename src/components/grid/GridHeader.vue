@@ -104,7 +104,6 @@ export default defineComponent({
     return {
       headers,
       totalGridWidth,
-      gridConfiguration,
     };
   },
   render(): VNode {

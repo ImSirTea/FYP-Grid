@@ -17,14 +17,8 @@ export enum SortDirection {
   DESCENDING,
 }
 
-export interface SortOptions {
-  ascIcon: string;
-  descIcon: string;
-  direction: SortDirection;
-}
-
 export interface ColumnOptions {
-  width: GridWidthEnum | number;
+  defaultWidth: GridWidthEnum | number;
   filterable: boolean;
   ascIcon: string;
   descIcon: string;
@@ -57,7 +51,7 @@ export abstract class Column<T, RenderableType> {
   }
 
   get width() {
-    return this.options.width ?? GridWidthEnum.MEDIUM;
+    return this.options.defaultWidth ?? GridWidthEnum.MEDIUM;
   }
 
   get ascIcon() {

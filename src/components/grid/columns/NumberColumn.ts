@@ -28,7 +28,7 @@ export class NumberColumn<T> extends Column<T, number> {
     super(key, itemValue, options);
 
     // Apply defaults
-    this.options.width ??= GridWidthEnum.SMALL;
+    this.options.defaultWidth ??= GridWidthEnum.SMALL;
     this.options.ascIcon ??= "mdi-sort-numeric-ascending";
     this.options.descIcon ??= "mdi-sort-numeric-descending";
   }

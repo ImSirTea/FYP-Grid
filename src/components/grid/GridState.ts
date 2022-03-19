@@ -28,6 +28,7 @@ interface SortOptions {
 type SortFunction = IThenBy<{
   [x: string]: Record<string, unknown>;
 }>;
+
 export class GridState {
   sortOptions: SortOptions[] = [];
   searchValue: string = "";
