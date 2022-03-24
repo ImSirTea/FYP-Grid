@@ -57,7 +57,7 @@
 <script lang="ts">
 import NumberField from "@/components/controls/inputs/NumberField.vue";
 import TextField from "@/components/controls/inputs/TextField.vue";
-import { Column } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 import {
   FilterCondition,
   FilterConnection,
@@ -78,7 +78,7 @@ export default defineComponent({
   components: { NumberField, TextField },
   props: {
     column: {
-      type: Object as PropType<Column<Record<string, any>, any>>,
+      type: Object as PropType<AnyGridColumn>,
       required: true,
     },
     filter: {
@@ -126,7 +126,9 @@ export default defineComponent({
     };
 
     const isLast = computed(
-      () => props.index + 1 === gridState.filterOptions[props.column.key].length
+      () =>
+        props.index + 1 ===
+        gridState.getColumnState(props.column.key).filterOptions.length
     );
 
     return {

@@ -52,7 +52,7 @@ import $tc from "@/textConstants";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import FilterGroup from "@/components/grid/filters/FilterGroup.vue";
 import { GridState } from "@/components/grid/GridState";
-import { Column } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 
 export default defineComponent({
   name: "FilterMenu",
@@ -77,8 +77,8 @@ export default defineComponent({
     return {
       gridConfiguration,
       toggleMenu: (isVisible) => context.emit("input", isVisible),
-      numberOfFiltersForColumn: (column: Column<Record<string, any>, any>) =>
-        gridState.filterOptions[column.key]?.length ?? 0,
+      numberOfFiltersForColumn: (column: AnyGridColumn) =>
+        gridState.getColumnState(column.key).filterOptions.length ?? 0,
       filterableColumns,
       $tc,
     };

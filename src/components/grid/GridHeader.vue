@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Column } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridState } from "@/components/grid/GridState";
 import { defineComponent, inject, h, computed } from "@vue/composition-api";
@@ -25,12 +25,12 @@ export default defineComponent({
     const gridState = inject<GridState>("gridState")!;
 
     // How wide should our header row should be to align with the grid
-    const totalGridWidth = computed(
-      () =>
-        gridConfiguration.columns.reduce(
-          (totalWidth, column) => totalWidth + column.width,
-          0
-        ) + "ch"
+    const totalGridWidth = computed(() =>
+      gridConfiguration.columns.reduce(
+        (totalWidth, column) =>
+          totalWidth + gridState.getColumnState(column.key).width,
+        0
+      )
     );
 
     // Generate our header rows
@@ -43,7 +43,7 @@ export default defineComponent({
         {
           class: "grid-header",
           style: {
-            width: totalGridWidth.value,
+            width: totalGridWidth.value + "px",
             height: props.rowHeight + "px",
             transform: `translateX(${-props.gridOffsetLeft + "px"}`,
           },
@@ -53,13 +53,13 @@ export default defineComponent({
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildCell = (column: Column<Record<string, any>, any>) => {
+    const buildCell = (column: AnyGridColumn) => {
       return h(
         "div",
         {
           style: {
-            width: column.widthWithUnit,
-            height: props.rowHeight,
+            width: gridState.getColumnState(column.key).width + "px",
+            height: props.rowHeight + "px",
           },
           class: "grid-header-cell",
           on: {
@@ -74,7 +74,7 @@ export default defineComponent({
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildSortIcon = (column: Column<Record<string, any>, any>) => {
+    const buildSortIcon = (column: AnyGridColumn) => {
       const isSortingOn = gridState.isSortingOnKey(column.key);
       const sortingIcon =
         isSortingOn?.options.direction === "desc"
@@ -100,6 +100,8 @@ export default defineComponent({
         ),
       ];
     };
+
+    const buildOptionsIcon = (column: AnyGridColumn) => {};
 
     return {
       headers,

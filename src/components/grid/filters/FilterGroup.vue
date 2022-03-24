@@ -28,7 +28,7 @@
 </template>
 
 <script lang="ts">
-import { Column } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
@@ -45,7 +45,7 @@ export default defineComponent({
   components: { FilterItem },
   props: {
     column: {
-      type: Object as PropType<Column<Record<string, any>, any>>,
+      type: Object as PropType<AnyGridColumn>,
       required: true,
     },
   },
@@ -56,7 +56,7 @@ export default defineComponent({
     const validate = () => (form.value as any)?.validate();
 
     const relevantFilters = computed(
-      () => gridState.filterOptions[props.column.key]
+      () => gridState.getColumnState(props.column.key).filterOptions
     );
 
     const addNewFilter = () => {

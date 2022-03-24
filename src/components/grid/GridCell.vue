@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { Column } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { defineComponent, PropType, ref, computed } from "@vue/composition-api";
 import { Component } from "vue";
 
@@ -33,7 +33,7 @@ export default defineComponent({
       required: true,
     },
     column: {
-      type: Object as PropType<Column<Record<string, any>, any>>,
+      type: Object as PropType<AnyGridColumn>,
       required: true,
     },
   },

@@ -25,7 +25,7 @@ export default defineComponent({
   components: { Grid },
   setup(props, context) {
     const items = shallowRef(
-      Array(1000000)
+      Array(100000)
         .fill(0)
         .map((_, index) => ({
           index,

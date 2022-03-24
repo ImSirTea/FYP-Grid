@@ -46,7 +46,7 @@ export default defineComponent({
   setup(props) {
     // Desperately avoid using ref here, it's painfully slow
     const internalItems = shallowRef<Record<string, any>[]>([]);
-    const gridState = reactive(new GridState());
+    const gridState = reactive(new GridState(props.gridConfiguration));
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
 
@@ -61,6 +61,8 @@ export default defineComponent({
     const indexedItems = computed(() =>
       gridState.injectGridIndexes(props.items)
     );
+
+    const totalGridWidth = computed(() => gridState.totalWidth);
 
     // If our indexes, config, or state has changed, we should re-filter and sort
     watch(
@@ -121,6 +123,7 @@ export default defineComponent({
         "div",
         {
           class: "grid-container",
+          style: { width: totalGridWidth.value + "px" },
         },
         [buildControlPanel(), buildHeader(), buildBody()]
       );

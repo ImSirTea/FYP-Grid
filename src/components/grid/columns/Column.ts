@@ -5,10 +5,10 @@ import { Component } from "vue";
 export type ValueExtractor<T, U> = (item: T) => U;
 
 export enum GridWidthEnum {
-  SMALL = 20,
-  MEDIUM = 50,
-  LARGE = 100,
-  XLARGE = 200,
+  SMALL = 50,
+  MEDIUM = 100,
+  LARGE = 200,
+  XLARGE = 350,
 }
 
 export enum SortDirection {
@@ -19,6 +19,7 @@ export enum SortDirection {
 
 export interface ColumnOptions {
   defaultWidth: GridWidthEnum | number;
+  defaultPin: "left" | "right";
   filterable: boolean;
   ascIcon: string;
   descIcon: string;
@@ -26,6 +27,8 @@ export interface ColumnOptions {
 
 // Would like to look into this, not a fan
 export type RenderableType = string | number | boolean; // Could be { toString(): string }?
+export type AnyGridItem = Record<string, any>;
+export type AnyGridColumn = Column<AnyGridItem, any>;
 
 export abstract class Column<T, RenderableType> {
   key: string;
@@ -44,14 +47,11 @@ export abstract class Column<T, RenderableType> {
     this.#itemValue = itemValue;
     this.options = options ?? {};
     this.options.filterable ??= true;
+    this.options.defaultWidth ??= GridWidthEnum.MEDIUM;
   }
 
   value(item: T): RenderableType {
     return this.#itemValue(item);
-  }
-
-  get width() {
-    return this.options.defaultWidth ?? GridWidthEnum.MEDIUM;
   }
 
   get ascIcon() {
@@ -59,10 +59,6 @@ export abstract class Column<T, RenderableType> {
   }
 
   get descIcon() {
-    return this.options.descIcon ?? "mdi-sort-descending";
-  }
-
-  get widthWithUnit() {
-    return this.width + "ch";
+    return this.options.ascIcon ?? "mdi-sort-descending";
   }
 }

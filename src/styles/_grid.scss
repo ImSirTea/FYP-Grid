@@ -6,6 +6,12 @@
   background-color: inherit;
 }
 
+.grid-row-cell * {
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow: ellipsis;
+}
+
 .grid-row,
 .grid-header {
   background-color: #fff;
@@ -60,4 +66,8 @@
 
 .grid-row-cell:hover .grid-row-cell-edit {
   display: inline-flex;
+}
+
+.grid-container {
+  max-width: 100%;
 }
