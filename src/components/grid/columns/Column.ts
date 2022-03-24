@@ -35,7 +35,8 @@ export abstract class Column<T, RenderableType> {
   #itemValue: ValueExtractor<T, RenderableType>;
   options: Partial<ColumnOptions> = {};
 
-  abstract renderer?: Component;
+  abstract viewRenderer?: Component;
+  abstract editRenderer?: Component;
   abstract filterOptions?: FilterOptions<any>;
 
   constructor(

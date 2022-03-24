@@ -3,8 +3,9 @@ import {
   ColumnOptions,
   ValueExtractor,
 } from "@/components/grid/columns/Column";
-import TextField from "@/components/controls/inputs/TextField.vue";
-import TextFilterOptions from "@/components/grid/filters/TextFilterOptions";
+import GridTextView from "@/components/grid/columns/text/GridTextView.vue";
+import GridTextEdit from "@/components/grid/columns/text/GridTextEdit.vue";
+import TextFilterOptions from "@/components/grid/columns/text/TextFilterOptions";
 
 /**
  * Optional and column specific properties to configure TextColumn behaviours
@@ -16,7 +17,8 @@ export interface TextColumnOptions extends ColumnOptions {}
  */
 export class TextColumn<T> extends Column<T, string> {
   declare options: Partial<TextColumnOptions>;
-  public renderer = TextField;
+  public viewRenderer = GridTextView;
+  public editRenderer = GridTextEdit;
   public filterOptions = TextFilterOptions;
 
   constructor(

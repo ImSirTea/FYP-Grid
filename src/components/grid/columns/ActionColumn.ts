@@ -7,6 +7,7 @@ export interface ActionColumnOptions extends ColumnOptions {}
 
 export class ActionColumn extends Column<Record<string, any>, any> {
   declare options: Partial<ActionColumnOptions>;
-  renderer = undefined;
+  viewRenderer = undefined;
+  editRenderer = undefined;
   filterOptions = undefined;
 }

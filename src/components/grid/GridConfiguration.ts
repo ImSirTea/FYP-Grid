@@ -11,11 +11,11 @@ import {
 import {
   NumberColumn,
   NumberColumnOptions,
-} from "@/components/grid/columns/NumberColumn";
+} from "@/components/grid/columns/number/NumberColumn";
 import {
   TextColumn,
   TextColumnOptions,
-} from "@/components/grid/columns/TextColumn";
+} from "@/components/grid/columns/text/TextColumn";
 
 export class GridConfiguration<T> {
   #columns: Column<T, RenderableType>[] = [];

@@ -3,14 +3,11 @@
     <v-row>
       <v-col cols="auto">
         <component
-          v-if="!readonly"
           v-bind="$attrs"
           :is="component"
           :value="internalValue"
-          :readonly="readonly"
           @input="internalValue = $event"
         />
-        <span v-else>{{ internalValue }}</span>
       </v-col>
     </v-row>
   </v-container>
@@ -19,15 +16,10 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { defineComponent, PropType, ref, computed } from "@vue/composition-api";
-import { Component } from "vue";
 
 export default defineComponent({
   name: "GridCell",
   props: {
-    component: {
-      type: Object as PropType<Component>,
-      required: true,
-    },
     item: {
       type: Object as PropType<Record<string, any>>,
       required: true,
@@ -45,10 +37,13 @@ export default defineComponent({
         context.emit("input", newValue);
       },
     });
+    const component = computed(() =>
+      readonly.value ? props.column.viewRenderer : props.column.editRenderer
+    );
 
     return {
       internalValue,
-      readonly,
+      component,
     };
   },
 });
