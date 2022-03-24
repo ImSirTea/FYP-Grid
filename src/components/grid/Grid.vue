@@ -42,6 +42,11 @@ export default defineComponent({
       required: false,
       default: 300,
     },
+    width: {
+      type: Number,
+      required: false,
+      default: undefined,
+    },
   },
   setup(props) {
     // Desperately avoid using ref here, it's painfully slow
@@ -62,7 +67,9 @@ export default defineComponent({
       gridState.injectGridIndexes(props.items)
     );
 
-    const totalGridWidth = computed(() => gridState.totalWidth);
+    const totalGridWidth = computed(() =>
+      props.width ? props.width + "px" : "100%"
+    );
 
     // If our indexes, config, or state has changed, we should re-filter and sort
     watch(
@@ -123,7 +130,7 @@ export default defineComponent({
         "div",
         {
           class: "grid-container",
-          style: { width: totalGridWidth.value + "px" },
+          style: { width: totalGridWidth.value },
         },
         [buildControlPanel(), buildHeader(), buildBody()]
       );
