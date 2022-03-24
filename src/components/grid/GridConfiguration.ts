@@ -1,7 +1,7 @@
 import {
   ActionColumn,
   ActionColumnOptions,
-} from "@/components/grid/columns/ActionColumn";
+} from "@/components/grid/columns/action/ActionColumn";
 import {
   Column,
   ColumnOptions,
@@ -52,6 +52,6 @@ export class GridConfiguration<T> {
       throw Error("Action column has already been defined.");
     }
 
-    //const actionColumn = new ActionColumn("actions", itemValue, options);
+    this.#actionColumn = new ActionColumn("actions", () => null, options);
   }
 }

@@ -1,17 +1,31 @@
 <template>
-  <span>{{ value }}</span>
+  <text-field :value="internalValue" @input="updateValue" />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/composition-api";
+import TextField from "@/components/controls/inputs/TextField.vue";
+import { defineComponent, ref } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridTextEdit",
+  components: { TextField },
   props: {
     value: {
-      type: String,
-      required: true,
+      type: Text,
+      required: false,
     },
+  },
+  setup(props, context) {
+    const internalValue = ref(props.value);
+
+    const updateValue = (value) => {
+      context.emit("input", value);
+    };
+
+    return {
+      internalValue,
+      updateValue,
+    };
   },
 });
 </script>

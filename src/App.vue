@@ -25,7 +25,7 @@ export default defineComponent({
   components: { Grid },
   setup(props, context) {
     const items = shallowRef(
-      Array(100000)
+      Array(1000)
         .fill(0)
         .map((_, index) => ({
           index,
@@ -50,6 +50,7 @@ export default defineComponent({
       "updated",
       (item) => "updated" + item.index + item.first
     );
+    builder.withActionColumn();
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);

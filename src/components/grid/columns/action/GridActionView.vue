@@ -1,5 +1,12 @@
 <template>
-  <span>{{ value }}</span>
+  <v-menu>
+    <template #activator="{ on }">
+      <v-btn v-on="on" icon>
+        <v-icon>mdi-dots-vertical</v-icon>
+      </v-btn>
+    </template>
+    ACTIONS
+  </v-menu>
 </template>
 
 <script lang="ts">
@@ -10,7 +17,7 @@ export default defineComponent({
   props: {
     value: {
       type: Number,
-      required: false,
+      required: true,
     },
   },
 });

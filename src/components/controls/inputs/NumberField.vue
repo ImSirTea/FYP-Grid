@@ -17,6 +17,10 @@ import { defineComponent, ref } from "@vue/composition-api";
 export default defineComponent({
   name: "NumberField",
   components: { TextField },
+  model: {
+    prop: "value",
+    event: "input",
+  },
   props: {
     value: {
       type: Number,

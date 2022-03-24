@@ -24,7 +24,7 @@
       <!-- Value -->
       <v-col cols="12">
         <component
-          :is="column.component"
+          :is="column.editRenderer"
           :value="filter.value"
           :label="$tc.value"
           :rules="[required]"
