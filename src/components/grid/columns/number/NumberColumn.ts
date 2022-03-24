@@ -4,8 +4,8 @@ import {
   ValueExtractor,
   GridWidthEnum,
 } from "@/components/grid/columns/Column";
-import GridNumberView from "@/components/grid/columns/Number/GridNumberView.vue";
-import GridNumberEdit from "@/components/grid/columns/Number/GridNumberEdit.vue";
+import GridNumberView from "@/components/grid/columns/number/GridNumberView.vue";
+import GridNumberEdit from "@/components/grid/columns/number/GridNumberEdit.vue";
 import NumberFilterOptions from "@/components/grid/columns/number/NumberFilterOptions";
 
 /**
