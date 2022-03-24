@@ -1,1 +1,3 @@
 And/OR connections don't highlight on first click? dunno why lmao
+
+How should default grid state be achieved, probably via building a grid?

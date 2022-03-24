@@ -3,15 +3,9 @@ import {
   Column,
   RenderableType,
 } from "@/components/grid/columns/Column";
-import NumberFilterOptions from "@/components/grid/filters/NumberFilterOptions";
-import {
-  FilterFunction,
-  FilterOperator,
-  FilterOption,
-} from "@/components/grid/filters/types";
+import { FilterOperator, FilterOption } from "@/components/grid/filters/types";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { hasAllProperties } from "@/components/util/helpers";
-import { isArguments } from "lodash";
 import { firstBy } from "thenby";
 import Vue from "vue";
 
@@ -48,12 +42,9 @@ interface ColumnState {
 
 export class GridState {
   public searchValue: string = "";
-  private sortOptions: SortOptions[] = [];
-  private sortFunction: SortFunction = firstBy("_grid-index");
-  private columnStates: Map<string, ColumnState> = new Map<
-    string,
-    ColumnState
-  >();
+  #sortOptions: SortOptions[] = [];
+  #sortFunction: SortFunction = firstBy("_grid-index");
+  #columnStates: Map<string, ColumnState> = new Map<string, ColumnState>();
 
   constructor(gridConfiguration?: GridConfiguration<any>) {
     // If we are provided a grid configuration, we should apply the defaults given by it
@@ -66,41 +57,41 @@ export class GridState {
           filterChain: (itemValue: RenderableType) => true,
         };
 
-        this.columnStates.set(column.key, columnState);
+        this.#columnStates.set(column.key, columnState);
       });
     }
   }
 
   get totalWidth() {
-    return Array.from(this.columnStates).reduce(
+    return Array.from(this.#columnStates).reduce(
       (acc, [key, column]) => acc + column.width,
       0
     );
   }
 
   getColumnState(key: string): ColumnState {
-    return this.columnStates.get(key)!;
+    return this.#columnStates.get(key)!;
   }
 
   // Build the function only when we update sorting options
-  private buildSortFunction() {
-    if (this.sortOptions.length) {
+  #buildSortFunction() {
+    if (this.#sortOptions.length) {
       // If we have anything to sort by
       let sortBy = firstBy(
-        this.sortOptions[0].key,
-        this.sortOptions[0].options
+        this.#sortOptions[0].key,
+        this.#sortOptions[0].options
       );
 
-      this.sortOptions.forEach((opt) => {
+      this.#sortOptions.forEach((opt) => {
         sortBy = sortBy.thenBy(opt.key, opt.options);
       });
 
-      this.sortFunction = sortBy.thenBy("_grid-index");
+      this.#sortFunction = sortBy.thenBy("_grid-index");
       return;
     }
 
     // Otherwise, default to original order
-    this.sortFunction = firstBy("_grid-index");
+    this.#sortFunction = firstBy("_grid-index");
   }
 
   /**
@@ -109,29 +100,29 @@ export class GridState {
    * @param key The column key to toggle sorting behaviours for
    */
   public toggleSort(key: string) {
-    const existingOptionIndex = this.sortOptions.findIndex(
+    const existingOptionIndex = this.#sortOptions.findIndex(
       (option) => option.key === key
     );
 
     // Creates a new sorting option if we don't have one
     if (existingOptionIndex === -1) {
-      this.sortOptions.push({
+      this.#sortOptions.push({
         key,
         options: { direction: "asc" },
       });
-      this.buildSortFunction();
+      this.#buildSortFunction();
       return;
     }
 
     // Otherwise, progresses or removes
-    const existingOption = this.sortOptions[existingOptionIndex];
+    const existingOption = this.#sortOptions[existingOptionIndex];
     if (existingOption.options.direction === "asc") {
       existingOption.options.direction = "desc";
     } else {
-      this.sortOptions.splice(existingOptionIndex, 1);
+      this.#sortOptions.splice(existingOptionIndex, 1);
     }
 
-    this.buildSortFunction();
+    this.#buildSortFunction();
   }
 
   /**
@@ -140,9 +131,9 @@ export class GridState {
    * @returns The sorting options and current index for a given column
    */
   public isSortingOnKey(key: string) {
-    const index = this.sortOptions.findIndex((option) => option.key === key);
+    const index = this.#sortOptions.findIndex((option) => option.key === key);
     return index !== -1
-      ? { ...this.sortOptions[index], index: index + 1 }
+      ? { ...this.#sortOptions[index], index: index + 1 }
       : null;
   }
 
@@ -164,12 +155,12 @@ export class GridState {
     items: any[],
     gridConfiguration: GridConfiguration<any>
   ): AnyWithGridIndex[] {
-    const filtersExist = Object.entries(this.columnStates).some(
+    const filtersExist = Object.entries(this.#columnStates).some(
       ([key, column]) => column.filterOptions.length
     );
 
     if (this.searchValue === "" && !filtersExist) {
-      return items.sort(this.sortFunction);
+      return items.sort(this.#sortFunction);
     }
 
     return items
@@ -191,7 +182,7 @@ export class GridState {
             searchPassed = true;
           }
 
-          const filterChain = this.columnStates[column.key].filterChain;
+          const filterChain = this.#columnStates[column.key].filterChain;
 
           if (typeof filterChain !== "undefined") {
             if (!filterChain(itemValueForColumn)) {
@@ -202,7 +193,7 @@ export class GridState {
 
         return searchPassed;
       })
-      .sort(this.sortFunction);
+      .sort(this.#sortFunction);
   }
 
   /**
@@ -222,11 +213,11 @@ export class GridState {
    * @param column Column to insert a new filter for
    */
   public addNewFilter(column: AnyGridColumn) {
-    if (!this.columnStates[column.key].filterOptions) {
-      Vue.set(this.columnStates[column.key].filterOptions, column.key, []);
+    if (!this.#columnStates[column.key].filterOptions) {
+      Vue.set(this.#columnStates[column.key].filterOptions, column.key, []);
     }
 
-    this.columnStates[column.key].filterOptions[column.key].push({
+    this.#columnStates[column.key].filterOptions[column.key].push({
       filterFunction: undefined,
       value: undefined,
       operator: undefined,
@@ -248,8 +239,8 @@ export class GridState {
   ) {
     Vue.set(filter, propertyName, value);
 
-    const filterChain = this.buildFilterFunctionsForColumn(columnKey);
-    Vue.set(this.columnStates[columnKey], "filterChain", filterChain);
+    const filterChain = this.#buildFilterFunctionsForColumn(columnKey);
+    Vue.set(this.#columnStates[columnKey], "filterChain", filterChain);
   }
 
   /**
@@ -258,10 +249,10 @@ export class GridState {
    * @param index The index of the filter
    */
   public removeFilter(column: AnyGridColumn, index: number) {
-    this.columnStates[column.key].filterOptions.splice(index, 1);
+    this.#columnStates[column.key].filterOptions.splice(index, 1);
 
-    const filterChain = this.buildFilterFunctionsForColumn(column.key);
-    Vue.set(this.columnStates[column.key], "filterChain", filterChain);
+    const filterChain = this.#buildFilterFunctionsForColumn(column.key);
+    Vue.set(this.#columnStates[column.key], "filterChain", filterChain);
   }
 
   /**
@@ -272,7 +263,7 @@ export class GridState {
    * @param index
    * @returns
    */
-  private isValidFilterOption(
+  #isValidFilterOption(
     options: FilterOption<RenderableType>,
     totalNumberOfOptions: number,
     index: number
@@ -291,8 +282,8 @@ export class GridState {
    * @param key The column's key to build the chain for
    * @returns All column's filter options, chained together
    */
-  private buildFilterFunctionsForColumn(key: string) {
-    const options = this.columnStates[key].filterOptions;
+  #buildFilterFunctionsForColumn(key: string) {
+    const options = this.#columnStates[key].filterOptions;
 
     if (typeof options === "undefined") {
       return null;
@@ -300,7 +291,7 @@ export class GridState {
 
     const filterChain = options?.reduceRight(
       (chain, option, index) => {
-        if (this.isValidFilterOption(option, options.length, index)) {
+        if (this.#isValidFilterOption(option, options.length, index)) {
           if (option.operator === FilterOperator.or) {
             return (itemValue: any) =>
               chain(itemValue) ||
@@ -321,11 +312,11 @@ export class GridState {
     gridConfiguration: GridConfiguration<any>
   ): PinnedColumnGroups {
     const leftColumns = gridConfiguration.columns.filter(
-      (column) => this.columnStates[column.key].pinnedColumn === "left"
+      (column) => this.#columnStates[column.key].pinnedColumn === "left"
     );
 
     const rightColumns = gridConfiguration.columns.filter(
-      (column) => this.columnStates[column.key].pinnedColumn === "right"
+      (column) => this.#columnStates[column.key].pinnedColumn === "right"
     );
 
     const centerColumns = gridConfiguration.columns.filter(

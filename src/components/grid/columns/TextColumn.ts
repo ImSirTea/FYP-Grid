@@ -16,7 +16,7 @@ export interface TextColumnOptions extends ColumnOptions {}
  */
 export class TextColumn<T> extends Column<T, string> {
   declare options: Partial<TextColumnOptions>;
-  public component = TextField;
+  public renderer = TextField;
   public filterOptions = TextFilterOptions;
 
   constructor(
