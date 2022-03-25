@@ -28,7 +28,7 @@ export default defineComponent({
     const totalGridWidth = computed(() =>
       gridConfiguration.columns.reduce(
         (totalWidth, column) =>
-          totalWidth + gridState.getColumnState(column.key).width,
+          totalWidth + gridState.columnStates[column.key].width,
         0
       )
     );
@@ -58,7 +58,7 @@ export default defineComponent({
         "div",
         {
           style: {
-            width: gridState.getColumnState(column.key).width + "px",
+            width: gridState.columnStates[column.key].width + "px",
             height: props.rowHeight + "px",
           },
           class: "grid-header-cell",
@@ -78,8 +78,8 @@ export default defineComponent({
       const isSortingOn = gridState.isSortingOnKey(column.key);
       const sortingIcon =
         isSortingOn?.options.direction === "desc"
-          ? column.descIcon
-          : column.ascIcon;
+          ? column.options.descIcon
+          : column.options.ascIcon;
 
       return [
         h(

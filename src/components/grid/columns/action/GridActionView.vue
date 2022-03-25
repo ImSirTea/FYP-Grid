@@ -1,22 +1,32 @@
 <template>
-  <v-menu>
+  <v-menu offset-x>
     <template #activator="{ on }">
       <v-btn v-on="on" icon>
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </template>
-    ACTIONS
+    <v-list>
+      <v-list-item v-for="action in value" :key="action.text">
+        <router-link v-if="action.to" :to="action.to">
+          {{ action.text }}
+        </router-link>
+        <v-list-item-content v-else @click="action.action">
+          {{ action.text }}
+        </v-list-item-content>
+      </v-list-item>
+    </v-list>
   </v-menu>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/composition-api";
+import { ActionDefinition } from "@/components/grid/columns/action/ActionColumn";
+import { defineComponent, PropType } from "@vue/composition-api";
 
 export default defineComponent({
-  name: "GridNumberView",
+  name: "GridActionView",
   props: {
     value: {
-      type: Number,
+      type: Array as PropType<ActionDefinition[]>,
       required: true,
     },
   },

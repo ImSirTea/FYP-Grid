@@ -15,21 +15,16 @@ export interface TextColumnOptions extends ColumnOptions {}
 /**
  * TextColumn type, used when building grids using string fields
  */
-export class TextColumn<T> extends Column<T, string> {
-  declare options: Partial<TextColumnOptions>;
+export class TextColumn<T> extends Column<T, string, TextColumnOptions> {
   public viewRenderer = GridTextView;
   public editRenderer = GridTextEdit;
   public filterOptions = TextFilterOptions;
 
-  constructor(
-    key: string,
-    itemValue: ValueExtractor<T, string>,
-    options?: Partial<TextColumnOptions>
-  ) {
-    super(key, itemValue, options);
+  constructor(key: string, itemValue: ValueExtractor<T, string>) {
+    super(key, itemValue);
 
     // Apply defaults
-    this.options.ascIcon ??= "mdi-sort-alphabetical-ascending";
-    this.options.descIcon ??= "mdi-sort-alphabetical-descending";
+    this.setOption("ascIcon", "mdi-sort-alphabetical-ascending");
+    this.setOption("descIcon", "mdi-sort-alphabetical-descending");
   }
 }

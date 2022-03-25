@@ -28,9 +28,9 @@ type SortFunction = IThenBy<{
 }>;
 
 interface PinnedColumnGroups {
-  left: Column<any, RenderableType>[];
-  center: Column<any, RenderableType>[];
-  right: Column<any, RenderableType>[];
+  left: AnyGridColumn[];
+  center: AnyGridColumn[];
+  right: AnyGridColumn[];
 }
 
 interface ColumnState {
@@ -68,10 +68,6 @@ export class GridState {
       (acc, [key, column]) => acc + column.width,
       0
     );
-  }
-
-  getColumnState(key: string): ColumnState {
-    return this.columnStates[key]!;
   }
 
   // Build the function only when we update sorting options
@@ -183,7 +179,7 @@ export class GridState {
             searchPassed = true;
           }
 
-          const filterChain = this.getColumnState(column.key).filterChain;
+          const filterChain = this.columnStates[column.key].filterChain;
 
           if (typeof filterChain !== "undefined") {
             if (!filterChain(itemValueForColumn)) {
@@ -214,7 +210,7 @@ export class GridState {
    * @param column Column to insert a new filter for
    */
   public addNewFilter(column: AnyGridColumn) {
-    const columnState = this.getColumnState(column.key);
+    const columnState = this.columnStates[column.key];
 
     if (!columnState.filterOptions) {
       Vue.set(columnState.filterOptions, column.key, []);
@@ -252,10 +248,10 @@ export class GridState {
    * @param index The index of the filter
    */
   public removeFilter(column: AnyGridColumn, index: number) {
-    this.getColumnState(column.key).filterOptions.splice(index, 1);
+    this.columnStates[column.key].filterOptions.splice(index, 1);
 
     const filterChain = this.#buildFilterFunctionsForColumn(column.key);
-    Vue.set(this.getColumnState(column.key), "filterChain", filterChain);
+    Vue.set(this.columnStates[column.key], "filterChain", filterChain);
   }
 
   /**
@@ -315,11 +311,11 @@ export class GridState {
     gridConfiguration: GridConfiguration<any>
   ): PinnedColumnGroups {
     const leftColumns = gridConfiguration.columns.filter(
-      (column) => this.getColumnState(column.key).pinnedColumn === "left"
+      (column) => this.columnStates[column.key].pinnedColumn === "left"
     );
 
     const rightColumns = gridConfiguration.columns.filter(
-      (column) => this.getColumnState(column.key).pinnedColumn === "right"
+      (column) => this.columnStates[column.key].pinnedColumn === "right"
     );
 
     const centerColumns = gridConfiguration.columns.filter(

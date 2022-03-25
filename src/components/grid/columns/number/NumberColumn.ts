@@ -11,27 +11,24 @@ import NumberFilterOptions from "@/components/grid/columns/number/NumberFilterOp
 /**
  * Optional and column specific properties to configure NumberColumn behaviours
  */
-export interface NumberColumnOptions extends ColumnOptions {}
+export interface NumberColumnOptions extends ColumnOptions {
+  max: number;
+}
 
 /**
  * NumberColumn type, used when building grids using number fields
  */
-export class NumberColumn<T> extends Column<T, number> {
-  declare options: Partial<NumberColumnOptions>;
+export class NumberColumn<T> extends Column<T, number, NumberColumnOptions> {
   public viewRenderer = GridNumberView;
   public editRenderer = GridNumberEdit;
   public filterOptions = NumberFilterOptions;
 
-  constructor(
-    key: string,
-    itemValue: ValueExtractor<T, number>,
-    options?: Partial<NumberColumnOptions>
-  ) {
-    super(key, itemValue, options);
+  constructor(key: string, itemValue: ValueExtractor<T, number>) {
+    super(key, itemValue);
 
     // Apply defaults
-    this.options.defaultWidth ??= GridWidthEnum.SMALL;
-    this.options.ascIcon ??= "mdi-sort-numeric-ascending";
-    this.options.descIcon ??= "mdi-sort-numeric-descending";
+    this.setOption("defaultWidth", GridWidthEnum.SMALL);
+    this.setOption("ascIcon", "mdi-sort-numeric-ascending");
+    this.setOption("descIcon", "mdi-sort-numeric-descending");
   }
 }

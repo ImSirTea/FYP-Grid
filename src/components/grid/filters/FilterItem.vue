@@ -128,7 +128,7 @@ export default defineComponent({
     const isLast = computed(
       () =>
         props.index + 1 ===
-        gridState.getColumnState(props.column.key).filterOptions.length
+        gridState.columnStates[props.column.key].filterOptions.length
     );
 
     return {

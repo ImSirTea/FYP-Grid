@@ -57,7 +57,7 @@ export default defineComponent({
     const validate = () => (form.value as any)?.validate();
 
     const relevantFilters = computed(
-      () => gridState.getColumnState(props.column.key).filterOptions
+      () => gridState.columnStates[props.column.key].filterOptions
     );
 
     const addNewFilter = () => {

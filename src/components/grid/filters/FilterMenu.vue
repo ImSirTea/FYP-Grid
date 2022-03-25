@@ -9,14 +9,16 @@
   >
     <!-- Prepend our header row -->
     <template #prepend>
-      <v-list-item>
-        <v-list-item-title>
-          {{ $tc.filter }}
-        </v-list-item-title>
-        <v-btn icon @click="toggleMenu(!value)">
-          <v-icon>mdi-close</v-icon>
-        </v-btn>
-      </v-list-item>
+      <v-list>
+        <v-list-item>
+          <v-list-item-title>
+            {{ $tc.filter }}
+          </v-list-item-title>
+          <v-btn icon @click="toggleMenu(!value)">
+            <v-icon>mdi-close</v-icon>
+          </v-btn>
+        </v-list-item>
+      </v-list>
     </template>
     <v-divider />
 
@@ -71,14 +73,14 @@ export default defineComponent({
     const gridState = inject<GridState>("gridState")!;
 
     const filterableColumns = gridConfiguration.columns.filter(
-      (column) => column.options?.filterable
+      (column) => column.options?.isFilterable
     );
 
     return {
       gridConfiguration,
       toggleMenu: (isVisible) => context.emit("input", isVisible),
       numberOfFiltersForColumn: (column: AnyGridColumn) =>
-        gridState.getColumnState(column.key).filterOptions.length ?? 0,
+        gridState.columnStates[column.key].filterOptions.length ?? 0,
       filterableColumns,
       $tc,
     };

@@ -1,24 +1,15 @@
-import {
-  ActionColumn,
-  ActionColumnOptions,
-} from "@/components/grid/columns/action/ActionColumn";
+import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import {
   Column,
   ColumnOptions,
   RenderableType,
   ValueExtractor,
 } from "@/components/grid/columns/Column";
-import {
-  NumberColumn,
-  NumberColumnOptions,
-} from "@/components/grid/columns/number/NumberColumn";
-import {
-  TextColumn,
-  TextColumnOptions,
-} from "@/components/grid/columns/text/TextColumn";
+import { NumberColumn } from "@/components/grid/columns/number/NumberColumn";
+import { TextColumn } from "@/components/grid/columns/text/TextColumn";
 
 export class GridConfiguration<T> {
-  #columns: Column<T, RenderableType>[] = [];
+  #columns: Column<T, RenderableType, ColumnOptions>[] = [];
   #actionColumn?: ActionColumn;
 
   get columns() {
@@ -29,29 +20,27 @@ export class GridConfiguration<T> {
     return this.#columns;
   }
 
-  addTextColumn(
-    name: string,
-    itemValue: ValueExtractor<T, string>,
-    options?: Partial<TextColumnOptions>
-  ) {
-    const textColumn = new TextColumn(name, itemValue, options);
+  addTextColumn(name: string, itemValue: ValueExtractor<T, string>) {
+    const textColumn = new TextColumn(name, itemValue);
     this.#columns.push(textColumn);
+
+    return textColumn;
   }
 
-  addNumberColumn(
-    name: string,
-    itemValue: ValueExtractor<T, number>,
-    options?: Partial<NumberColumnOptions>
-  ) {
-    const numberColumn = new NumberColumn(name, itemValue, options);
+  addNumberColumn(name: string, itemValue: ValueExtractor<T, number>) {
+    const numberColumn = new NumberColumn(name, itemValue);
     this.#columns.push(numberColumn);
+
+    return numberColumn;
   }
 
-  withActionColumn(options?: Partial<ActionColumnOptions>) {
+  withActionColumn() {
     if (this.#actionColumn) {
       throw Error("Action column has already been defined.");
     }
 
-    this.#actionColumn = new ActionColumn("actions", () => null, options);
+    this.#actionColumn = new ActionColumn("actions", () => null);
+
+    return this.#actionColumn;
   }
 }

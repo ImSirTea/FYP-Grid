@@ -31,7 +31,7 @@ export default defineComponent({
     const cells = this.gridConfiguration.columns.map((column) =>
       h(GridCell, {
         style: {
-          width: this.gridState.getColumnState(column.key).width + "px",
+          width: this.gridState.columnStates[column.key].width + "px",
         },
         class: "grid-row-cell",
         attrs: { readonly: true, role: "gridcell" },

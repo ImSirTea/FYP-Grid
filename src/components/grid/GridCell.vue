@@ -14,6 +14,7 @@
 </template>
 
 <script lang="ts">
+import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { defineComponent, PropType, ref, computed } from "@vue/composition-api";
 
@@ -32,9 +33,17 @@ export default defineComponent({
   setup(props, context) {
     const readonly = ref(true);
     const internalValue = computed({
-      get: () => props.column.value(props.item),
+      get: () => {
+        if (props.column instanceof ActionColumn) {
+          return props.column.actions;
+        }
+
+        return props.column.value(props.item);
+      },
       set: (newValue: any) => {
-        context.emit("input", newValue);
+        if (!(props.column instanceof ActionColumn)) {
+          context.emit("input", newValue);
+        }
       },
     });
     const component = computed(() =>

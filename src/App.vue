@@ -11,7 +11,6 @@
 import { defineComponent, shallowRef } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid from "@/components/grid/Grid.vue";
-import { GridWidthEnum } from "@/components/grid/columns/Column";
 
 interface Item {
   first: string;
@@ -37,20 +36,21 @@ export default defineComponent({
 
     const builder = new GridConfiguration<Item>();
 
-    builder.addNumberColumn("index", (item) => item.index);
+    builder.addNumberColumn("index", (item) => item.index).setOption("max", 14);
     builder.addTextColumn("first", (item) => item.first);
     builder.addTextColumn("last", (item) => item.last);
-    builder.addTextColumn(
-      "wide",
-      (item) => (item.first + item.last).repeat(8),
-      { defaultWidth: GridWidthEnum.XLARGE }
-    );
+    builder.addTextColumn("wide", (item) => (item.first + item.last).repeat(8));
     builder.addNumberColumn("age", (item) => item.age);
     builder.addTextColumn(
       "updated",
       (item) => "updated" + item.index + item.first
     );
-    builder.withActionColumn();
+    builder
+      .withActionColumn()
+      .addAction("log for me", () => {
+        console.log("eee");
+      })
+      .addRouting("redirect to hash", { path: "#" });
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);
