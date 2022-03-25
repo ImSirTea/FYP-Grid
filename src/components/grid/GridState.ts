@@ -6,26 +6,16 @@ import {
 import { FilterOperator, FilterOption } from "@/components/grid/filters/types";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { hasAllProperties } from "@/components/util/helpers";
-import { firstBy } from "thenby";
+import { firstBy, IThenBy } from "thenby";
 import Vue from "vue";
 
 const gridIndexId = "_grid-index";
 export type AnyWithGridIndex = { [gridIndexId]: number };
 
-type SortOrder = "asc" | "desc" | -1 | 1;
-interface ThenByOpts {
-  direction?: SortOrder;
-  ignoreCase?: boolean;
-}
-
 interface SortOptions {
-  key: string;
-  options: ThenByOpts;
+  column: AnyGridColumn;
+  direction: "asc" | "desc";
 }
-
-type SortFunction = IThenBy<{
-  [x: string]: Record<string, unknown>;
-}>;
 
 interface PinnedColumnGroups {
   left: AnyGridColumn[];
@@ -42,8 +32,8 @@ interface ColumnState {
 
 export class GridState {
   public searchValue: string = "";
-  #sortOptions: SortOptions[] = [];
-  #sortFunction: SortFunction = firstBy("_grid-index");
+  private sortOptions: SortOptions[] = [];
+  private sortFunction: IThenBy<any> = firstBy("_grid-index");
   columnStates: Record<string, ColumnState> = {};
 
   constructor(gridConfiguration?: GridConfiguration<any>) {
@@ -72,51 +62,55 @@ export class GridState {
 
   // Build the function only when we update sorting options
   #buildSortFunction() {
-    if (this.#sortOptions.length) {
-      // If we have anything to sort by
-      let sortBy = firstBy(
-        this.#sortOptions[0].key,
-        this.#sortOptions[0].options
-      );
+    if (this.sortOptions.length) {
+      let sortBy;
 
-      this.#sortOptions.forEach((opt) => {
-        sortBy = sortBy.thenBy(opt.key, opt.options);
+      this.sortOptions.forEach((opt) => {
+        if (!sortBy) {
+          sortBy = firstBy((item: any) => {
+            return opt.column.value(item);
+          }, opt.direction);
+        } else {
+          sortBy = sortBy.thenBy((item: any) => {
+            return opt.column.value(item);
+          }, opt.direction);
+        }
       });
 
-      this.#sortFunction = sortBy.thenBy("_grid-index");
+      this.sortFunction = sortBy.thenBy("_grid-index");
       return;
     }
 
     // Otherwise, default to original order
-    this.#sortFunction = firstBy("_grid-index");
+    this.sortFunction = firstBy("_grid-index");
   }
 
   /**
    * Cycles through sorting behaviours for a column
    *
-   * @param key The column key to toggle sorting behaviours for
+   * @param column The column to toggle sorting behaviours for
    */
-  public toggleSort(key: string) {
-    const existingOptionIndex = this.#sortOptions.findIndex(
-      (option) => option.key === key
+  public toggleSort(column: AnyGridColumn) {
+    const existingOptionIndex = this.sortOptions.findIndex(
+      (option) => option.column.key === column.key
     );
 
     // Creates a new sorting option if we don't have one
     if (existingOptionIndex === -1) {
-      this.#sortOptions.push({
-        key,
-        options: { direction: "asc" },
+      this.sortOptions.push({
+        column,
+        direction: "asc",
       });
       this.#buildSortFunction();
       return;
     }
 
     // Otherwise, progresses or removes
-    const existingOption = this.#sortOptions[existingOptionIndex];
-    if (existingOption.options.direction === "asc") {
-      existingOption.options.direction = "desc";
+    const existingOption = this.sortOptions[existingOptionIndex];
+    if (existingOption.direction === "asc") {
+      existingOption.direction = "desc";
     } else {
-      this.#sortOptions.splice(existingOptionIndex, 1);
+      this.sortOptions.splice(existingOptionIndex, 1);
     }
 
     this.#buildSortFunction();
@@ -124,13 +118,15 @@ export class GridState {
 
   /**
    *
-   * @param key The column key to look for
+   * @param column The column to look for
    * @returns The sorting options and current index for a given column
    */
-  public isSortingOnKey(key: string) {
-    const index = this.#sortOptions.findIndex((option) => option.key === key);
+  public isSortingOnKey(column: AnyGridColumn) {
+    const index = this.sortOptions.findIndex(
+      (option) => option.column.key === column.key
+    );
     return index !== -1
-      ? { ...this.#sortOptions[index], index: index + 1 }
+      ? { ...this.sortOptions[index], index: index + 1 }
       : null;
   }
 
@@ -157,7 +153,7 @@ export class GridState {
     );
 
     if (this.searchValue === "" && !filtersExist) {
-      return items.sort(this.#sortFunction);
+      return items.sort(this.sortFunction);
     }
 
     return items
@@ -165,7 +161,11 @@ export class GridState {
         // !searchValue allows for being true if we don't have a search value to check against
         let searchPassed = !this.searchValue;
 
-        for (const column of gridConfiguration.columns) {
+        const columnsToFilter = gridConfiguration.columns.filter(
+          (column) => column.options.isFilterable
+        );
+
+        for (const column of columnsToFilter) {
           const itemValueForColumn = column
             .value(item)
             .toString()
@@ -190,7 +190,7 @@ export class GridState {
 
         return searchPassed;
       })
-      .sort(this.#sortFunction);
+      .sort(this.sortFunction);
   }
 
   /**

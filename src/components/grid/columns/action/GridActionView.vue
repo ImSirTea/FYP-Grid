@@ -6,14 +6,18 @@
       </v-btn>
     </template>
     <v-list>
-      <v-list-item v-for="action in value" :key="action.text">
-        <router-link v-if="action.to" :to="action.to">
-          {{ action.text }}
-        </router-link>
-        <v-list-item-content v-else @click="action.action">
-          {{ action.text }}
-        </v-list-item-content>
-      </v-list-item>
+      <v-list-item-group>
+        <v-list-item v-for="action in value" :key="action.text">
+          <router-link v-if="action.to" :to="action.to">
+            {{ action.text }}
+          </router-link>
+          <v-list-item-content v-else @click="action.action">
+            <v-list-item-title>
+              {{ action.text }}
+            </v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
+      </v-list-item-group>
     </v-list>
   </v-menu>
 </template>

@@ -140,6 +140,7 @@ export default defineComponent({
       buildTable,
       indexedItems,
       internalItems,
+      gridState,
     };
   },
   render(): VNode {

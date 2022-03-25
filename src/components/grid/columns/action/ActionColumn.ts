@@ -1,6 +1,10 @@
-import { Column, ColumnOptions } from "@/components/grid/columns/Column";
+import {
+  Column,
+  ColumnOptions,
+  GridWidthEnum,
+  ValueExtractor,
+} from "@/components/grid/columns/Column";
 import GridActionView from "@/components/grid/columns/action/GridActionView.vue";
-import { RouteLocationRaw } from "vue-router";
 
 /**
  * Optional and column specific properties to configure NumberColumn behaviours
@@ -22,6 +26,14 @@ export class ActionColumn extends Column<
   editRenderer = undefined;
   filterOptions = undefined;
   actions: ActionDefinition[] = [];
+
+  constructor(key: string, itemValue: ValueExtractor<any, any>) {
+    super(key, itemValue);
+
+    this.setOption("isFilterable", false);
+    this.setOption("isSortable", false);
+    this.setOption("defaultWidth", GridWidthEnum.SMALL);
+  }
 
   addAction(
     text: ActionDefinition["text"],

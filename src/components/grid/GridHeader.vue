@@ -54,6 +54,10 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn) => {
+      const sortIcon = column.options.isSortable
+        ? buildSortIcon(column)
+        : undefined;
+
       return h(
         "div",
         {
@@ -65,19 +69,19 @@ export default defineComponent({
           on: {
             click: () => {
               // Toggle our sorting behaviours
-              gridState.toggleSort(column.key);
+              gridState.toggleSort(column);
             },
           },
         },
-        [column.key, buildSortIcon(column)]
+        [column.key, sortIcon]
       );
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildSortIcon = (column: AnyGridColumn) => {
-      const isSortingOn = gridState.isSortingOnKey(column.key);
+      const isSortingOn = gridState.isSortingOnKey(column);
       const sortingIcon =
-        isSortingOn?.options.direction === "desc"
+        isSortingOn?.direction === "desc"
           ? column.options.descIcon
           : column.options.ascIcon;
 
@@ -100,8 +104,6 @@ export default defineComponent({
         ),
       ];
     };
-
-    const buildOptionsIcon = (column: AnyGridColumn) => {};
 
     return {
       headers,
