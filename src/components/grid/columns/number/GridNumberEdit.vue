@@ -4,19 +4,24 @@
 
 <script lang="ts">
 import NumberField from "@/components/controls/inputs/NumberField.vue";
-import { defineComponent, ref } from "@vue/composition-api";
+import { NumberColumn } from "@/components/grid/columns/number/NumberColumn";
+import { defineComponent, ref, PropType } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridNumberEdit",
   components: { NumberField },
   props: {
-    value: {
-      type: Number,
-      required: false,
+    item: {
+      type: Object as PropType<Record<string, any>>,
+      required: true,
+    },
+    column: {
+      type: Object as PropType<NumberColumn<any>>,
+      required: true,
     },
   },
   setup(props, context) {
-    const internalValue = ref(props.value);
+    const internalValue = ref(props.column.value(props.item));
 
     const updateValue = (value) => {
       context.emit("input", value);

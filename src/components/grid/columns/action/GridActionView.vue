@@ -7,11 +7,11 @@
     </template>
     <v-list>
       <v-list-item-group>
-        <v-list-item v-for="action in value" :key="action.text">
-          <router-link v-if="action.to" :to="action.to">
+        <v-list-item v-for="action in actions" :key="action.text">
+          <router-link v-if="action.to" :to="action.to(item)">
             {{ action.text }}
           </router-link>
-          <v-list-item-content v-else @click="action.action">
+          <v-list-item-content v-else @click="action.onClick(item)">
             <v-list-item-title>
               {{ action.text }}
             </v-list-item-title>
@@ -23,16 +23,25 @@
 </template>
 
 <script lang="ts">
-import { ActionDefinition } from "@/components/grid/columns/action/ActionColumn";
+import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import { defineComponent, PropType } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridActionView",
   props: {
-    value: {
-      type: Array as PropType<ActionDefinition[]>,
+    item: {
+      type: Object as PropType<Record<string, any>>,
       required: true,
     },
+    column: {
+      type: Object as PropType<ActionColumn<any>>,
+      required: true,
+    },
+  },
+  setup(props) {
+    return {
+      actions: props.column.actions,
+    };
   },
 });
 </script>

@@ -5,8 +5,9 @@
         <component
           v-bind="$attrs"
           :is="component"
-          :value="internalValue"
-          @input="internalValue = $event"
+          :item="item"
+          :column="column"
+          @input="$emit('input', $event)"
         />
       </v-col>
     </v-row>
@@ -14,7 +15,6 @@
 </template>
 
 <script lang="ts">
-import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { defineComponent, PropType, ref, computed } from "@vue/composition-api";
 
@@ -32,26 +32,12 @@ export default defineComponent({
   },
   setup(props, context) {
     const readonly = ref(true);
-    const internalValue = computed({
-      get: () => {
-        if (props.column instanceof ActionColumn) {
-          return props.column.actions;
-        }
 
-        return props.column.value(props.item);
-      },
-      set: (newValue: any) => {
-        if (!(props.column instanceof ActionColumn)) {
-          context.emit("input", newValue);
-        }
-      },
-    });
     const component = computed(() =>
       readonly.value ? props.column.viewRenderer : props.column.editRenderer
     );
 
     return {
-      internalValue,
       component,
     };
   },

@@ -3,15 +3,25 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/composition-api";
+import { TextColumn } from "@/components/grid/columns/text/TextColumn";
+import { defineComponent, PropType } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridTextView",
   props: {
-    value: {
-      type: String,
+    item: {
+      type: Object as PropType<Record<string, any>>,
       required: true,
     },
+    column: {
+      type: Object as PropType<TextColumn<any>>,
+      required: true,
+    },
+  },
+  setup(props) {
+    return {
+      value: props.column.value(props.item),
+    };
   },
 });
 </script>

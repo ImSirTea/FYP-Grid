@@ -53,9 +53,12 @@ export default defineComponent({
       (item) => "updated" + item.index + item.first
     );
     builder.addNumberColumn("test", (item) => item.index);
-    builder.withActionColumn().addAction("log for me", () => {
-      console.log("Logging from actions");
-    });
+    builder
+      .withActionColumn()
+      .addAction("log for me", (item) => {
+        console.log(`Logging from actions: #${item.index}`);
+      })
+      .addRoute(`redirect to #{index}`, (item) => `#${item.index}`);
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);

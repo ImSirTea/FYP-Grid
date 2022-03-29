@@ -15,4 +15,5 @@ export default {
   value: "Value",
   connection: "Connection",
   required: "Value is required",
+  actions: "Actions",
 };
