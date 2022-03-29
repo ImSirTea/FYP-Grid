@@ -7,7 +7,8 @@
           :is="component"
           :item="item"
           :column="column"
-          @input="$emit('input', $event)"
+          :value="internalValue"
+          @input="$emit('input', value)"
         />
       </v-col>
     </v-row>
@@ -31,7 +32,12 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const readonly = ref(true);
+    const readonly = ref(false);
+
+    const internalValue = computed({
+      get: () => props.column.value(props.item),
+      set: (value) => context.emit("input", value),
+    });
 
     const component = computed(() =>
       readonly.value ? props.column.viewRenderer : props.column.editRenderer
@@ -39,6 +45,7 @@ export default defineComponent({
 
     return {
       component,
+      internalValue,
     };
   },
 });

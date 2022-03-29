@@ -36,6 +36,15 @@ export default defineComponent({
         class: "grid-row-cell",
         attrs: { readonly: true, role: "gridcell" },
         props: { item: this.item, column },
+        on: {
+          input: (value) => {
+            console.log(
+              "Logic on assignment will need to be applied",
+              value,
+              this.item
+            );
+          },
+        },
       })
     );
 

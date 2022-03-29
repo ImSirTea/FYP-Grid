@@ -17,11 +17,10 @@ export default defineComponent({
       type: Object as PropType<NumberColumn<any>>,
       required: true,
     },
-  },
-  setup(props) {
-    return {
-      value: props.column.value(props.item),
-    };
+    value: {
+      type: Number,
+      required: false,
+    },
   },
 });
 </script>
