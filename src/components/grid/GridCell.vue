@@ -32,7 +32,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const readonly = ref(false);
+    const readonly = ref(true);
 
     const internalValue = computed({
       get: () => props.column.value(props.item),
