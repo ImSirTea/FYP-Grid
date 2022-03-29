@@ -4,8 +4,7 @@
 
 <script lang="ts">
 import NumberField from "@/components/controls/inputs/NumberField.vue";
-import { NumberColumn } from "@/components/grid/columns/number/NumberColumn";
-import { defineComponent, computed, PropType } from "@vue/composition-api";
+import { defineComponent, computed } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridNumberEdit",
@@ -15,14 +14,6 @@ export default defineComponent({
     prop: "value",
   },
   props: {
-    item: {
-      type: Object as PropType<Record<string, any>>,
-      required: true,
-    },
-    column: {
-      type: Object as PropType<NumberColumn<any>>,
-      required: true,
-    },
     value: {
       type: Number,
       required: false,
