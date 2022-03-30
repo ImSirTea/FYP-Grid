@@ -4,6 +4,7 @@
   display: flex;
   align-items: center;
   background-color: inherit;
+  width: 100%;
 }
 
 .grid-row-cell * {
@@ -20,6 +21,18 @@
 
 .grid-row {
   position: absolute;
+}
+
+// Don't allow styling on action-able rows
+.grid-row-clickable > a {
+  text-decoration: none ;
+  color: inherit !important;
+  cursor: pointer;
+}
+
+.grid-row-clickable > a > * {
+  cursor: default;
+  user-select: text;
 }
 
 .grid-header-container {
@@ -44,6 +57,14 @@
 
 .grid-row-odd {
   background-color: #f3f3f3;
+}
+
+.grid-row-clickable.grid-row-odd:hover {
+  background-color: #dfdfdf;
+}
+
+.grid-row-clickable.grid-row:hover {
+  background-color: #dfdfdf;
 }
 
 .grid-sort-icon:not(.grid-sort-active) {

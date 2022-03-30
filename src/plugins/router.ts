@@ -1,3 +1,6 @@
-import VueRouter from "vue-router";
+import VueRouter, { RouteConfig } from "vue-router";
+import App from "@/App.vue";
 
-export default new VueRouter({ mode: "history" });
+const routes: RouteConfig[] = [{ path: "/", component: App }];
+
+export default new VueRouter({ mode: "history", routes });

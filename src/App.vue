@@ -58,7 +58,11 @@ export default defineComponent({
       .addAction("log for me", (item) => {
         console.log(`Logging from actions: #${item.index}`);
       })
-      .addRoute(`redirect to #{index}`, (item) => `#${item.index}`);
+      .addRoute(
+        `redirect to /actionRoute/index/{index}`,
+        (item) => `/actionRoute/index/${item.index}`
+      );
+    builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);

@@ -28,13 +28,17 @@ export default defineComponent({
     };
   },
   render(): VNode {
+    const isRowClickable = !!(
+      this.gridConfiguration.rowAction || this.gridConfiguration.rowRoute
+    );
+
     const cells = this.gridConfiguration.columns.map((column) =>
       h(GridCell, {
         style: {
           width: this.gridState.columnStates[column.key].width + "px",
         },
         class: "grid-row-cell",
-        attrs: { readonly: true, role: "gridcell" },
+        attrs: { role: "gridcell" },
         props: { item: this.item, column },
         on: {
           input: (value) => {
@@ -48,7 +52,7 @@ export default defineComponent({
       })
     );
 
-    return h("div", cells);
+    return h("div", { class: { "grid-row-clickable": isRowClickable } }, cells);
   },
 });
 </script>
