@@ -1,7 +1,7 @@
 <template>
-  <v-menu offset-x>
-    <template #activator="{ on }">
-      <v-btn v-on="on" icon>
+  <v-menu v-model="isMenuVisible" offset-x>
+    <template #activator="{}">
+      <v-btn icon @click="toggleMenu">
         <v-icon>mdi-dots-vertical</v-icon>
       </v-btn>
     </template>
@@ -24,10 +24,11 @@
 
 <script lang="ts">
 import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
-import { defineComponent, PropType } from "@vue/composition-api";
+import { defineComponent, PropType, ref } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridActionView",
+  inheritAttrs: false,
   props: {
     item: {
       type: Object as PropType<Record<string, any>>,
@@ -39,8 +40,15 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const isMenuVisible = ref(false);
     return {
       actions: props.column.actions,
+      isMenuVisible,
+
+      // Manually handle toggling as row-actions/routes were being forcibly added
+      toggleMenu: (on: any) => {
+        isMenuVisible.value = !isMenuVisible.value;
+      },
     };
   },
 });
