@@ -6,8 +6,6 @@ import {
   PropType,
   computed,
   watch,
-  inject,
-  shallowRef,
 } from "@vue/composition-api";
 import { VNode } from "vue";
 export interface GridScrollEvent {

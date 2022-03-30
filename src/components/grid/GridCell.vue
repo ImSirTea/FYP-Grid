@@ -63,8 +63,8 @@ export default defineComponent({
     );
 
     const onRowClick = (
-      event: MouseEvent,
-      navigate: (event: MouseEvent) => void
+      event: PointerEvent,
+      navigate: (event: PointerEvent) => void
     ) => {
       // If we are clicking the blank space
       if (event.target === link.value) {
