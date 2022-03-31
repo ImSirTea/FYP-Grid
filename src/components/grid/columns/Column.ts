@@ -19,7 +19,8 @@ export enum SortDirection {
 
 export interface ColumnOptions {
   defaultWidth: GridWidthEnum | number;
-  defaultPin: "left" | "right";
+  defaultPin: "left" | "right" | "none";
+  defaultHidden: boolean;
   isFilterable: boolean;
   isSortable: boolean;
   ascIcon: string;
@@ -47,6 +48,8 @@ export abstract class Column<T, RenderableType, O extends ColumnOptions> {
     this.setOption("isFilterable", true);
     this.setOption("isSortable", true);
     this.setOption("defaultWidth", GridWidthEnum.MEDIUM);
+    this.setOption("defaultHidden", false);
+    this.setOption("defaultPin", "none");
     this.setOption("ascIcon", "mdi-sort-ascending");
     this.setOption("descIcon", "mdi-sort-descending");
   }

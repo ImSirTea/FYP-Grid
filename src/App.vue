@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-main>
-      <grid :grid-configuration="builder" :items="items" :grid-height="900" />
+      <grid :grid-configuration="builder" :items="items" :grid-height="750" />
       <v-btn @click="updateItems">Update Items</v-btn>
     </v-main>
   </v-app>

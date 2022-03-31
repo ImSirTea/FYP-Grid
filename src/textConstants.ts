@@ -16,4 +16,8 @@ export default {
   connection: "Connection",
   required: "Value is required",
   actions: "Actions",
+  manage_columns: "Manage Columns",
+  manage: "Manage",
+  hide: "Hide",
+  pin: "Pin",
 };

@@ -1,6 +1,7 @@
 import {
   AnyGridColumn,
   Column,
+  ColumnOptions,
   RenderableType,
 } from "@/components/grid/columns/Column";
 import { FilterOperator, FilterOption } from "@/components/grid/filters/types";
@@ -24,8 +25,9 @@ interface PinnedColumnGroups {
 }
 
 interface ColumnState {
-  width: number;
-  pinnedColumn: string | undefined;
+  width: ColumnOptions["defaultWidth"];
+  pinnedColumn: ColumnOptions["defaultPin"];
+  hidden: ColumnOptions["defaultHidden"];
   filterOptions: FilterOption<RenderableType>[];
   filterChain: (itemValue: RenderableType) => boolean;
 }
@@ -43,7 +45,8 @@ export class GridState {
       gridConfiguration.columns.forEach((column) => {
         const columnState: ColumnState = {
           width: column.options.defaultWidth!,
-          pinnedColumn: column.options.defaultPin,
+          pinnedColumn: column.options.defaultPin!,
+          hidden: column.options.defaultHidden!,
           filterOptions: [],
           filterChain: (itemValue: RenderableType) => true,
         };

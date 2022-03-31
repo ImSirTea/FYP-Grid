@@ -14,7 +14,7 @@ import {
   shallowRef,
 } from "@vue/composition-api";
 import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
-import GridControlPanel from "@/components/GridControlPanel.vue";
+import GridControlPanel from "@/components/grid/GridControlPanel.vue";
 
 /**
  * Manages creating a grid with given specifications

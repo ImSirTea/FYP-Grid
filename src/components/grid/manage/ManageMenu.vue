@@ -12,7 +12,7 @@
       <v-list>
         <v-list-item>
           <v-list-item-title>
-            {{ $tc.filter }}
+            {{ $tc.manage_columns }}
           </v-list-item-title>
           <v-btn icon @click="toggleMenu(!value)">
             <v-icon>mdi-close</v-icon>
@@ -20,27 +20,20 @@
         </v-list-item>
       </v-list>
     </template>
-    <v-divider />
 
-    <!-- Build all of our filter controls -->
-    <v-expansion-panels accordion flat multiple>
-      <v-expansion-panel v-for="column in filterableColumns" :key="column.key">
+    <v-expansion-panels accordian flat multiple>
+      <v-expansion-panel v-for="column in manageableColumns" :key="column.key">
         <v-expansion-panel-header>
           <v-container class="pa-0" fluid>
             <v-row align="center" no-gutters>
               <v-col cols="auto">
                 {{ column.key }}
               </v-col>
-              <v-col class="pl-2" cols="auto">
-                <v-chip small pill v-if="numberOfFiltersForColumn(column)">
-                  {{ numberOfFiltersForColumn(column) }}
-                </v-chip>
-              </v-col>
             </v-row>
           </v-container>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <filter-group :column="column" />
+          <manage-group :column="column" />
         </v-expansion-panel-content>
         <v-divider />
       </v-expansion-panel>
@@ -52,15 +45,12 @@
 import { defineComponent, inject, computed } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import FilterGroup from "@/components/grid/filters/FilterGroup.vue";
 import { GridState } from "@/components/grid/GridState";
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import ManageGroup from "@/components/grid/manage/ManageGroup.vue";
 
 export default defineComponent({
-  name: "FilterMenu",
-  components: {
-    FilterGroup,
-  },
+  name: "ManageMenu",
+  components: { ManageGroup },
   props: {
     value: {
       type: Boolean,
@@ -72,16 +62,11 @@ export default defineComponent({
       inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
 
-    const filterableColumns = computed(() =>
-      gridConfiguration.columns.filter((column) => column.options?.isFilterable)
-    );
+    const manageableColumns = computed(() => gridConfiguration.columns);
 
     return {
-      gridConfiguration,
+      manageableColumns,
       toggleMenu: (isVisible) => context.emit("input", isVisible),
-      numberOfFiltersForColumn: (column: AnyGridColumn) =>
-        gridState.columnStates[column.key].filterOptions.length ?? 0,
-      filterableColumns,
       $tc,
     };
   },
