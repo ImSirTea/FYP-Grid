@@ -1,5 +1,6 @@
 <script lang="ts">
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { GridManager } from "@/components/grid/GridManager";
 import GridHeader from "@/components/grid/GridHeader.vue";
 import { GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
@@ -32,6 +33,10 @@ export default defineComponent({
       type: Object as PropType<GridConfiguration<Record<string, any>>>,
       required: true,
     },
+    gridState: {
+      type: Object as PropType<GridState>,
+      required: false,
+    },
     rowHeight: {
       type: Number,
       required: false,
@@ -51,9 +56,16 @@ export default defineComponent({
   setup(props) {
     // Desperately avoid using ref here, it's painfully slow
     const internalItems = shallowRef<Record<string, any>[]>([]);
-    const gridState = reactive(new GridState(props.gridConfiguration));
+    const gridState = reactive(
+      props.gridState ?? props.gridConfiguration.defaultState
+    );
+    const gridManager = new GridManager(
+      gridState as GridState,
+      props.gridConfiguration
+    );
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
+    provide("gridManager", gridManager);
 
     // Scroll offsets
     const gridOffsets = reactive({
@@ -138,9 +150,6 @@ export default defineComponent({
 
     return {
       buildTable,
-      indexedItems,
-      internalItems,
-      gridState,
     };
   },
   render(): VNode {

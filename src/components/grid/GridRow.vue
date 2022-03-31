@@ -4,6 +4,7 @@ import GridCell from "@/components/grid/GridCell.vue";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
 import { GridState } from "@/components/grid/GridState";
+import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
   name: "GridRow",
@@ -21,10 +22,12 @@ export default defineComponent({
     const gridConfiguration =
       inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
 
     return {
       gridState,
       gridConfiguration,
+      gridManager,
     };
   },
   render(): VNode {
@@ -32,7 +35,7 @@ export default defineComponent({
       this.gridConfiguration.rowAction || this.gridConfiguration.rowRoute
     );
 
-    const cells = this.gridConfiguration.columns.map((column) =>
+    const cells = this.gridManager.visibleColumns.map((column) =>
       h(GridCell, {
         style: {
           width: this.gridState.columnStates[column.key].width + "px",

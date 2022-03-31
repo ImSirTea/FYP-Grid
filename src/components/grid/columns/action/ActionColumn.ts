@@ -19,7 +19,6 @@ export interface ActionDefinition<T> {
 }
 
 export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
-  declare options: Partial<ActionColumnOptions>;
   viewRenderer = GridActionView;
   editRenderer = undefined;
   filterOptions = undefined;

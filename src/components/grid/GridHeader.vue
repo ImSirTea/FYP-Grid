@@ -1,6 +1,7 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { GridManager } from "@/components/grid/GridManager";
 import { GridState } from "@/components/grid/GridState";
 import { defineComponent, inject, h, computed } from "@vue/composition-api";
 import { VNode } from "vue";
@@ -23,6 +24,7 @@ export default defineComponent({
     const gridConfiguration =
       inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
 
     // How wide should our header row should be to align with the grid
     const totalGridWidth = computed(() =>
@@ -48,7 +50,7 @@ export default defineComponent({
             transform: `translateX(${-props.gridOffsetLeft + "px"}`,
           },
         },
-        gridConfiguration.columns.map((column) => buildCell(column))
+        gridManager.visibleColumns.map((column) => buildCell(column))
       );
     };
 

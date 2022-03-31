@@ -27,7 +27,7 @@ interface PinnedColumnGroups {
 interface ColumnState {
   width: ColumnOptions["defaultWidth"];
   pinnedColumn: ColumnOptions["defaultPin"];
-  hidden: ColumnOptions["defaultHidden"];
+  isHidden: ColumnOptions["defaultHidden"];
   filterOptions: FilterOption<RenderableType>[];
   filterChain: (itemValue: RenderableType) => boolean;
 }
@@ -37,24 +37,6 @@ export class GridState {
   private sortOptions: SortOptions[] = [];
   private sortFunction: IThenBy<any> = firstBy("_grid-index");
   columnStates: Record<string, ColumnState> = {};
-
-  constructor(gridConfiguration?: GridConfiguration<any>) {
-    // If we are provided a grid configuration, we should apply the defaults given by it
-    // TODO: This is awful atm
-    if (gridConfiguration) {
-      gridConfiguration.columns.forEach((column) => {
-        const columnState: ColumnState = {
-          width: column.options.defaultWidth!,
-          pinnedColumn: column.options.defaultPin!,
-          hidden: column.options.defaultHidden!,
-          filterOptions: [],
-          filterChain: (itemValue: RenderableType) => true,
-        };
-
-        this.columnStates[column.key] = columnState;
-      });
-    }
-  }
 
   get totalWidth() {
     return Object.entries(this.columnStates).reduce(

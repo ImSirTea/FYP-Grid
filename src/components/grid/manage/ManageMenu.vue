@@ -20,8 +20,9 @@
         </v-list-item>
       </v-list>
     </template>
+    <v-divider />
 
-    <v-expansion-panels accordian flat multiple>
+    <v-expansion-panels accordian flat>
       <v-expansion-panel v-for="column in manageableColumns" :key="column.key">
         <v-expansion-panel-header>
           <v-container class="pa-0" fluid>

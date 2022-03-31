@@ -7,6 +7,7 @@ import {
 } from "@/components/grid/columns/Column";
 import { NumberColumn } from "@/components/grid/columns/number/NumberColumn";
 import { TextColumn } from "@/components/grid/columns/text/TextColumn";
+import { GridState } from "@/components/grid/GridState";
 import $tc from "@/textConstants";
 import { RawLocation } from "vue-router";
 
@@ -25,6 +26,22 @@ export class GridConfiguration<T> {
     }
 
     return this.#columns;
+  }
+
+  get defaultState(): GridState {
+    const gridState = new GridState();
+
+    this.columns.forEach((column) => {
+      gridState.columnStates[column.key] = {
+        width: column.options.defaultWidth!,
+        pinnedColumn: column.options.defaultPin!,
+        isHidden: column.options.defaultHidden!,
+        filterOptions: [],
+        filterChain: () => true,
+      };
+    });
+
+    return gridState;
   }
 
   addTextColumn(
