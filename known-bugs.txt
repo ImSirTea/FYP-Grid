@@ -3,5 +3,3 @@ And/OR connections don't highlight on first click? dunno why lmao
 Deleting filters doesn't correctly update the filter components
 
 How should default grid state be achieved, probably via building a grid?
-
-Actions column routing is weird
