@@ -38,7 +38,6 @@ export default defineComponent({
           width: this.gridState.columnStates[column.key].width + "px",
         },
         class: "grid-row-cell",
-        attrs: { role: "gridcell" },
         props: { item: this.item, column },
         on: {
           input: (value) => {
@@ -52,7 +51,24 @@ export default defineComponent({
       })
     );
 
-    return h("div", { class: { "grid-row-clickable": isRowClickable } }, cells);
+    if (this.gridConfiguration.rowRoute) {
+      return h(
+        "router-link",
+        {
+          props: { to: this.gridConfiguration.rowRoute(this.item) },
+          class: { "grid-row-clickable": isRowClickable },
+        },
+        [cells]
+      );
+    }
+
+    const rowType = this.gridConfiguration.rowAction ? "a" : "div";
+
+    return h(
+      rowType,
+      { class: { "grid-row-clickable": isRowClickable } },
+      cells
+    );
   },
 });
 </script>
