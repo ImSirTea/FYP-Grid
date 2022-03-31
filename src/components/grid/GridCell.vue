@@ -1,31 +1,28 @@
 <template>
-  <!-- Weirdly, we need to use custom, 
-    and manually provide the a definitions to allow for @click events properly -->
-  <router-link :to="rowRoute" custom v-slot="{ href, navigate }">
-    <a ref="link" :href="href" @click="onRowClick($event, navigate)">
-      <component
-        ref="span"
-        v-bind="$attrs"
-        :is="component"
-        :item="item"
-        :column="column"
-        :value="internalValue"
-        @input="$emit('input', value)"
-      />
-    </a>
-  </router-link>
+  <div ref="container" @click="onCellClick">
+    <component
+      ref="renderer"
+      v-bind="$attrs"
+      :is="component"
+      :item="item"
+      :column="column"
+      :value="internalValue"
+      @input="$emit('input', value)"
+      role="gridcell"
+    />
+  </div>
 </template>
 
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
-import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import {
   defineComponent,
   PropType,
   ref,
   computed,
-  inject,
+  watch,
 } from "@vue/composition-api";
+import Vue from "vue";
 
 export default defineComponent({
   name: "GridCell",
@@ -40,12 +37,12 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const gridConfiguration =
-      inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
-
+    // Decides if we show view or edit renderers
     const readonly = ref(true);
 
-    const link = ref(null);
+    // References to DOM elements, used for overflow detection and click target detection
+    const container = ref<HTMLAnchorElement | null>(null);
+    const renderer = ref<Vue | null>(null);
 
     const internalValue = computed({
       get: () => props.column.value(props.item),
@@ -56,33 +53,25 @@ export default defineComponent({
       readonly.value ? props.column.viewRenderer : props.column.editRenderer
     );
 
-    const rowRoute = computed(() =>
-      gridConfiguration.rowRoute
-        ? gridConfiguration.rowRoute(props.item)
-        : undefined
-    );
+    // Cells handle row clicks so they can do cell-specific actions instead of row actions if needed
+    const onCellClick = (event: PointerEvent) => {
+      if (renderer.value && container.value) {
+        const isOverflowing =
+          renderer.value.$el.scrollWidth > container.value.clientWidth;
 
-    const onRowClick = (
-      event: PointerEvent,
-      navigate: (event: PointerEvent) => void
-    ) => {
-      // If we are clicking the blank space
-      if (event.target === link.value) {
-        navigate(event);
-        return;
+        if (isOverflowing) {
+          console.log("Show truncated text");
+          event.preventDefault();
+        }
       }
-
-      // Otherwise, prevent our navigation and attempt our row-action if it exists
-      event.preventDefault();
-      gridConfiguration.rowAction?.(props.item);
     };
 
     return {
       component,
       internalValue,
-      rowRoute,
-      onRowClick,
-      link,
+      onCellClick,
+      container,
+      renderer,
     };
   },
 });
