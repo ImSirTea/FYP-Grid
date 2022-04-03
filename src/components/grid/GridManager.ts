@@ -1,3 +1,4 @@
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridState } from "@/components/grid/GridState";
 
@@ -14,14 +15,23 @@ export class GridManager {
   }
 
   get visibleColumns() {
-    return this.#gridConfiguration.columns.filter(
-      (column) => !this.#gridState.columnStates[column.key].isHidden
-    );
+    return this.#gridConfiguration.columns
+      .filter((column) => !this.#gridState.columnStates[column.key].isHidden)
+      .sort(this.sortOnOrder);
   }
 
   get filterableColumns() {
-    return this.#gridConfiguration.columns.filter(
-      (column) => column.options.isFilterable
-    );
+    return this.#gridConfiguration.columns
+      .filter((column) => column.options.isFilterable)
+      .sort(this.sortOnOrder);
+  }
+
+  get sortOnOrder() {
+    return (a: AnyGridColumn, b: AnyGridColumn) => {
+      const aOrder = this.#gridState.columnStates[a.key].order;
+      const bOrder = this.#gridState.columnStates[b.key].order;
+
+      return aOrder - bOrder;
+    };
   }
 }

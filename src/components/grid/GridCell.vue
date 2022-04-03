@@ -15,13 +15,7 @@
 
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
-import {
-  defineComponent,
-  PropType,
-  ref,
-  computed,
-  watch,
-} from "@vue/composition-api";
+import { defineComponent, PropType, ref, computed } from "@vue/composition-api";
 import Vue from "vue";
 
 export default defineComponent({

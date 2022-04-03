@@ -31,11 +31,12 @@ export class GridConfiguration<T> {
   get defaultState(): GridState {
     const gridState = new GridState();
 
-    this.columns.forEach((column) => {
+    this.columns.forEach((column, index) => {
       gridState.columnStates[column.key] = {
         width: column.options.defaultWidth!,
         pinnedColumn: column.options.defaultPin!,
         isHidden: column.options.defaultHidden!,
+        order: index,
         filterOptions: [],
         filterChain: () => true,
       };

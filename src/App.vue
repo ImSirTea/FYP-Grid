@@ -5,7 +5,7 @@
         :grid-configuration="builder"
         :grid-state="builder.defaultState"
         :items="items"
-        :grid-height="750"
+        :grid-height="550"
       />
       <v-btn @click="updateItems">Update Items</v-btn>
     </v-main>
@@ -49,8 +49,16 @@ export default defineComponent({
     const builder = new GridConfiguration<Item>();
 
     builder.addNumberColumn("index", (item) => item.index);
-    builder.addTextColumn("first", (item) => item.first);
-    builder.addTextColumn("last", (item) => item.last);
+    builder.addTextColumn("first1", (item) => item.first + "- 1");
+    builder.addTextColumn("last1", (item) => item.last + "- 1");
+    builder.addTextColumn("first2", (item) => item.first + "- 2");
+    builder.addTextColumn("last2", (item) => item.last + "- 2");
+    builder.addTextColumn("first3", (item) => item.first + "- 3");
+    builder.addTextColumn("last3", (item) => item.last + "- 3");
+    builder.addTextColumn("first4", (item) => item.first + "- 4");
+    builder.addTextColumn("last4", (item) => item.last + "- 4");
+    builder.addTextColumn("first5", (item) => item.first + "- 5");
+    builder.addTextColumn("last5", (item) => item.last + "- 5");
     builder.addTextColumn("wide", (item) =>
       (item.first + " " + item.last + " ").repeat(8)
     );

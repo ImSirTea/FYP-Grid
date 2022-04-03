@@ -29,6 +29,7 @@ export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
 
     this.setOption("isFilterable", false);
     this.setOption("isSortable", false);
+    this.setOption("isDraggable", false);
     this.setOption("defaultWidth", GridWidthEnum.SMALL);
   }
 

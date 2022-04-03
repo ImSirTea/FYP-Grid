@@ -6,6 +6,7 @@ import { GridState } from "@/components/grid/GridState";
 import { defineComponent, inject, h, computed } from "@vue/composition-api";
 import { VNode } from "vue";
 import { VIcon } from "vuetify/lib/components";
+import { debounce } from "lodash";
 
 export default defineComponent({
   name: "GridHeader",
@@ -26,6 +27,11 @@ export default defineComponent({
     const gridState = inject<GridState>("gridState")!;
     const gridManager = inject<GridManager>("gridManager")!;
 
+    // Drag handlers
+    let draggedColumn: AnyGridColumn | null = null;
+    let targetColumn: AnyGridColumn | null = null;
+    let lastClientX = 0;
+
     // How wide should our header row should be to align with the grid
     const totalGridWidth = computed(() =>
       gridConfiguration.columns.reduce(
@@ -40,6 +46,9 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeaderRow = () => {
+      const cells = gridManager.visibleColumns.map((column) =>
+        buildCell(column)
+      );
       return h(
         "div",
         {
@@ -50,7 +59,7 @@ export default defineComponent({
             transform: `translateX(${-props.gridOffsetLeft + "px"}`,
           },
         },
-        gridManager.visibleColumns.map((column) => buildCell(column))
+        cells
       );
     };
 
@@ -69,14 +78,81 @@ export default defineComponent({
           },
           class: "grid-header-cell",
           on: {
+            // Toggle our sorting behaviours
             click: () => {
-              // Toggle our sorting behaviours
               gridState.toggleSort(column);
             },
+            // Set our drag type and data
+            dragstart: (event: DragEvent) => {
+              event.dataTransfer!.dropEffect = "move";
+              draggedColumn = column;
+              lastClientX = event.clientX;
+            },
+            // Allow the header to be the drop target, and reassign when needed
+            dragover: (event: DragEvent) => {
+              event.preventDefault();
+              // Don't swap with our last column
+              if (
+                targetColumn?.key === column.key &&
+                !isDraggingAwayFromDraggedColumn(event)
+              ) {
+                lastClientX = event.clientX;
+                return;
+              }
+
+              targetColumn = column;
+
+              // Don't try swap with ourselves
+              if (targetColumn.key === draggedColumn?.key) {
+                return;
+              }
+
+              if (draggedColumn && targetColumn) {
+                gridState.rearrangeColumnOrders(draggedColumn!, targetColumn!);
+              }
+
+              lastClientX = event.clientX;
+            },
+            drop: (event: DragEvent) => {
+              draggedColumn = null;
+              targetColumn = null;
+            },
+          },
+          domProps: {
+            draggable: column.options.isDraggable,
           },
         },
         [column.key, sortIcon]
       );
+    };
+
+    // As we prevent swapping with the same column twice in a row
+    // We need to allow going back where we just where
+    const isDraggingAwayFromDraggedColumn = (event: DragEvent) => {
+      if (!draggedColumn || !targetColumn) {
+        return true;
+      }
+
+      const draggedColumnOrder =
+        gridState.columnStates[draggedColumn.key].order;
+      const targetColumnOrder = gridState.columnStates[targetColumn.key].order;
+
+      // Dragging right
+      if (event.clientX > lastClientX) {
+        return targetColumnOrder > draggedColumnOrder;
+      }
+
+      // Dragging left
+      if (lastClientX > event.clientX) {
+        return draggedColumnOrder > targetColumnOrder;
+      }
+
+      // Not moved
+      if (lastClientX === event.clientX) {
+        return false;
+      }
+
+      return true;
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
@@ -110,6 +186,8 @@ export default defineComponent({
     return {
       headers,
       totalGridWidth,
+      gridState,
+      gridManager,
     };
   },
   render(): VNode {

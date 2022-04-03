@@ -28,6 +28,7 @@ interface ColumnState {
   width: ColumnOptions["defaultWidth"];
   pinnedColumn: ColumnOptions["defaultPin"];
   isHidden: ColumnOptions["defaultHidden"];
+  order: number;
   filterOptions: FilterOption<RenderableType>[];
   filterChain: (itemValue: RenderableType) => boolean;
 }
@@ -314,5 +315,38 @@ export class GridState {
       center: centerColumns,
       right: rightColumns,
     };
+  }
+
+  public rearrangeColumnOrders(
+    draggedColumn: AnyGridColumn,
+    targetColumn: AnyGridColumn
+  ) {
+    const draggedColumnState = this.columnStates[draggedColumn.key];
+    const initialOrder = draggedColumnState.order;
+
+    const targetColumnState = this.columnStates[targetColumn.key];
+    const targetOrder = targetColumnState.order;
+
+    const orderedColumns = Object.values(this.columnStates).sort(
+      (stateA, stateB) => stateA.order - stateB.order
+    );
+
+    // Going up
+    if (targetOrder > initialOrder) {
+      for (let i = targetOrder; i > initialOrder; i--) {
+        orderedColumns[i].order--;
+      }
+
+      draggedColumnState.order = targetOrder;
+    }
+
+    // Going down
+    if (initialOrder > targetOrder) {
+      for (let i = targetOrder; i <= initialOrder; i++) {
+        orderedColumns[i].order++;
+      }
+
+      draggedColumnState.order = targetOrder;
+    }
   }
 }

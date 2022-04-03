@@ -55,6 +55,7 @@ import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import FilterGroup from "@/components/grid/filters/FilterGroup.vue";
 import { GridState } from "@/components/grid/GridState";
 import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
   name: "FilterMenu",
@@ -71,10 +72,9 @@ export default defineComponent({
     const gridConfiguration =
       inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
 
-    const filterableColumns = computed(() =>
-      gridConfiguration.columns.filter((column) => column.options?.isFilterable)
-    );
+    const filterableColumns = computed(() => gridManager.filterableColumns);
 
     return {
       gridConfiguration,

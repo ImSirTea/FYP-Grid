@@ -46,8 +46,8 @@
 import { defineComponent, inject, computed } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import { GridState } from "@/components/grid/GridState";
 import ManageGroup from "@/components/grid/manage/ManageGroup.vue";
+import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
   name: "ManageMenu",
@@ -59,11 +59,9 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const gridConfiguration =
-      inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
-    const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
 
-    const manageableColumns = computed(() => gridConfiguration.columns);
+    const manageableColumns = computed(() => gridManager.visibleColumns);
 
     return {
       manageableColumns,
