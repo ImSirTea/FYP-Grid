@@ -1,10 +1,15 @@
+$base-colour: #ffffff;
+$dark-colour: #f3f3f3;
+$hover-colour: #dfdfdf;
+$border-colour: lightgray;
+
 // Grid containers
 .grid-container {
   max-width: 100%;
 }
 
 .grid-header-container {
-  border-bottom: 2px solid lightgray;
+  border-bottom: 2px solid $border-colour;
   cursor: pointer;
   user-select: none;
   overflow: hidden;
@@ -19,7 +24,7 @@
 // Grid rows
 .grid-row,
 .grid-header {
-  background-color: #fff;
+  background-color: $base-colour;
   display: flex;
 }
 
@@ -30,7 +35,7 @@
 }
 
 .grid-row-odd {
-  background-color: #f3f3f3;
+  background-color: $dark-colour;
 }
 
 // Don't allow styling on action-able rows
@@ -39,17 +44,17 @@
 }
 
 .grid-row-clickable.grid-row-odd:hover {
-  background-color: #dfdfdf;
+  background-color: $hover-colour;
 }
 
 .grid-row-clickable.grid-row:hover {
-  background-color: #dfdfdf;
+  background-color: $hover-colour;
 }
 
 // Grid cells
 .grid-header-cell,
 .grid-row-cell {
-  padding-left: 1em;
+  padding-left: 0.5em;
   display: flex;
   align-items: center;
   background-color: inherit;
@@ -66,11 +71,7 @@
 }
 
 .grid-header-cell:hover {
-  background-color: #f3f3f3;
-}
-
-.grid-header-cell:active {
-  background-color: #e7e7e7;
+  background-color: $hover-colour;
 }
 
 .grid-sort-icon:not(.grid-sort-active) {
@@ -84,4 +85,11 @@
 .grid-header-cell:hover .grid-sort-icon,
 .grid-sort-active {
   display: inline-block;
+}
+
+.grid-header-resize {
+  width: max(0.5em, 10px);
+  height: 100%;
+  margin-left: auto;
+  cursor: e-resize !important;
 }

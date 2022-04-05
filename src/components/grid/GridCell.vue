@@ -9,6 +9,7 @@
       :value="internalValue"
       @input="$emit('input', value)"
       role="gridcell"
+      :col-key="column.key"
     />
   </div>
 </template>

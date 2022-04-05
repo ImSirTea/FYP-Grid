@@ -30,7 +30,9 @@ export default defineComponent({
     // Drag handlers
     let draggedColumn: AnyGridColumn | null = null;
     let targetColumn: AnyGridColumn | null = null;
-    let lastClientX = 0;
+    let isResizing = false;
+    let lastResizeX = 0;
+    let lastDragX = 0;
 
     // How wide should our header row should be to align with the grid
     const totalGridWidth = computed(() =>
@@ -69,6 +71,8 @@ export default defineComponent({
         ? buildSortIcon(column)
         : undefined;
 
+      const resizeBar = buildResizeBar(column);
+
       return h(
         "div",
         {
@@ -84,19 +88,25 @@ export default defineComponent({
             },
             // Set our drag type and data
             dragstart: (event: DragEvent) => {
-              event.dataTransfer!.dropEffect = "move";
+              //event.dataTransfer!.dropEffect = "move";
               draggedColumn = column;
-              lastClientX = event.clientX;
+              lastDragX = event.clientX;
             },
             // Allow the header to be the drop target, and reassign when needed
             dragover: (event: DragEvent) => {
               event.preventDefault();
+
+              // Don't allow moving when we are resizing
+              if (isResizing) {
+                return;
+              }
+
               // Don't swap with our last column
               if (
                 targetColumn?.key === column.key &&
                 !isDraggingAwayFromDraggedColumn(event)
               ) {
-                lastClientX = event.clientX;
+                lastDragX = event.clientX;
                 return;
               }
 
@@ -111,7 +121,7 @@ export default defineComponent({
                 gridState.rearrangeColumnOrders(draggedColumn!, targetColumn!);
               }
 
-              lastClientX = event.clientX;
+              lastDragX = event.clientX;
             },
             drop: (event: DragEvent) => {
               draggedColumn = null;
@@ -122,7 +132,7 @@ export default defineComponent({
             draggable: column.options.isDraggable,
           },
         },
-        [column.key, sortIcon]
+        [column.key, sortIcon, resizeBar]
       );
     };
 
@@ -138,17 +148,17 @@ export default defineComponent({
       const targetColumnOrder = gridState.columnStates[targetColumn.key].order;
 
       // Dragging right
-      if (event.clientX > lastClientX) {
+      if (event.clientX > lastDragX) {
         return targetColumnOrder > draggedColumnOrder;
       }
 
       // Dragging left
-      if (lastClientX > event.clientX) {
+      if (lastDragX > event.clientX) {
         return draggedColumnOrder > targetColumnOrder;
       }
 
       // Not moved
-      if (lastClientX === event.clientX) {
+      if (lastDragX === event.clientX) {
         return false;
       }
 
@@ -181,6 +191,49 @@ export default defineComponent({
           isSortingOn?.index.toString() ?? ""
         ),
       ];
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildResizeBar = (column: AnyGridColumn) => {
+      return h("div", {
+        class: "grid-header-resize",
+        domProps: { draggable: true },
+        on: {
+          // Prevent sorting click
+          click: (event: PointerEvent) => {
+            event.stopPropagation();
+            event.preventDefault();
+          },
+          // Get our widest visible cell, and resize our column to fit
+          dblclick: () => {
+            const relevantCells = Array.from(
+              document.querySelectorAll(`[col-key=${column.key}]`)
+            );
+            const largestWidth = Math.max(
+              ...relevantCells.map((cell) => cell.clientWidth)
+            );
+            gridState.columnStates[column.key].width = largestWidth;
+          },
+          // Initiate our drag
+          dragstart: (event: DragEvent) => {
+            isResizing = true;
+            lastResizeX = event.clientX;
+          },
+          drag: debounce((event: DragEvent) => {
+            // Don't resize if we shouldn't be, or if this is the last drag event
+            if (!isResizing || !event.clientX) {
+              return;
+            }
+
+            const resizeDelta = event.clientX - lastResizeX;
+            gridState.columnStates[column.key].width += resizeDelta;
+            lastResizeX = event.clientX;
+          }),
+          drop: () => {
+            isResizing = false;
+          },
+        },
+      });
     };
 
     return {
