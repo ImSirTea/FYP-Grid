@@ -17,9 +17,13 @@ export enum SortDirection {
   DESCENDING,
 }
 
+// Exportable pin values so we can use them in the pin manager
+export const pinValues = ["left", "none", "right"] as const;
+export type PinTypes = typeof pinValues[number];
+
 export interface ColumnOptions {
   defaultWidth: GridWidthEnum | number;
-  defaultPin: "left" | "right" | "none";
+  defaultPin: PinTypes;
   defaultHidden: boolean;
   isFilterable: boolean;
   isDraggable: boolean;

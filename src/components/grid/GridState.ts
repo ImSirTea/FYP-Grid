@@ -18,15 +18,9 @@ interface SortOptions {
   direction: "asc" | "desc";
 }
 
-interface PinnedColumnGroups {
-  left: AnyGridColumn[];
-  center: AnyGridColumn[];
-  right: AnyGridColumn[];
-}
-
 interface ColumnState {
   width: ColumnOptions["defaultWidth"];
-  pinnedColumn: ColumnOptions["defaultPin"];
+  pin: ColumnOptions["defaultPin"];
   isHidden: ColumnOptions["defaultHidden"];
   order: number;
   filterOptions: FilterOption<RenderableType>[];
@@ -291,30 +285,6 @@ export class GridState {
     );
 
     return filterChain;
-  }
-
-  public columnGroups(
-    gridConfiguration: GridConfiguration<any>
-  ): PinnedColumnGroups {
-    const leftColumns = gridConfiguration.columns.filter(
-      (column) => this.columnStates[column.key].pinnedColumn === "left"
-    );
-
-    const rightColumns = gridConfiguration.columns.filter(
-      (column) => this.columnStates[column.key].pinnedColumn === "right"
-    );
-
-    const centerColumns = gridConfiguration.columns.filter(
-      (column) =>
-        !leftColumns.find((pinnedColumn) => column.key === pinnedColumn.key) &&
-        !rightColumns.find((pinnedColumn) => column.key === pinnedColumn.key)
-    );
-
-    return {
-      left: leftColumns,
-      center: centerColumns,
-      right: rightColumns,
-    };
   }
 
   public rearrangeColumnOrders(

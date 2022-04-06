@@ -34,7 +34,7 @@ export class GridConfiguration<T> {
     this.columns.forEach((column, index) => {
       gridState.columnStates[column.key] = {
         width: column.options.defaultWidth!,
-        pinnedColumn: column.options.defaultPin!,
+        pin: column.options.defaultPin!,
         isHidden: column.options.defaultHidden!,
         order: index,
         filterOptions: [],

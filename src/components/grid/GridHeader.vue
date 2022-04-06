@@ -48,9 +48,14 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeaderRow = () => {
-      const cells = gridManager.visibleColumns.map((column) =>
-        buildCell(column)
-      );
+      const { left, none, right } = gridManager.pinnedSortedAndVisibleColumns;
+
+      const cells = {
+        left: left.map((column) => buildCell(column)),
+        none: none.map((column) => buildCell(column)),
+        right: right.map((column) => buildCell(column)),
+      };
+
       return h(
         "div",
         {
@@ -61,7 +66,7 @@ export default defineComponent({
             transform: `translateX(${-props.gridOffsetLeft + "px"}`,
           },
         },
-        cells
+        [cells.left, cells.none, cells.right]
       );
     };
 
