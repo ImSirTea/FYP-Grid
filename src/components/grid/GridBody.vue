@@ -6,12 +6,9 @@ import {
   PropType,
   computed,
   watch,
+  ref,
 } from "@vue/composition-api";
 import { VNode } from "vue";
-export interface GridScrollEvent {
-  gridOffsetTop: number;
-  gridOffsetLeft: number;
-}
 
 /**
  * Container for all grid rows, handling scroll events, offsets, and rendering
@@ -33,12 +30,14 @@ export default defineComponent({
       type: Number,
       required: true,
     },
-    gridOffsetTop: {
+    gridOffsetLeft: {
       type: Number,
       required: true,
     },
   },
   setup(props, context) {
+    const scrollOffsetTop = ref(0);
+
     // Total height of all rows, used for scrolling
     const totalGridHeight = computed((): number => {
       return props.internalItems.length * props.rowHeight;
@@ -46,7 +45,7 @@ export default defineComponent({
 
     // How many rows have we scrolled passed (effectively the topmost id of visible rows)
     const rowsOffset = computed((): number => {
-      return Math.floor(props.gridOffsetTop / props.rowHeight);
+      return Math.floor(scrollOffsetTop.value / props.rowHeight);
     });
 
     // Maximum number of rows visible within the grid's height
@@ -87,11 +86,8 @@ export default defineComponent({
     };
 
     // Manages scroll events passthrough
-    const gridScroll = (e: any) => {
-      context.emit("update:scroll", {
-        gridOffsetTop: e.target.scrollTop,
-        gridOffsetLeft: e.target.scrollLeft,
-      } as GridScrollEvent);
+    const gridScroll = (e: Event) => {
+      scrollOffsetTop.value = (e.target as HTMLElement).scrollTop;
     };
 
     watch(
@@ -140,6 +136,7 @@ export default defineComponent({
             class: "grid-row-height-wrapper",
             style: {
               height: this.totalGridHeight + "px",
+              transform: `translateX(${-this.gridOffsetLeft + "px"}`,
             },
             attrs: {
               role: "grid",

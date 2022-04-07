@@ -13,8 +13,9 @@ import {
   provide,
   watch,
   shallowRef,
+  ref,
 } from "@vue/composition-api";
-import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
+import GridBody from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/grid/GridControlPanel.vue";
 
 /**
@@ -63,15 +64,10 @@ export default defineComponent({
       gridState as GridState,
       props.gridConfiguration
     );
+    const scrollOffsetLeft = ref(0);
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
     provide("gridManager", gridManager);
-
-    // Scroll offsets
-    const gridOffsets = reactive({
-      top: 0,
-      left: 0,
-    });
 
     // Copy our items, with inserted indexes of their original sorting order
     // Pulled out seperately to prevent iterating over the same list of items and injecting what existed
@@ -101,21 +97,49 @@ export default defineComponent({
         0
       );
 
-      const rightWidth = gridManager.pinnedSortedAndVisibleColumns.left.reduce(
+      const centreWidth =
+        gridManager.pinnedSortedAndVisibleColumns.centre.reduce(
+          (width, column) => width + gridState.columnStates[column.key].width,
+          0
+        );
+
+      const rightWidth = gridManager.pinnedSortedAndVisibleColumns.right.reduce(
         (width, column) => width + gridState.columnStates[column.key].width,
         0
       );
-      return h("div", [
-        h("div", {
-          class: "virtual-scroll-bar",
-          style: { width: leftWidth + "px" },
-        }),
-        h("div", { class: "virtual-scroll-bar" }),
-        h("div", {
-          class: "virtual-scroll-bar",
-          style: { width: rightWidth + "px" },
-        }),
-      ]);
+
+      return h(
+        "div",
+        {
+          class: "virtual-scroll-bar-container",
+        },
+        [
+          h("div", {
+            class: "virtual-scroll-bar",
+            style: { width: leftWidth + "px" },
+          }),
+          h(
+            "div",
+            {
+              class: "virtual-scroll-bar",
+              style: { width: "100%", height: "17px" },
+              on: {
+                scroll: (event: Event) => {
+                  console.log("eee");
+                  scrollOffsetLeft.value = (
+                    event.target as HTMLElement
+                  ).scrollLeft;
+                },
+              },
+            },
+            [h("div", { style: { width: centreWidth + "px", height: "17px" } })]
+          ),
+          h("div", {
+            class: "virtual-scroll-bar",
+            style: { width: rightWidth + "px" },
+          }),
+        ]
+      );
     };
 
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
@@ -123,16 +147,9 @@ export default defineComponent({
       return h(GridBody, {
         props: {
           internalItems: internalItems.value,
-          gridOffsetTop: gridOffsets.top,
           rowHeight: props.rowHeight,
           gridHeight: props.gridHeight,
-        },
-        on: {
-          // We want the scrolling to be within the rows, not the entire grid, so listen for these events
-          "update:scroll": (scroll: GridScrollEvent) => {
-            gridOffsets.top = scroll.gridOffsetTop;
-            gridOffsets.left = scroll.gridOffsetLeft;
-          },
+          gridOffsetLeft: scrollOffsetLeft.value,
         },
       });
     };
@@ -144,7 +161,7 @@ export default defineComponent({
           gridConfiguration: props.gridConfiguration,
           gridState: gridState,
           rowHeight: props.rowHeight,
-          gridOffsetLeft: gridOffsets.left,
+          gridOffsetLeft: scrollOffsetLeft.value,
         },
       });
     };

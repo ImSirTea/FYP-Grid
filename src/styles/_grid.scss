@@ -16,7 +16,8 @@ $border-colour: lightgray;
 }
 
 .grid-row-container {
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
 }
 
@@ -92,4 +93,13 @@ $border-colour: lightgray;
   height: 100%;
   margin-left: auto;
   cursor: e-resize !important;
+}
+
+.virtual-scroll-bar-container {
+  display: flex;
+  flex-flow: row;
+}
+
+.virtual-scroll-bar {
+  overflow-x: scroll;
 }

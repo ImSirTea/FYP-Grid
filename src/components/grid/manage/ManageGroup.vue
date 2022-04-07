@@ -2,7 +2,7 @@
   <v-container class="pa-0" fluid>
     <v-row no-gutters>
       <v-col cols="auto">
-        <v-select :label="$tc.pin" />
+        <v-select v-model="pinnedColumn" :label="$tc.pin" :items="pinValues" />
       </v-col>
       <v-col cols="auto">
         <v-switch v-model="isHidden" :label="$tc.hide" dense />
@@ -18,7 +18,7 @@ import {
   PropType,
   computed,
 } from "@vue/composition-api";
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn, pinValues } from "@/components/grid/columns/Column";
 import { GridState } from "@/components/grid/GridState";
 import $tc from "@/textConstants";
 
@@ -40,10 +40,36 @@ export default defineComponent({
       },
     });
 
+    const pinnedColumn = computed({
+      get: () => gridState.columnStates[props.column.key].pin,
+      set: (newPinned) => {
+        // Set our pin to the appropriate one
+        gridState.columnStates[props.column.key].pin = newPinned;
+
+        let targetSortIndex;
+
+        //TODO Reordering when pins change
+
+        if (newPinned === "left") {
+          return;
+        }
+
+        if (newPinned === "right") {
+          return;
+        }
+
+        if (newPinned === "centre") {
+          return;
+        }
+      },
+    });
+
     return {
       isHidden,
+      pinnedColumn,
       gridState,
       $tc,
+      pinValues,
     };
   },
 });

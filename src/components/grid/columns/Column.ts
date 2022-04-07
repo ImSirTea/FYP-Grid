@@ -17,9 +17,12 @@ export enum SortDirection {
   DESCENDING,
 }
 
+export const pinValues = ["left", "centre", "right"] as const;
+export type PinTypes = typeof pinValues[number];
+
 export interface ColumnOptions {
   defaultWidth: GridWidthEnum | number;
-  defaultPin: "left" | "centre" | "right";
+  defaultPin: PinTypes;
   defaultHidden: boolean;
   isFilterable: boolean;
   isDraggable: boolean;
