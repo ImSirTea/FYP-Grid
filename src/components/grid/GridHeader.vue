@@ -20,6 +20,10 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    totalGridWidth: {
+      type: Number,
+      required: true,
+    },
   },
   setup(props) {
     const gridConfiguration =
@@ -34,15 +38,6 @@ export default defineComponent({
     let lastResizeX = 0;
     let lastDragX = 0;
 
-    // How wide should our header row should be to align with the grid
-    const totalGridWidth = computed(() =>
-      gridConfiguration.columns.reduce(
-        (totalWidth, column) =>
-          totalWidth + gridState.columnStates[column.key].width,
-        0
-      )
-    );
-
     // Generate our header rows
     const headers = computed(() => [buildHeaderRow()]);
 
@@ -56,7 +51,7 @@ export default defineComponent({
         {
           class: "grid-header",
           style: {
-            width: totalGridWidth.value + "px",
+            width: props.totalGridWidth + "px",
             height: props.rowHeight + "px",
             transform: `translateX(${-props.gridOffsetLeft + "px"}`,
           },
@@ -80,6 +75,9 @@ export default defineComponent({
             width: gridState.columnStates[column.key].width + "px",
             height: props.rowHeight + "px",
           },
+          attrs: {
+            "col-key": column.key,
+          },
           class: "grid-header-cell",
           on: {
             // Toggle our sorting behaviours
@@ -91,6 +89,11 @@ export default defineComponent({
               //event.dataTransfer!.dropEffect = "move";
               draggedColumn = column;
               lastDragX = event.clientX;
+            },
+            touchstart: (event: TouchEvent) => {
+              //event.dataTransfer!.dropEffect = "move";
+              draggedColumn = column;
+              lastDragX = event.touches[0].clientX;
             },
             // Allow the header to be the drop target, and reassign when needed
             dragover: (event: DragEvent) => {
@@ -123,7 +126,54 @@ export default defineComponent({
 
               lastDragX = event.clientX;
             },
+            touchmove: (event: TouchEvent) => {
+              // Don't allow moving when we are resizing
+              if (isResizing) {
+                return;
+              }
+
+              // Touchmove behaves different to dragover, "column" in this instance will always be the dragged column
+              // as that column's element will own the event here, so we need to manually find it instead
+              const elementTouchIsOver = document.elementFromPoint(
+                event.touches[0].clientX,
+                event.touches[0].clientY
+              );
+              const elementColumnId =
+                elementTouchIsOver?.attributes.getNamedItem("col-key")?.value;
+
+              if (!elementColumnId) {
+                return;
+              }
+
+              // Don't swap with our last column
+              if (
+                targetColumn?.key === elementColumnId &&
+                !isDraggingAwayFromDraggedColumn(event)
+              ) {
+                lastDragX = event.touches[0].clientX;
+                return;
+              }
+
+              targetColumn = gridConfiguration.columns.find(
+                (column) => column.key === elementColumnId
+              )!;
+
+              // Don't try swap with ourselves
+              if (targetColumn.key === draggedColumn?.key) {
+                return;
+              }
+
+              if (draggedColumn && targetColumn) {
+                gridState.rearrangeColumnOrders(draggedColumn!, targetColumn!);
+              }
+
+              lastDragX = event.touches[0].clientX;
+            },
             drop: (event: DragEvent) => {
+              draggedColumn = null;
+              targetColumn = null;
+            },
+            touchend: (event: DragEvent) => {
               draggedColumn = null;
               targetColumn = null;
             },
@@ -136,9 +186,13 @@ export default defineComponent({
       );
     };
 
+    const isDragEvent = (event: DragEvent | TouchEvent): event is DragEvent => {
+      return (event as DragEvent).clientX !== undefined;
+    };
+
     // As we prevent swapping with the same column twice in a row
     // We need to allow going back where we just where
-    const isDraggingAwayFromDraggedColumn = (event: DragEvent) => {
+    const isDraggingAwayFromDraggedColumn = (event: DragEvent | TouchEvent) => {
       if (!draggedColumn || !targetColumn) {
         return true;
       }
@@ -147,18 +201,22 @@ export default defineComponent({
         gridState.columnStates[draggedColumn.key].order;
       const targetColumnOrder = gridState.columnStates[targetColumn.key].order;
 
+      const clientX = isDragEvent(event)
+        ? event.clientX
+        : event.touches[0].clientX;
+
       // Dragging right
-      if (event.clientX > lastDragX) {
+      if (clientX > lastDragX) {
         return targetColumnOrder > draggedColumnOrder;
       }
 
       // Dragging left
-      if (lastDragX > event.clientX) {
+      if (lastDragX > clientX) {
         return draggedColumnOrder > targetColumnOrder;
       }
 
       // Not moved
-      if (lastDragX === event.clientX) {
+      if (lastDragX === clientX) {
         return false;
       }
 
@@ -238,7 +296,6 @@ export default defineComponent({
 
     return {
       headers,
-      totalGridWidth,
       gridState,
       gridManager,
     };

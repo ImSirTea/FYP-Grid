@@ -64,7 +64,10 @@ export default defineComponent({
       gridState as GridState,
       props.gridConfiguration
     );
+    const gridRef = ref(null);
     const scrollOffsetLeft = ref(0);
+    let currentTouchX = 0;
+
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
     provide("gridManager", gridManager);
@@ -76,8 +79,20 @@ export default defineComponent({
     );
 
     const totalGridWidth = computed(() =>
-      props.width ? props.width + "px" : "100%"
+      props.gridConfiguration.columns.reduce(
+        (totalWidth, column) =>
+          totalWidth + gridState.columnStates[column.key].width,
+        0
+      )
     );
+
+    const actualGridWidth = computed(() => {
+      if (gridRef.value) {
+        return (gridRef.value as HTMLElement).clientWidth;
+      }
+
+      return 0;
+    });
 
     // If our indexes, config, or state has changed, we should re-filter and sort
     watch(
@@ -125,7 +140,6 @@ export default defineComponent({
               style: { width: "100%", height: "17px" },
               on: {
                 scroll: (event: Event) => {
-                  console.log("eee");
                   scrollOffsetLeft.value = (
                     event.target as HTMLElement
                   ).scrollLeft;
@@ -151,6 +165,24 @@ export default defineComponent({
           gridHeight: props.gridHeight,
           gridOffsetLeft: scrollOffsetLeft.value,
         },
+        // Allow for touch dragging events for mobile support
+        // A little jank as it doesn't allow for velocities
+        nativeOn: {
+          touchstart: (event: TouchEvent) => {
+            currentTouchX += event.touches[0].clientX;
+          },
+          touchmove: (event: TouchEvent) => {
+            const wantedOffsetLeft = currentTouchX - event.touches[0].clientX;
+            const clampedOffsetLeft = Math.min(
+              Math.max(0, wantedOffsetLeft),
+              totalGridWidth.value - actualGridWidth.value
+            );
+            scrollOffsetLeft.value = clampedOffsetLeft;
+          },
+          touchend: () => {
+            currentTouchX = scrollOffsetLeft.value;
+          },
+        },
       });
     };
 
@@ -159,9 +191,10 @@ export default defineComponent({
       return h(GridHeader, {
         props: {
           gridConfiguration: props.gridConfiguration,
-          gridState: gridState,
+          gridState,
           rowHeight: props.rowHeight,
           gridOffsetLeft: scrollOffsetLeft.value,
+          totalGridWidth: totalGridWidth.value,
         },
       });
     };
@@ -182,7 +215,8 @@ export default defineComponent({
         "div",
         {
           class: "grid-container",
-          style: { width: totalGridWidth.value },
+          style: { width: props.width ? props.width + "px" : "100%" },
+          ref: "gridRef",
         },
         [
           buildControlPanel(),
@@ -194,6 +228,7 @@ export default defineComponent({
     };
 
     return {
+      gridRef,
       buildTable,
     };
   },

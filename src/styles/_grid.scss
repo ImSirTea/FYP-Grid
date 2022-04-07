@@ -16,11 +16,9 @@ $border-colour: lightgray;
 }
 
 .grid-row-container {
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: auto;
   position: relative;
 }
-
 
 // Grid rows
 .grid-row,
