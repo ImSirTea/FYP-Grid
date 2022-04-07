@@ -1,5 +1,5 @@
 <script lang="ts">
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn, PinTypes } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
 import { GridState } from "@/components/grid/GridState";
@@ -50,11 +50,28 @@ export default defineComponent({
     const buildHeaderRow = () => {
       const { left, none, right } = gridManager.pinnedSortedAndVisibleColumns;
 
-      const cells = {
-        left: left.map((column) => buildCell(column)),
-        none: none.map((column) => buildCell(column)),
-        right: right.map((column) => buildCell(column)),
-      };
+      const leftCells: VNode[] = [];
+      const centreCells: VNode[] = none.map((column) =>
+        buildCell(column, "none")
+      );
+      const rightCells: VNode[] = [];
+
+      let leftOffset = 0;
+      let rightOffset = 0;
+
+      left.forEach((column, index) => {
+        leftCells.push(
+          buildCell(column, "left", leftOffset, index === left.length - 1)
+        );
+        leftOffset += gridState.columnStates[column.key].width;
+      });
+
+      right.forEach((column, index) => {
+        rightCells.push(
+          buildCell(column, "right", rightOffset, index === right.length - 1)
+        );
+        rightOffset += gridState.columnStates[column.key].width;
+      });
 
       return h(
         "div",
@@ -66,12 +83,23 @@ export default defineComponent({
             transform: `translateX(${-props.gridOffsetLeft + "px"}`,
           },
         },
-        [cells.left, cells.none, cells.right]
+        [leftCells, centreCells, rightCells]
       );
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildCell = (column: AnyGridColumn) => {
+    /**
+     * @param column The column relevant to the cell
+     * @param pin The column's pin
+     * @param offset How far along the cell should get stuck
+     * @param isLast For applying borders to the last sticky cells
+     * @returns The built cell
+     */ const buildCell = (
+      column: AnyGridColumn,
+      pin: PinTypes,
+      offset: number = 0,
+      isLast: boolean = false
+    ) => {
       const sortIcon = column.options.isSortable
         ? buildSortIcon(column)
         : undefined;
@@ -83,9 +111,14 @@ export default defineComponent({
         {
           style: {
             width: gridState.columnStates[column.key].width + "px",
-            height: props.rowHeight + "px",
+            left: pin === "left" ? offset + "px" : undefined,
+            right: pin === "right" ? offset + "px" : undefined,
+            "border-right":
+              pin === "left" && isLast ? "solid 1px lightgray" : undefined,
+            "border-left":
+              pin === "right" && isLast ? "solid 1px lightgray" : undefined,
           },
-          class: "grid-header-cell",
+          class: { "grid-header-cell": true, sticky: pin !== "none" },
           on: {
             // Toggle our sorting behaviours
             click: () => {
@@ -254,6 +287,9 @@ export default defineComponent({
       "div",
       {
         class: "grid-header-container",
+        style: {
+          height: this.rowHeight + "px",
+        },
       },
       this.headers
     );

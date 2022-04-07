@@ -40,7 +40,7 @@ export default defineComponent({
     rowHeight: {
       type: Number,
       required: false,
-      default: 35,
+      default: 50,
     },
     gridHeight: {
       type: Number,

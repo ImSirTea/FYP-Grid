@@ -13,6 +13,7 @@ $border-colour: lightgray;
   cursor: pointer;
   user-select: none;
   overflow: hidden;
+  position: relative;
 }
 
 .grid-row-container {
@@ -20,16 +21,15 @@ $border-colour: lightgray;
   position: relative;
 }
 
-
 // Grid rows
 .grid-row,
 .grid-header {
   background-color: $base-colour;
   display: flex;
+  position: absolute;
 }
 
 .grid-row {
-  position: absolute;
   text-decoration: none;
   color: inherit !important;
 }

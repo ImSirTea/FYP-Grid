@@ -4,7 +4,7 @@ import GridCell from "@/components/grid/GridCell.vue";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
 import { GridState } from "@/components/grid/GridState";
-import { GridManager, PinnedColumnGroups } from "@/components/grid/GridManager";
+import { GridManager } from "@/components/grid/GridManager";
 import { AnyGridColumn, PinTypes } from "@/components/grid/columns/Column";
 
 export default defineComponent({
@@ -26,12 +26,29 @@ export default defineComponent({
     const gridManager = inject<GridManager>("gridManager")!;
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildCell = (column: AnyGridColumn, pin: PinTypes) => {
+    /**
+     *
+     * @param column The column relevant to the cell
+     * @param pin The column's pin
+     * @param offset How far along the cell should get stuck
+     * @param isLast For applying borders to the last sticky cells
+     * @returns The sorting options and current index for a given column
+     */
+    const buildCell = (
+      column: AnyGridColumn,
+      pin: PinTypes,
+      offset: number = 0,
+      isLast: boolean = false
+    ) => {
       return h(GridCell, {
         style: {
           width: gridState.columnStates[column.key].width + "px",
-          left: pin === "left" ? 0 : undefined,
-          right: pin === "right" ? 0 : undefined,
+          left: pin === "left" ? offset + "px" : undefined,
+          right: pin === "right" ? offset + "px" : undefined,
+          "border-right":
+            pin === "left" && isLast ? "solid 1px lightgray" : undefined,
+          "border-left":
+            pin === "right" && isLast ? "solid 1px lightgray" : undefined,
         },
         class: { "grid-row-cell": true, sticky: pin !== "none" },
         props: { item: props.item, column },
@@ -62,11 +79,28 @@ export default defineComponent({
     const { left, none, right } =
       this.gridManager.pinnedSortedAndVisibleColumns;
 
-    const cells = {
-      left: left.map((column) => this.buildCell(column, "left")),
-      none: none.map((column) => this.buildCell(column, "none")),
-      right: right.map((column) => this.buildCell(column, "right")),
-    };
+    const leftCells: VNode[] = [];
+    const centreCells: VNode[] = none.map((column) =>
+      this.buildCell(column, "none")
+    );
+    const rightCells: VNode[] = [];
+
+    let leftOffset = 0;
+    let rightOffset = 0;
+
+    left.forEach((column, index) => {
+      leftCells.push(
+        this.buildCell(column, "left", leftOffset, index === left.length - 1)
+      );
+      leftOffset += this.gridState.columnStates[column.key].width;
+    });
+
+    right.forEach((column, index) => {
+      rightCells.push(
+        this.buildCell(column, "right", rightOffset, index === right.length - 1)
+      );
+      rightOffset += this.gridState.columnStates[column.key].width;
+    });
 
     if (this.gridConfiguration.rowRoute) {
       return h(
@@ -75,16 +109,16 @@ export default defineComponent({
           props: { to: this.gridConfiguration.rowRoute(this.item) },
           class: { "grid-row-clickable": isRowClickable },
         },
-        [cells.left, cells.none, cells.right]
+        [leftCells, centreCells, rightCells]
       );
     }
 
     const rowType = this.gridConfiguration.rowAction ? "a" : "div";
 
     return h(rowType, { class: { "grid-row-clickable": isRowClickable } }, [
-      cells.left,
-      cells.none,
-      cells.right,
+      leftCells,
+      centreCells,
+      rightCells,
     ]);
   },
 });
