@@ -1,11 +1,15 @@
 <script lang="ts">
+import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { GridManager } from "@/components/grid/GridManager";
 import GridRow from "@/components/grid/GridRow.vue";
+import { GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
   h,
   PropType,
   computed,
   watch,
+  inject,
 } from "@vue/composition-api";
 import { VNode } from "vue";
 export interface GridScrollEvent {
@@ -39,6 +43,9 @@ export default defineComponent({
     },
   },
   setup(props, context) {
+    const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
+
     // Total height of all rows, used for scrolling
     const totalGridHeight = computed((): number => {
       return props.internalItems.length * props.rowHeight;
@@ -66,7 +73,7 @@ export default defineComponent({
     }));
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildRow = (item: any, index: number) => {
+    const buildRow = (item: any, index: number, columns: AnyGridColumn[]) => {
       return h(GridRow, {
         attrs: {
           role: "row",
@@ -82,6 +89,7 @@ export default defineComponent({
         props: {
           item,
           index,
+          columns,
         },
       });
     };
@@ -113,14 +121,45 @@ export default defineComponent({
       rowsOffset,
       totalGridHeight,
       rowIndexBoundaries,
+      gridManager,
+      gridState,
     };
   },
   render(): VNode {
     const { min, max } = this.rowIndexBoundaries;
+    const { left, centre, right } =
+      this.gridManager.pinnedSortedAndVisibleColumns;
     const rows: VNode[] = [];
+
+    const leftRows: VNode[] = [];
+    const centreRows: VNode[] = [];
+    const rightRows: VNode[] = [];
+
     for (let i = min; i < max; i++) {
-      rows.push(this.buildRow(this.internalItems[i], i));
+      if (left.length)
+        leftRows.push(this.buildRow(this.internalItems[i], i, left));
+
+      if (centre.length)
+        centreRows.push(this.buildRow(this.internalItems[i], i, centre));
+
+      if (right.length)
+        rightRows.push(this.buildRow(this.internalItems[i], i, right));
     }
+
+    const leftWidth = left.reduce(
+      (acc, column) => acc + this.gridState.columnStates[column.key].width,
+      0
+    );
+
+    const centreWidth = centre.reduce(
+      (acc, column) => acc + this.gridState.columnStates[column.key].width,
+      0
+    );
+
+    const rightWidth = right.reduce(
+      (acc, column) => acc + this.gridState.columnStates[column.key].width,
+      0
+    );
 
     return h(
       "div",
@@ -137,15 +176,59 @@ export default defineComponent({
         h(
           "div",
           {
-            class: "grid-row-height-wrapper",
+            style: {
+              height: this.totalGridHeight + "px",
+              width: leftWidth + "px",
+              "min-width": leftWidth + "px",
+            },
+          },
+          leftRows
+        ),
+        h(
+          "div",
+          {
+            class: "grid-row-cropper",
             style: {
               height: this.totalGridHeight + "px",
             },
-            attrs: {
-              role: "grid",
+          },
+          [
+            h(
+              "div",
+              {
+                class: "grid-row-center-wrapper",
+                style: {
+                  height: this.totalGridHeight + "px",
+                },
+              },
+              [
+                h(
+                  "div",
+                  {
+                    style: {
+                      width: centreWidth + "px",
+                      height: this.totalGridHeight + "px",
+                    },
+                    attrs: {
+                      role: "grid",
+                    },
+                  },
+                  centreRows
+                ),
+              ]
+            ),
+          ]
+        ),
+        h(
+          "div",
+          {
+            style: {
+              height: this.totalGridHeight + "px",
+              width: rightWidth + "px",
+              "min-width": rightWidth + "px",
             },
           },
-          rows
+          rightRows
         ),
       ]
     );

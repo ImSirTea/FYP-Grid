@@ -8,7 +8,7 @@ import { GridState } from "@/components/grid/GridState";
 
 export interface PinnedColumnGroups {
   left: AnyGridColumn[];
-  none: AnyGridColumn[];
+  centre: AnyGridColumn[];
   right: AnyGridColumn[];
 }
 export class GridManager {
@@ -35,7 +35,7 @@ export class GridManager {
   get pinnedSortedAndVisibleColumns() {
     const columns: PinnedColumnGroups = {
       left: [],
-      none: [],
+      centre: [],
       right: [],
     };
 

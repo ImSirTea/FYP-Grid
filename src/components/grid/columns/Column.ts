@@ -18,7 +18,7 @@ export enum SortDirection {
 }
 
 // Exportable pin values so we can use them in the pin manager
-export const pinValues = ["left", "none", "right"] as const;
+export const pinValues = ["left", "centre", "right"] as const;
 export type PinTypes = typeof pinValues[number];
 
 export interface ColumnOptions {
@@ -55,7 +55,7 @@ export abstract class Column<T, RenderableType, O extends ColumnOptions> {
     this.setOption("isDraggable", true);
     this.setOption("defaultWidth", GridWidthEnum.MEDIUM);
     this.setOption("defaultHidden", false);
-    this.setOption("defaultPin", "none");
+    this.setOption("defaultPin", "centre");
     this.setOption("ascIcon", "mdi-sort-ascending");
     this.setOption("descIcon", "mdi-sort-descending");
   }

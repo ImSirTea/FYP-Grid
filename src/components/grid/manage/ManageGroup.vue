@@ -56,7 +56,7 @@ export default defineComponent({
           return;
         }
 
-        if (newPinned === "none") {
+        if (newPinned === "centre") {
           return;
         }
       },

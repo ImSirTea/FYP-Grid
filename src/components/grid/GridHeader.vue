@@ -48,10 +48,10 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeaderRow = () => {
-      const { left, none, right } = gridManager.pinnedSortedAndVisibleColumns;
+      const { left, centre, right } = gridManager.pinnedSortedAndVisibleColumns;
 
       const leftCells: VNode[] = [];
-      const centreCells: VNode[] = none.map((column) => buildCell(column));
+      const centreCells: VNode[] = centre.map((column) => buildCell(column));
       const rightCells: VNode[] = [];
 
       left.forEach((column, index) => {

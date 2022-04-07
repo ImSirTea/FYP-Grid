@@ -18,6 +18,10 @@ export default defineComponent({
       type: Object as PropType<Record<string, any>>,
       required: true,
     },
+    columns: {
+      type: Array as PropType<AnyGridColumn[]>,
+      required: true,
+    },
   },
   setup(props) {
     const gridConfiguration =
@@ -57,21 +61,6 @@ export default defineComponent({
       this.gridConfiguration.rowAction || this.gridConfiguration.rowRoute
     );
 
-    const { left, none, right } =
-      this.gridManager.pinnedSortedAndVisibleColumns;
-
-    const leftCells: VNode[] = [];
-    const centreCells: VNode[] = none.map((column) => this.buildCell(column));
-    const rightCells: VNode[] = [];
-
-    left.forEach((column, index) => {
-      leftCells.push(this.buildCell(column));
-    });
-
-    right.forEach((column, index) => {
-      rightCells.push(this.buildCell(column));
-    });
-
     if (this.gridConfiguration.rowRoute) {
       return h(
         "router-link",
@@ -79,17 +68,17 @@ export default defineComponent({
           props: { to: this.gridConfiguration.rowRoute(this.item) },
           class: { "grid-row-clickable": isRowClickable },
         },
-        [leftCells, centreCells, rightCells]
+        this.columns.map((column) => this.buildCell(column))
       );
     }
 
     const rowType = this.gridConfiguration.rowAction ? "a" : "div";
 
-    return h(rowType, { class: { "grid-row-clickable": isRowClickable } }, [
-      leftCells,
-      centreCells,
-      rightCells,
-    ]);
+    return h(
+      rowType,
+      { class: { "grid-row-clickable": isRowClickable } },
+      this.columns.map((column) => this.buildCell(column))
+    );
   },
 });
 </script>
