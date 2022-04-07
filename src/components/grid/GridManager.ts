@@ -20,7 +20,7 @@ export class GridManager {
     this.#gridConfiguration = gridConfiguration;
   }
 
-  get visibleColumns() {
+  get #visibleColumns() {
     return this.#gridConfiguration.columns
       .filter((column) => !this.#gridState.columnStates[column.key].isHidden)
       .sort(this.sortOnOrder);
@@ -32,14 +32,14 @@ export class GridManager {
       .sort(this.sortOnOrder);
   }
 
-  get pinnedSortedAndVisibleColumns() {
+  get columns() {
     const columns: PinnedColumnGroups = {
       left: [],
       centre: [],
       right: [],
     };
 
-    this.visibleColumns.forEach((column) => {
+    this.#visibleColumns.forEach((column) => {
       const pin = this.#gridState.columnStates[column.key].pin;
       columns[pin].push(column);
     });
@@ -54,5 +54,22 @@ export class GridManager {
 
       return aOrder - bOrder;
     };
+  }
+
+  get columnSizes() {
+    const leftWidth = this.columns.left.reduce(
+      (acc, column) => acc + this.#gridState.columnStates[column.key].width,
+      0
+    );
+    const centreWidth = this.columns.centre.reduce(
+      (acc, column) => acc + this.#gridState.columnStates[column.key].width,
+      0
+    );
+    const rightWidth = this.columns.right.reduce(
+      (acc, column) => acc + this.#gridState.columnStates[column.key].width,
+      0
+    );
+
+    return { leftWidth, centreWidth, rightWidth };
   }
 }

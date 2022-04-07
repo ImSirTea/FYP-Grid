@@ -48,6 +48,7 @@ import $tc from "@/textConstants";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import ManageGroup from "@/components/grid/manage/ManageGroup.vue";
 import { GridManager } from "@/components/grid/GridManager";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 
 export default defineComponent({
   name: "ManageMenu",
@@ -61,7 +62,9 @@ export default defineComponent({
   setup(props, context) {
     const gridManager = inject<GridManager>("gridManager")!;
 
-    const manageableColumns = computed(() => gridManager.visibleColumns);
+    const manageableColumns = computed<AnyGridColumn[]>(() =>
+      Array.from(Object.values(gridManager.columns).flatMap((column) => column))
+    );
 
     return {
       manageableColumns,

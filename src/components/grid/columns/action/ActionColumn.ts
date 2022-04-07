@@ -31,6 +31,7 @@ export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
     this.setOption("isSortable", false);
     this.setOption("isDraggable", false);
     this.setOption("defaultWidth", GridWidthEnum.SMALL);
+    this.setOption("defaultPin", "right");
   }
 
   addAction(

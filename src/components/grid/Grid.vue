@@ -13,8 +13,9 @@ import {
   provide,
   watch,
   shallowRef,
+  ref,
 } from "@vue/composition-api";
-import GridBody, { GridScrollEvent } from "@/components/grid/GridBody.vue";
+import GridBody from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/grid/GridControlPanel.vue";
 
 /**
@@ -52,6 +53,11 @@ export default defineComponent({
       required: false,
       default: undefined,
     },
+    bufferRows: {
+      type: Number,
+      required: false,
+      default: 1,
+    },
   },
   setup(props) {
     // Desperately avoid using ref here, it's painfully slow
@@ -66,6 +72,8 @@ export default defineComponent({
     provide("gridState", gridState);
     provide("gridConfiguration", props.gridConfiguration);
     provide("gridManager", gridManager);
+
+    const centreBar = ref<HTMLElement | null>(null);
 
     // Scroll offsets
     const gridOffsets = reactive({
@@ -101,14 +109,18 @@ export default defineComponent({
         props: {
           internalItems: internalItems.value,
           gridOffsetTop: gridOffsets.top,
+          gridOffsetLeft: gridOffsets.left,
           rowHeight: props.rowHeight,
           gridHeight: props.gridHeight,
+          bufferRows: props.bufferRows,
         },
         on: {
           // We want the scrolling to be within the rows, not the entire grid, so listen for these events
-          "update:scroll": (scroll: GridScrollEvent) => {
-            gridOffsets.top = scroll.gridOffsetTop;
-            gridOffsets.left = scroll.gridOffsetLeft;
+          "update:scroll-top": (offsetTop: number) => {
+            gridOffsets.top = offsetTop;
+          },
+          "update:scroll-left": (offsetLeft: number) => {
+            gridOffsets.left = offsetLeft;
           },
         },
       });
@@ -136,6 +148,41 @@ export default defineComponent({
       });
     };
 
+    const buildVirtualScrollbars = () => {
+      const { leftWidth, centreWidth, rightWidth } = gridManager.columnSizes;
+
+      return h(
+        "div",
+        {
+          class: "virtual-scroll-bar-container",
+        },
+        [
+          h("div", {
+            class: "virtual-scroll-bar",
+            style: { width: leftWidth + "px", "min-width": leftWidth + "px" },
+          }),
+          h(
+            "div",
+            {
+              ref: "centreBar",
+              class: "virtual-scroll-bar",
+              style: { width: "100%", height: "17px" },
+              on: {
+                scroll: (event: Event) => {
+                  gridOffsets.left = (event.target as HTMLElement).scrollLeft;
+                },
+              },
+            },
+            [h("div", { style: { width: centreWidth + "px", height: "17px" } })]
+          ),
+          h("div", {
+            class: "virtual-scroll-bar",
+            style: { width: rightWidth + "px", "min-width": rightWidth + "px" },
+          }),
+        ]
+      );
+    };
+
     // ONLY USE IN CONTEXT OF RENDERING
     const buildTable = () => {
       return h(
@@ -144,12 +191,28 @@ export default defineComponent({
           class: "grid-container",
           style: { width: totalGridWidth.value },
         },
-        [buildControlPanel(), buildHeader(), buildBody()]
+        [
+          buildControlPanel(),
+          buildHeader(),
+          buildBody(),
+          buildVirtualScrollbars(),
+        ]
       );
     };
 
+    watch(
+      () => gridOffsets.left,
+      () => {
+        if (centreBar.value) {
+          centreBar.value.scrollTo({ left: gridOffsets.left });
+        }
+      }
+    );
+
     return {
       buildTable,
+      centreBar,
+      gridOffsets,
     };
   },
   render(): VNode {

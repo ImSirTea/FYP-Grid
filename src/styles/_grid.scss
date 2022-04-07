@@ -14,6 +14,7 @@ $border-colour: lightgray;
   user-select: none;
   overflow: hidden;
   position: relative;
+  display: flex;
 }
 
 .grid-row-container {
@@ -56,7 +57,7 @@ $border-colour: lightgray;
 // Grid cells
 .grid-header-cell,
 .grid-row-cell {
-  padding: 0 0.75em;
+  padding-left: 0.75em;
   display: flex;
   align-items: center;
   background-color: inherit;
@@ -96,7 +97,7 @@ $border-colour: lightgray;
   cursor: e-resize !important;
 }
 
-.grid-row-cropper {
+.grid-column-cropper {
   overflow: hidden;
 }
 
@@ -113,4 +114,23 @@ $border-colour: lightgray;
   display: none;
   -ms-overflow-style: none;  /* IE and Edge */
   scrollbar-width: none;  /* Firefox */
+}
+
+.virtual-scroll-bar-container {
+  overflow: hidden;
+  display: flex;
+}
+
+.virtual-scroll-bar {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.virtual-scroll-bar-container:last-child {
+  padding-right: 17px
+}
+
+.grid-column-wrapper {
+  display: flex;
+  height: 100%;
 }

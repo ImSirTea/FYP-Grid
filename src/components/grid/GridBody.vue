@@ -10,12 +10,9 @@ import {
   computed,
   watch,
   inject,
+  ref,
 } from "@vue/composition-api";
 import { VNode } from "vue";
-export interface GridScrollEvent {
-  gridOffsetTop: number;
-  gridOffsetLeft: number;
-}
 
 /**
  * Container for all grid rows, handling scroll events, offsets, and rendering
@@ -41,10 +38,19 @@ export default defineComponent({
       type: Number,
       required: true,
     },
+    bufferRows: {
+      type: Number,
+      required: true,
+    },
+    gridOffsetLeft: {
+      type: Number,
+      required: true,
+    },
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
     const gridManager = inject<GridManager>("gridManager")!;
+    const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Total height of all rows, used for scrolling
     const totalGridHeight = computed((): number => {
@@ -65,10 +71,10 @@ export default defineComponent({
 
     // Row boundaries to build rows between, defaults to -1 so our watcher can compute them correctly in a single place
     const rowIndexBoundaries = computed((): { min: number; max: number } => ({
-      min: Math.max(0, rowsOffset.value),
+      min: Math.max(0, rowsOffset.value - props.bufferRows),
       max: Math.min(
         props.internalItems.length,
-        rowsOffset.value + maximumVisibleRows.value
+        rowsOffset.value + maximumVisibleRows.value + props.bufferRows
       ),
     }));
 
@@ -95,15 +101,15 @@ export default defineComponent({
     };
 
     // Manages scroll events passthrough
-    const gridScroll = (e: any) => {
-      context.emit("update:scroll", {
-        gridOffsetTop: e.target.scrollTop,
-        gridOffsetLeft: e.target.scrollLeft,
-      } as GridScrollEvent);
+    const gridTopScroll = (e: any) => {
+      context.emit("update:scroll-top", e.target.scrollTop);
+    };
+    const gridLeftScroll = (e: any) => {
+      context.emit("update:scroll-left", e.target.scrollLeft);
     };
 
     watch(
-      () => props.internalItems,
+      totalGridHeight,
       () => {
         // TODO: This should probably not be hard coded
         if (totalGridHeight.value > 33554400) {
@@ -115,21 +121,32 @@ export default defineComponent({
       { immediate: true }
     );
 
+    watch(
+      () => props.gridOffsetLeft,
+      () => {
+        if (scrollableDiv.value) {
+          scrollableDiv.value.scrollTo({ left: props.gridOffsetLeft });
+        }
+      }
+    );
+
     return {
       buildRow,
-      gridScroll,
+      gridTopScroll,
+      gridLeftScroll,
       rowsOffset,
       totalGridHeight,
       rowIndexBoundaries,
       gridManager,
       gridState,
+      scrollableDiv,
     };
   },
   render(): VNode {
     const { min, max } = this.rowIndexBoundaries;
-    const { left, centre, right } =
-      this.gridManager.pinnedSortedAndVisibleColumns;
-    const rows: VNode[] = [];
+    const { left, centre, right } = this.gridManager.columns;
+
+    const { leftWidth, centreWidth, rightWidth } = this.gridManager.columnSizes;
 
     const leftRows: VNode[] = [];
     const centreRows: VNode[] = [];
@@ -146,21 +163,6 @@ export default defineComponent({
         rightRows.push(this.buildRow(this.internalItems[i], i, right));
     }
 
-    const leftWidth = left.reduce(
-      (acc, column) => acc + this.gridState.columnStates[column.key].width,
-      0
-    );
-
-    const centreWidth = centre.reduce(
-      (acc, column) => acc + this.gridState.columnStates[column.key].width,
-      0
-    );
-
-    const rightWidth = right.reduce(
-      (acc, column) => acc + this.gridState.columnStates[column.key].width,
-      0
-    );
-
     return h(
       "div",
       {
@@ -169,7 +171,7 @@ export default defineComponent({
           height: this.gridHeight + "px",
         },
         on: {
-          scroll: this.gridScroll,
+          scroll: this.gridTopScroll,
         },
       },
       [
@@ -187,35 +189,29 @@ export default defineComponent({
         h(
           "div",
           {
-            class: "grid-row-cropper",
+            class: "grid-column-cropper",
             style: {
               height: this.totalGridHeight + "px",
+              width: centreWidth + "px",
             },
           },
           [
             h(
               "div",
               {
+                ref: "scrollableDiv",
                 class: "grid-row-center-wrapper",
                 style: {
                   height: this.totalGridHeight + "px",
                 },
+                attrs: {
+                  role: "grid",
+                },
+                on: {
+                  scroll: this.gridLeftScroll,
+                },
               },
-              [
-                h(
-                  "div",
-                  {
-                    style: {
-                      width: centreWidth + "px",
-                      height: this.totalGridHeight + "px",
-                    },
-                    attrs: {
-                      role: "grid",
-                    },
-                  },
-                  centreRows
-                ),
-              ]
+              centreRows
             ),
           ]
         ),

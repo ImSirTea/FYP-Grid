@@ -48,8 +48,9 @@ export default defineComponent({
 
     const builder = new GridConfiguration<Item>();
 
-    builder.addNumberColumn("index", (item) => item.index);
-    builder.addTextColumn("first1", (item) => item.first + "- 1");
+    builder
+      .addNumberColumn("index", (item) => item.index)
+      .setOption("defaultPin", "left");
     builder.addTextColumn("last1", (item) => item.last + "- 1");
     builder.addTextColumn("first2", (item) => item.first + "- 2");
     builder.addTextColumn("last2", (item) => item.last + "- 2");
@@ -81,6 +82,9 @@ export default defineComponent({
     //   console.log(`/rowRoute/index/${item.index}`)
     // );
     builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
+    builder
+      .addTextColumn("first1", (item) => item.first + "- 1")
+      .setOption("defaultPin", "right");
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);

@@ -1,9 +1,16 @@
 <script lang="ts">
-import { AnyGridColumn, PinTypes } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
 import { GridState } from "@/components/grid/GridState";
-import { defineComponent, inject, h, computed } from "@vue/composition-api";
+import {
+  defineComponent,
+  inject,
+  h,
+  computed,
+  watch,
+  ref,
+} from "@vue/composition-api";
 import { VNode } from "vue";
 import { VIcon } from "vuetify/lib/components";
 import { debounce } from "lodash";
@@ -26,6 +33,7 @@ export default defineComponent({
       inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
     const gridManager = inject<GridManager>("gridManager")!;
+    const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Drag handlers
     let draggedColumn: AnyGridColumn | null = null;
@@ -43,12 +51,10 @@ export default defineComponent({
       )
     );
 
-    // Generate our header rows
-    const headers = computed(() => [buildHeaderRow()]);
-
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeaderRow = () => {
-      const { left, centre, right } = gridManager.pinnedSortedAndVisibleColumns;
+      const { left, centre, right } = gridManager.columns;
+      const { leftWidth, centreWidth, rightWidth } = gridManager.columnSizes;
 
       const leftCells: VNode[] = [];
       const centreCells: VNode[] = centre.map((column) => buildCell(column));
@@ -62,18 +68,43 @@ export default defineComponent({
         rightCells.push(buildCell(column));
       });
 
-      return h(
-        "div",
-        {
-          class: "grid-header",
-          style: {
-            width: totalGridWidth.value + "px",
-            height: props.rowHeight + "px",
-            transform: `translateX(${-props.gridOffsetLeft + "px"}`,
+      return [
+        h(
+          "div",
+          {
+            class: "grid-column-wrapper",
+            style: { width: leftWidth + "px", "min-width": leftWidth + "px" },
           },
-        },
-        [leftCells, centreCells, rightCells]
-      );
+          leftCells
+        ),
+        h(
+          "div",
+          {
+            ref: "scrollableDiv",
+            class: "grid-column-cropper",
+          },
+          [
+            h(
+              "div",
+              {
+                class: "grid-column-wrapper",
+                style: {
+                  width: centreWidth + "px",
+                },
+              },
+              centreCells
+            ),
+          ]
+        ),
+        h(
+          "div",
+          {
+            class: "grid-column-wrapper",
+            style: { width: rightWidth + "px", "min-width": rightWidth + "px" },
+          },
+          rightCells
+        ),
+      ];
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
@@ -246,11 +277,21 @@ export default defineComponent({
       });
     };
 
+    watch(
+      () => props.gridOffsetLeft,
+      () => {
+        if (scrollableDiv.value) {
+          scrollableDiv.value.scrollTo({ left: props.gridOffsetLeft });
+        }
+      }
+    );
+
     return {
-      headers,
+      buildHeaderRow,
       totalGridWidth,
       gridState,
       gridManager,
+      scrollableDiv,
     };
   },
   render(): VNode {
@@ -263,7 +304,7 @@ export default defineComponent({
           height: this.rowHeight + "px",
         },
       },
-      this.headers
+      [this.buildHeaderRow()]
     );
   },
 });

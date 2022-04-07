@@ -2,4 +2,8 @@ And/OR connections don't highlight on first click? dunno why lmao
 
 Deleting filters doesn't correctly update the filter components
 
-How should default grid state be achieved, probably via building a grid?
+Prevent swapping with actions column
+
+resize icon is sadge :( make it resize icon all time
+
+resize hide the ghost
