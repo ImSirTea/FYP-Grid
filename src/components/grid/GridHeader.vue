@@ -51,26 +51,15 @@ export default defineComponent({
       const { left, none, right } = gridManager.pinnedSortedAndVisibleColumns;
 
       const leftCells: VNode[] = [];
-      const centreCells: VNode[] = none.map((column) =>
-        buildCell(column, "none")
-      );
+      const centreCells: VNode[] = none.map((column) => buildCell(column));
       const rightCells: VNode[] = [];
 
-      let leftOffset = 0;
-      let rightOffset = 0;
-
       left.forEach((column, index) => {
-        leftCells.push(
-          buildCell(column, "left", leftOffset, index === left.length - 1)
-        );
-        leftOffset += gridState.columnStates[column.key].width;
+        leftCells.push(buildCell(column));
       });
 
       right.forEach((column, index) => {
-        rightCells.push(
-          buildCell(column, "right", rightOffset, index === right.length - 1)
-        );
-        rightOffset += gridState.columnStates[column.key].width;
+        rightCells.push(buildCell(column));
       });
 
       return h(
@@ -88,18 +77,7 @@ export default defineComponent({
     };
 
     // ONLY USE IN CONTEXT OF RENDERING
-    /**
-     * @param column The column relevant to the cell
-     * @param pin The column's pin
-     * @param offset How far along the cell should get stuck
-     * @param isLast For applying borders to the last sticky cells
-     * @returns The built cell
-     */ const buildCell = (
-      column: AnyGridColumn,
-      pin: PinTypes,
-      offset: number = 0,
-      isLast: boolean = false
-    ) => {
+    const buildCell = (column: AnyGridColumn) => {
       const sortIcon = column.options.isSortable
         ? buildSortIcon(column)
         : undefined;
@@ -111,14 +89,8 @@ export default defineComponent({
         {
           style: {
             width: gridState.columnStates[column.key].width + "px",
-            left: pin === "left" ? offset + "px" : undefined,
-            right: pin === "right" ? offset + "px" : undefined,
-            "border-right":
-              pin === "left" && isLast ? "solid 1px lightgray" : undefined,
-            "border-left":
-              pin === "right" && isLast ? "solid 1px lightgray" : undefined,
           },
-          class: { "grid-header-cell": true, sticky: pin !== "none" },
+          class: "grid-header-cell",
           on: {
             // Toggle our sorting behaviours
             click: () => {
