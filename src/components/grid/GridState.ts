@@ -26,7 +26,7 @@ interface PinnedColumnGroups {
 
 interface ColumnState {
   width: ColumnOptions["defaultWidth"];
-  pinnedColumn: ColumnOptions["defaultPin"];
+  pin: ColumnOptions["defaultPin"];
   isHidden: ColumnOptions["defaultHidden"];
   order: number;
   filterOptions: FilterOption<RenderableType>[];
@@ -297,17 +297,17 @@ export class GridState {
     gridConfiguration: GridConfiguration<any>
   ): PinnedColumnGroups {
     const leftColumns = gridConfiguration.columns.filter(
-      (column) => this.columnStates[column.key].pinnedColumn === "left"
+      (column) => this.columnStates[column.key].pin === "left"
     );
 
     const rightColumns = gridConfiguration.columns.filter(
-      (column) => this.columnStates[column.key].pinnedColumn === "right"
+      (column) => this.columnStates[column.key].pin === "right"
     );
 
     const centerColumns = gridConfiguration.columns.filter(
       (column) =>
-        !leftColumns.find((pinnedColumn) => column.key === pinnedColumn.key) &&
-        !rightColumns.find((pinnedColumn) => column.key === pinnedColumn.key)
+        !leftColumns.find((pin) => column.key === pin.key) &&
+        !rightColumns.find((pin) => column.key === pin.key)
     );
 
     return {

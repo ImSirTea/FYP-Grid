@@ -19,7 +19,7 @@ export enum SortDirection {
 
 export interface ColumnOptions {
   defaultWidth: GridWidthEnum | number;
-  defaultPin: "left" | "right" | "none";
+  defaultPin: "left" | "centre" | "right";
   defaultHidden: boolean;
   isFilterable: boolean;
   isDraggable: boolean;
@@ -51,7 +51,7 @@ export abstract class Column<T, RenderableType, O extends ColumnOptions> {
     this.setOption("isDraggable", true);
     this.setOption("defaultWidth", GridWidthEnum.MEDIUM);
     this.setOption("defaultHidden", false);
-    this.setOption("defaultPin", "none");
+    this.setOption("defaultPin", "centre");
     this.setOption("ascIcon", "mdi-sort-ascending");
     this.setOption("descIcon", "mdi-sort-descending");
   }

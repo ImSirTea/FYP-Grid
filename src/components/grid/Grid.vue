@@ -40,7 +40,7 @@ export default defineComponent({
     rowHeight: {
       type: Number,
       required: false,
-      default: 35,
+      default: 45,
     },
     gridHeight: {
       type: Number,
@@ -95,6 +95,29 @@ export default defineComponent({
       { immediate: true, deep: true }
     );
 
+    const buildVirtualScrollbars = () => {
+      const leftWidth = gridManager.pinnedSortedAndVisibleColumns.left.reduce(
+        (width, column) => width + gridState.columnStates[column.key].width,
+        0
+      );
+
+      const rightWidth = gridManager.pinnedSortedAndVisibleColumns.left.reduce(
+        (width, column) => width + gridState.columnStates[column.key].width,
+        0
+      );
+      return h("div", [
+        h("div", {
+          class: "virtual-scroll-bar",
+          style: { width: leftWidth + "px" },
+        }),
+        h("div", { class: "virtual-scroll-bar" }),
+        h("div", {
+          class: "virtual-scroll-bar",
+          style: { width: rightWidth + "px" },
+        }),
+      ]);
+    };
+
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
     const buildBody = () => {
       return h(GridBody, {
@@ -144,7 +167,12 @@ export default defineComponent({
           class: "grid-container",
           style: { width: totalGridWidth.value },
         },
-        [buildControlPanel(), buildHeader(), buildBody()]
+        [
+          buildControlPanel(),
+          buildHeader(),
+          buildBody(),
+          buildVirtualScrollbars(),
+        ]
       );
     };
 

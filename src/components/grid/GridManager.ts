@@ -5,6 +5,12 @@ import { GridState } from "@/components/grid/GridState";
 /**
  * Wraps column states which can be used consistently across the Grid
  */
+
+export interface PinnedColumnGroups {
+  left: AnyGridColumn[];
+  centre: AnyGridColumn[];
+  right: AnyGridColumn[];
+}
 export class GridManager {
   #gridState!: GridState;
   #gridConfiguration!: GridConfiguration<any>;
@@ -24,6 +30,21 @@ export class GridManager {
     return this.#gridConfiguration.columns
       .filter((column) => column.options.isFilterable)
       .sort(this.sortOnOrder);
+  }
+
+  get pinnedSortedAndVisibleColumns() {
+    const columns: PinnedColumnGroups = {
+      left: [],
+      centre: [],
+      right: [],
+    };
+
+    this.visibleColumns.forEach((column) => {
+      const pin = this.#gridState.columnStates[column.key].pin;
+      columns[pin].push(column);
+    });
+
+    return columns;
   }
 
   get sortOnOrder() {
