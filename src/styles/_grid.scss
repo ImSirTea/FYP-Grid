@@ -108,3 +108,9 @@ $border-colour: lightgray;
   height: 100%;
   position: relative;
 }
+
+.grid-row-center-wrapper::-webkit-scrollbar {
+  display: none;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
