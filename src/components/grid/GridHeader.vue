@@ -2,7 +2,7 @@
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
-import { GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
   inject,
@@ -30,15 +30,15 @@ export default defineComponent({
   },
   setup(props) {
     const gridConfiguration =
-      inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
+      inject<GridConfiguration<AnyWithGridIndex>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
     const gridManager = inject<GridManager>("gridManager")!;
     const scrollableDiv = ref<HTMLElement | null>(null);
 
-    // Drag handlers
+    // Drag vars
     let draggedColumn: AnyGridColumn | null = null;
     let targetColumn: AnyGridColumn | null = null;
-    let isResizing = false;
+    let isResizing = ref(false);
     let lastResizeX = 0;
     let lastDragX = 0;
 
@@ -100,7 +100,11 @@ export default defineComponent({
           "div",
           {
             class: "grid-column-wrapper",
-            style: { width: rightWidth + "px", "min-width": rightWidth + "px" },
+            style: {
+              width: rightWidth + "px",
+              "min-width": rightWidth + "px",
+              "margin-right": "17px",
+            },
           },
           rightCells
         ),
@@ -129,7 +133,6 @@ export default defineComponent({
             },
             // Set our drag type and data
             dragstart: (event: DragEvent) => {
-              //event.dataTransfer!.dropEffect = "move";
               draggedColumn = column;
               lastDragX = event.clientX;
             },
@@ -138,7 +141,7 @@ export default defineComponent({
               event.preventDefault();
 
               // Don't allow moving when we are resizing
-              if (isResizing) {
+              if (isResizing.value) {
                 return;
               }
 
@@ -164,7 +167,7 @@ export default defineComponent({
 
               lastDragX = event.clientX;
             },
-            drop: (event: DragEvent) => {
+            dragend: () => {
               draggedColumn = null;
               targetColumn = null;
             },
@@ -257,21 +260,28 @@ export default defineComponent({
           },
           // Initiate our drag
           dragstart: (event: DragEvent) => {
-            isResizing = true;
+            isResizing.value = true;
             lastResizeX = event.clientX;
+
+            // Hide ghost when resizing
+            event.dataTransfer!.setDragImage(new Image(), 0, 0);
+          },
+          dragover: (event: DragEvent) => {
+            event.preventDefault();
           },
           drag: debounce((event: DragEvent) => {
             // Don't resize if we shouldn't be, or if this is the last drag event
-            if (!isResizing || !event.clientX) {
+            if (!isResizing.value || !event.clientX) {
               return;
             }
 
             const resizeDelta = event.clientX - lastResizeX;
-            gridState.columnStates[column.key].width += resizeDelta;
+            const width = gridState.columnStates[column.key].width;
+            gridState.columnStates[column.key].width = width + resizeDelta;
             lastResizeX = event.clientX;
           }),
-          drop: () => {
-            isResizing = false;
+          dragend: () => {
+            isResizing.value = false;
           },
         },
       });
@@ -292,6 +302,7 @@ export default defineComponent({
       gridState,
       gridManager,
       scrollableDiv,
+      isResizing,
     };
   },
   render(): VNode {
@@ -299,7 +310,10 @@ export default defineComponent({
     return h(
       "div",
       {
-        class: "grid-header-container",
+        class: {
+          "grid-header-container": true,
+          "grid-resizing": this.isResizing,
+        },
         style: {
           height: this.rowHeight + "px",
         },

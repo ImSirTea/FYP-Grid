@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyWithGridIndex } from "@/components/grid/GridState";
 import { defineComponent, PropType, ref, computed } from "@vue/composition-api";
 import Vue from "vue";
 
@@ -23,7 +24,7 @@ export default defineComponent({
   name: "GridCell",
   props: {
     item: {
-      type: Object as PropType<Record<string, any>>,
+      type: Object as PropType<AnyWithGridIndex>,
       required: true,
     },
     column: {

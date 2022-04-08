@@ -1,4 +1,5 @@
 import { FilterOptions } from "@/components/grid/filters/types";
+import { AnyWithGridIndex } from "@/components/grid/GridState";
 import { Component } from "vue";
 
 /** General Types */
@@ -34,8 +35,11 @@ export interface ColumnOptions {
 
 // Would like to look into this, not a fan
 export type RenderableType = string | number | boolean; // Could be { toString(): string }?
-export type AnyGridItem = Record<string, any>;
-export type AnyGridColumn = Column<AnyGridItem, any, ColumnOptions>;
+export type AnyGridColumn = Column<
+  AnyWithGridIndex,
+  RenderableType,
+  ColumnOptions
+>;
 
 export abstract class Column<T, RenderableType, O extends ColumnOptions> {
   key: string;

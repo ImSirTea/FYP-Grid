@@ -2,7 +2,7 @@
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
 import GridHeader from "@/components/grid/GridHeader.vue";
-import { GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 import { VNode } from "vue";
 import {
   h,
@@ -26,12 +26,12 @@ export default defineComponent({
   components: { GridHeader, GridBody, GridControlPanel },
   props: {
     items: {
-      type: Array as PropType<Record<string, any>[]>,
+      type: Array as PropType<AnyWithGridIndex[]>,
       required: true,
       default: () => [],
     },
     gridConfiguration: {
-      type: Object as PropType<GridConfiguration<Record<string, any>>>,
+      type: Object as PropType<GridConfiguration<AnyWithGridIndex>>,
       required: true,
     },
     gridState: {
@@ -61,7 +61,7 @@ export default defineComponent({
   },
   setup(props) {
     // Desperately avoid using ref here, it's painfully slow
-    const internalItems = shallowRef<Record<string, any>[]>([]);
+    const internalItems = shallowRef<AnyWithGridIndex[]>([]);
     const gridState = reactive(
       props.gridState ?? props.gridConfiguration.defaultState
     );

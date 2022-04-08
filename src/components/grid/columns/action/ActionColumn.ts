@@ -6,6 +6,7 @@ import {
 } from "@/components/grid/columns/Column";
 import GridActionView from "@/components/grid/columns/action/GridActionView.vue";
 import { RawLocation } from "vue-router";
+import { AnyWithGridIndex } from "@/components/grid/GridState";
 
 /**
  * Optional and column specific properties to configure NumberColumn behaviours
@@ -24,7 +25,7 @@ export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
   filterOptions = undefined;
   actions: ActionDefinition<T>[] = [];
 
-  constructor(key: string, itemValue: ValueExtractor<T, any>) {
+  constructor(key: string, itemValue: ValueExtractor<T, null>) {
     super(key, itemValue);
 
     this.setOption("isFilterable", false);

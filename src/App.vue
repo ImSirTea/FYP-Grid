@@ -5,7 +5,7 @@
         :grid-configuration="builder"
         :grid-state="builder.defaultState"
         :items="items"
-        :grid-height="350"
+        :grid-height="550"
       />
       <v-btn @click="updateItems">Update Items</v-btn>
     </v-main>

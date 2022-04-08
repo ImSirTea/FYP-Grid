@@ -1,6 +1,5 @@
 import {
   AnyGridColumn,
-  Column,
   ColumnOptions,
   RenderableType,
 } from "@/components/grid/columns/Column";
@@ -10,7 +9,7 @@ import { hasAllProperties } from "@/components/util/helpers";
 import { firstBy, IThenBy } from "thenby";
 import Vue from "vue";
 
-const gridIndexId = "_grid-index";
+const gridIndexId = "_grid-index" as const;
 export type AnyWithGridIndex = { [gridIndexId]: number };
 
 interface SortOptions {
@@ -30,8 +29,9 @@ interface ColumnState {
 export class GridState {
   public searchValue: string = "";
   private sortOptions: SortOptions[] = [];
-  private sortFunction: IThenBy<any> = firstBy("_grid-index");
+  private sortFunction: IThenBy<AnyWithGridIndex> = firstBy("_grid-index");
   columnStates: Record<string, ColumnState> = {};
+  rowHovered: AnyWithGridIndex[typeof gridIndexId] | null = null;
 
   get totalWidth() {
     return Object.entries(this.columnStates).reduce(
@@ -47,11 +47,11 @@ export class GridState {
 
       this.sortOptions.forEach((opt) => {
         if (!sortBy) {
-          sortBy = firstBy((item: any) => {
+          sortBy = firstBy((item: AnyWithGridIndex) => {
             return opt.column.value(item);
           }, opt.direction);
         } else {
-          sortBy = sortBy.thenBy((item: any) => {
+          sortBy = sortBy.thenBy((item: AnyWithGridIndex) => {
             return opt.column.value(item);
           }, opt.direction);
         }
@@ -125,8 +125,8 @@ export class GridState {
    * @returns Items with filtering and sorting
    */
   public filterAndSortItems(
-    items: any[],
-    gridConfiguration: GridConfiguration<any>
+    items: AnyWithGridIndex[],
+    gridConfiguration: GridConfiguration<AnyWithGridIndex>
   ): AnyWithGridIndex[] {
     const filtersExist = Object.entries(this.columnStates).some(
       ([key, column]) => column.filterOptions.length

@@ -1,6 +1,6 @@
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import { GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 
 /**
  * Wraps column states which can be used consistently across the Grid
@@ -13,9 +13,12 @@ export interface PinnedColumnGroups {
 }
 export class GridManager {
   #gridState!: GridState;
-  #gridConfiguration!: GridConfiguration<any>;
+  #gridConfiguration!: GridConfiguration<AnyWithGridIndex>;
 
-  constructor(gridState: GridState, gridConfiguration: GridConfiguration<any>) {
+  constructor(
+    gridState: GridState,
+    gridConfiguration: GridConfiguration<AnyWithGridIndex>
+  ) {
     this.#gridState = gridState;
     this.#gridConfiguration = gridConfiguration;
   }

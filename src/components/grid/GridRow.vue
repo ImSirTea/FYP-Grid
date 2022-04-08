@@ -3,9 +3,9 @@ import { VNode } from "vue";
 import GridCell from "@/components/grid/GridCell.vue";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
-import { GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 import { GridManager } from "@/components/grid/GridManager";
-import { AnyGridColumn, PinTypes } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/Column";
 
 export default defineComponent({
   name: "GridRow",
@@ -15,7 +15,7 @@ export default defineComponent({
       required: true,
     },
     item: {
-      type: Object as PropType<Record<string, any>>,
+      type: Object as PropType<AnyWithGridIndex>,
       required: true,
     },
     columns: {
@@ -25,7 +25,7 @@ export default defineComponent({
   },
   setup(props) {
     const gridConfiguration =
-      inject<GridConfiguration<Record<string, any>>>("gridConfiguration")!;
+      inject<GridConfiguration<AnyWithGridIndex>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
     const gridManager = inject<GridManager>("gridManager")!;
 

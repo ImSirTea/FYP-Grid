@@ -24,6 +24,11 @@ $border-colour: lightgray;
   display: flex;
 }
 
+.grid-column-cropper {
+  border-right: solid 1px $border-colour;
+  border-left: solid 1px $border-colour;
+}
+
 // Grid rows
 .grid-row,
 .grid-header {
@@ -46,11 +51,11 @@ $border-colour: lightgray;
   cursor: pointer;
 }
 
-.grid-row-clickable.grid-row-odd:hover {
+.grid-row-clickable.grid-row-odd.grid-row-hovered {
   background-color: $hover-colour;
 }
 
-.grid-row-clickable.grid-row:hover {
+.grid-row-clickable.grid-row.grid-row-hovered {
   background-color: $hover-colour;
 }
 
@@ -58,19 +63,21 @@ $border-colour: lightgray;
 .grid-header-cell,
 .grid-row-cell {
   padding-left: 0.75em;
-  display: flex;
-  align-items: center;
-  background-color: inherit;
+  display: inline-block;
+}
+
+.grid-header-cell::before,
+.grid-row-cell::before {
+  content: "";
+  display: inline-block;
+  vertical-align: middle;
+  height: 100%;
 }
 
 .grid-row-cell {
   overflow: hidden;
   white-space:nowrap;
   text-overflow: ellipsis;
-}
-
-[role="gridcell"] {
-  margin: auto 0;
 }
 
 .grid-header-cell:hover {
@@ -94,6 +101,10 @@ $border-colour: lightgray;
   width: max(0.5em, 10px);
   height: 100%;
   margin-left: auto;
+  cursor: e-resize !important;
+}
+
+.grid-resizing  * {
   cursor: e-resize !important;
 }
 

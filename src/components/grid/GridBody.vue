@@ -2,7 +2,7 @@
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridManager } from "@/components/grid/GridManager";
 import GridRow from "@/components/grid/GridRow.vue";
-import { GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
   h,
@@ -22,7 +22,7 @@ export default defineComponent({
   components: { GridRow },
   props: {
     internalItems: {
-      type: Array as PropType<Record<string, any>[]>,
+      type: Array as PropType<AnyWithGridIndex[]>,
       required: true,
       default: () => [],
     },
@@ -79,7 +79,11 @@ export default defineComponent({
     }));
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildRow = (item: any, index: number, columns: AnyGridColumn[]) => {
+    const buildRow = (
+      item: AnyWithGridIndex,
+      index: number,
+      columns: AnyGridColumn[]
+    ) => {
       return h(GridRow, {
         attrs: {
           role: "row",
@@ -87,6 +91,7 @@ export default defineComponent({
         class: {
           "grid-row": true,
           "grid-row-odd": index % 2,
+          "grid-row-hovered": item["_grid-index"] === gridState.rowHovered,
         },
         style: {
           top: index * props.rowHeight + "px",
@@ -97,15 +102,23 @@ export default defineComponent({
           index,
           columns,
         },
+        nativeOn: {
+          mouseenter: () => {
+            gridState.rowHovered = item["_grid-index"];
+          },
+          mouseleave: () => {
+            gridState.rowHovered = null;
+          },
+        },
       });
     };
 
     // Manages scroll events passthrough
-    const gridTopScroll = (e: any) => {
-      context.emit("update:scroll-top", e.target.scrollTop);
+    const gridTopScroll = (e: Event) => {
+      context.emit("update:scroll-top", (e.target as HTMLElement).scrollTop);
     };
-    const gridLeftScroll = (e: any) => {
-      context.emit("update:scroll-left", e.target.scrollLeft);
+    const gridLeftScroll = (e: Event) => {
+      context.emit("update:scroll-left", (e.target as HTMLElement).scrollLeft);
     };
 
     watch(
