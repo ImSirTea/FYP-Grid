@@ -6,4 +6,4 @@ Prevent swapping with actions column
 
 resize icon is sadge :( make it resize icon all time
 
-resize hide the ghost
+re-ordering columns is weird for pinned stuff

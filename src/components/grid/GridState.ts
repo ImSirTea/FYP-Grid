@@ -1,3 +1,4 @@
+import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import {
   AnyGridColumn,
   ColumnOptions,
@@ -291,6 +292,10 @@ export class GridState {
     draggedColumn: AnyGridColumn,
     targetColumn: AnyGridColumn
   ) {
+    if (targetColumn instanceof ActionColumn) {
+      return;
+    }
+
     const draggedColumnState = this.columnStates[draggedColumn.key];
     const initialOrder = draggedColumnState.order;
 
@@ -301,8 +306,12 @@ export class GridState {
       (stateA, stateB) => stateA.order - stateB.order
     );
 
+    console.log("draggedBefore", draggedColumnState.order);
+    console.log("targetBefore", targetColumnState.order);
+
     // Going up
     if (targetOrder > initialOrder) {
+      console.log("up");
       for (let i = targetOrder; i > initialOrder; i--) {
         orderedColumns[i].order--;
       }
@@ -312,11 +321,15 @@ export class GridState {
 
     // Going down
     if (initialOrder > targetOrder) {
+      console.log("down");
       for (let i = targetOrder; i <= initialOrder; i++) {
         orderedColumns[i].order++;
       }
 
       draggedColumnState.order = targetOrder;
     }
+
+    console.log("draggedAfter", draggedColumnState.order);
+    console.log("targetAfter", targetColumnState.order);
   }
 }

@@ -14,6 +14,7 @@ import {
 import { VNode } from "vue";
 import { VIcon } from "vuetify/lib/components";
 import { debounce } from "lodash";
+import { useColumnDragManager } from "@/components/grid/events/ColumnDragManager";
 
 export default defineComponent({
   name: "GridHeader",
@@ -36,11 +37,12 @@ export default defineComponent({
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Drag vars
-    let draggedColumn: AnyGridColumn | null = null;
-    let targetColumn: AnyGridColumn | null = null;
+    const { dragStart, dragOver, dragEnd } = useColumnDragManager(
+      gridState,
+      "horizontal"
+    );
     let isResizing = ref(false);
     let lastResizeX = 0;
-    let lastDragX = 0;
 
     // How wide should our header row should be to align with the grid
     const totalGridWidth = computed(() =>
@@ -132,45 +134,17 @@ export default defineComponent({
               gridState.toggleSort(column);
             },
             // Set our drag type and data
-            dragstart: (event: DragEvent) => {
-              draggedColumn = column;
-              lastDragX = event.clientX;
-            },
+            dragstart: (event: DragEvent) => dragStart(event, column),
             // Allow the header to be the drop target, and reassign when needed
             dragover: (event: DragEvent) => {
-              event.preventDefault();
-
               // Don't allow moving when we are resizing
               if (isResizing.value) {
                 return;
               }
 
-              // Don't swap with our last column
-              if (
-                targetColumn?.key === column.key &&
-                !isDraggingAwayFromDraggedColumn(event)
-              ) {
-                lastDragX = event.clientX;
-                return;
-              }
-
-              targetColumn = column;
-
-              // Don't try swap with ourselves
-              if (targetColumn.key === draggedColumn?.key) {
-                return;
-              }
-
-              if (draggedColumn && targetColumn) {
-                gridState.rearrangeColumnOrders(draggedColumn!, targetColumn!);
-              }
-
-              lastDragX = event.clientX;
+              dragOver(event, column);
             },
-            dragend: () => {
-              draggedColumn = null;
-              targetColumn = null;
-            },
+            dragend: dragEnd,
           },
           domProps: {
             draggable: column.options.isDraggable,
@@ -178,35 +152,6 @@ export default defineComponent({
         },
         [column.key, sortIcon, resizeBar]
       );
-    };
-
-    // As we prevent swapping with the same column twice in a row
-    // We need to allow going back where we just where
-    const isDraggingAwayFromDraggedColumn = (event: DragEvent) => {
-      if (!draggedColumn || !targetColumn) {
-        return true;
-      }
-
-      const draggedColumnOrder =
-        gridState.columnStates[draggedColumn.key].order;
-      const targetColumnOrder = gridState.columnStates[targetColumn.key].order;
-
-      // Dragging right
-      if (event.clientX > lastDragX) {
-        return targetColumnOrder > draggedColumnOrder;
-      }
-
-      // Dragging left
-      if (lastDragX > event.clientX) {
-        return draggedColumnOrder > targetColumnOrder;
-      }
-
-      // Not moved
-      if (lastDragX === event.clientX) {
-        return false;
-      }
-
-      return true;
     };
 
     // ONLY USE IN CONTEXT OF RENDERING

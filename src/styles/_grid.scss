@@ -66,6 +66,10 @@ $border-colour: lightgray;
   display: inline-block;
 }
 
+.grid-header-cell {
+  position: relative;
+}
+
 .grid-header-cell::before,
 .grid-row-cell::before {
   content: "";
@@ -102,6 +106,10 @@ $border-colour: lightgray;
   height: 100%;
   margin-left: auto;
   cursor: e-resize !important;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
 }
 
 .grid-resizing  * {
