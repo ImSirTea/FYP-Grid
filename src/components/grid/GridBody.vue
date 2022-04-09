@@ -90,7 +90,6 @@ export default defineComponent({
         },
         class: {
           "grid-row": true,
-          "grid-row-odd": index % 2,
           "grid-row-hovered": item["_grid-index"] === gridState.rowHovered,
         },
         style: {

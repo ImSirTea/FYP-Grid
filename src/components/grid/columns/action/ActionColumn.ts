@@ -24,7 +24,7 @@ export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
   filterOptions = undefined;
   actions: ActionDefinition<T>[] = [];
 
-  constructor(key: string, itemValue: ValueExtractor<T, null>) {
+  constructor(key: string, itemValue: ValueExtractor<T, any>) {
     super(key, itemValue);
 
     this.setOption("isFilterable", false);

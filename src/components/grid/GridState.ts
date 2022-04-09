@@ -32,7 +32,10 @@ export class GridState {
   private sortOptions: SortOptions[] = [];
   private sortFunction: IThenBy<AnyWithGridIndex> = firstBy("_grid-index");
   columnStates: Record<string, ColumnState> = {};
+  // Can't rely on :hover as our rows aren't all in the same row due to pins
   rowHovered: AnyWithGridIndex[typeof gridIndexId] | null = null;
+
+  // Which column are we dragging, highlight it so dragging is clearer
   columnDragged: AnyGridColumn | null = null;
 
   get totalWidth() {

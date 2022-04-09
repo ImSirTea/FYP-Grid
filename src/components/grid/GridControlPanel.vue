@@ -12,7 +12,7 @@
       </v-col>
       <v-col cols="auto">
         <v-btn outlined @click="toggleManageMenu">
-          <v-icon class="mr-2">mdi-tools</v-icon>
+          <v-icon class="mr-2">mdi-view-column</v-icon>
           {{ $tc.manage }}
         </v-btn>
       </v-col>

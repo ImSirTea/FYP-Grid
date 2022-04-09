@@ -29,6 +29,10 @@ export class GridManager {
       .sort(this.sortOnOrder);
   }
 
+  get sortedColumns() {
+    return this.#gridConfiguration.columns.sort(this.sortOnOrder);
+  }
+
   get filterableColumns() {
     return this.#gridConfiguration.columns
       .filter((column) => column.options.isFilterable)

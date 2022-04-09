@@ -81,8 +81,8 @@ export default defineComponent({
       "vertical"
     );
 
-    const manageableColumns = computed<AnyGridColumn[]>(() =>
-      Array.from(Object.values(gridManager.columns).flatMap((column) => column))
+    const manageableColumns = computed<AnyGridColumn[]>(
+      () => gridManager.sortedColumns
     );
 
     return {
@@ -90,7 +90,6 @@ export default defineComponent({
       drag,
       dragEnd,
       manageableColumns,
-      cols: gridManager.columns,
       toggleMenu: (isVisible) => context.emit("input", isVisible),
       $tc,
     };
