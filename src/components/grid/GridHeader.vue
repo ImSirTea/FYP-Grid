@@ -37,8 +37,9 @@ export default defineComponent({
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Drag vars
-    const { dragStart, dragOver, dragEnd } = useColumnDragManager(
+    const { dragStart, drag, dragEnd } = useColumnDragManager(
       gridState,
+      gridConfiguration,
       "horizontal"
     );
     let isResizing = ref(false);
@@ -119,7 +120,11 @@ export default defineComponent({
         ? buildSortIcon(column)
         : undefined;
 
-      const resizeBar = buildResizeBar(column);
+      const resizeBar = column.options.isResizeable
+        ? buildResizeBar(column)
+        : undefined;
+
+      const draggedColumnKey = gridState.columnDragged?.key ?? null;
 
       return h(
         "div",
@@ -127,7 +132,16 @@ export default defineComponent({
           style: {
             width: gridState.columnStates[column.key].width + "px",
           },
-          class: "grid-header-cell",
+          attrs: {
+            "col-key": column.key,
+          },
+          class: {
+            "grid-header-cell": true,
+            "grid-column-dragged": draggedColumnKey === column.key,
+            "grid-header-no-hover": draggedColumnKey
+              ? draggedColumnKey !== column.key
+              : false,
+          },
           on: {
             // Toggle our sorting behaviours
             click: () => {
@@ -135,16 +149,26 @@ export default defineComponent({
             },
             // Set our drag type and data
             dragstart: (event: DragEvent) => dragStart(event, column),
+            touchstart: (event: TouchEvent) => dragStart(event, column),
             // Allow the header to be the drop target, and reassign when needed
-            dragover: (event: DragEvent) => {
+            drag: (event: DragEvent) => {
               // Don't allow moving when we are resizing
               if (isResizing.value) {
                 return;
               }
 
-              dragOver(event, column);
+              drag(event);
+            },
+            touchmove: (event: TouchEvent) => {
+              // Don't allow moving when we are resizing
+              if (isResizing.value) {
+                return;
+              }
+
+              drag(event);
             },
             dragend: dragEnd,
+            touchend: dragEnd,
           },
           domProps: {
             draggable: column.options.isDraggable,

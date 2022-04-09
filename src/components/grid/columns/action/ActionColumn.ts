@@ -6,7 +6,6 @@ import {
 } from "@/components/grid/columns/Column";
 import GridActionView from "@/components/grid/columns/action/GridActionView.vue";
 import { RawLocation } from "vue-router";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
 
 /**
  * Optional and column specific properties to configure NumberColumn behaviours
@@ -31,6 +30,7 @@ export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
     this.setOption("isFilterable", false);
     this.setOption("isSortable", false);
     this.setOption("isDraggable", false);
+    this.setOption("isResizeable", false);
     this.setOption("defaultWidth", GridWidthEnum.SMALL);
     this.setOption("defaultPin", "right");
   }

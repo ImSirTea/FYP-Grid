@@ -33,6 +33,7 @@ export class GridState {
   private sortFunction: IThenBy<AnyWithGridIndex> = firstBy("_grid-index");
   columnStates: Record<string, ColumnState> = {};
   rowHovered: AnyWithGridIndex[typeof gridIndexId] | null = null;
+  columnDragged: AnyGridColumn | null = null;
 
   get totalWidth() {
     return Object.entries(this.columnStates).reduce(
@@ -306,12 +307,8 @@ export class GridState {
       (stateA, stateB) => stateA.order - stateB.order
     );
 
-    console.log("draggedBefore", draggedColumnState.order);
-    console.log("targetBefore", targetColumnState.order);
-
     // Going up
     if (targetOrder > initialOrder) {
-      console.log("up");
       for (let i = targetOrder; i > initialOrder; i--) {
         orderedColumns[i].order--;
       }
@@ -321,15 +318,11 @@ export class GridState {
 
     // Going down
     if (initialOrder > targetOrder) {
-      console.log("down");
       for (let i = targetOrder; i <= initialOrder; i++) {
         orderedColumns[i].order++;
       }
 
       draggedColumnState.order = targetOrder;
     }
-
-    console.log("draggedAfter", draggedColumnState.order);
-    console.log("targetAfter", targetColumnState.order);
   }
 }

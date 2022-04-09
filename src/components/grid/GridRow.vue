@@ -35,7 +35,10 @@ export default defineComponent({
         style: {
           width: gridState.columnStates[column.key].width + "px",
         },
-        class: "grid-row-cell",
+        class: {
+          "grid-row-cell": true,
+          "grid-column-dragged": gridState.columnDragged?.key === column.key,
+        },
         props: { item: props.item, column },
         on: {
           input: (value) => {

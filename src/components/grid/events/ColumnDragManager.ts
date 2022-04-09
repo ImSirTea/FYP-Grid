@@ -1,41 +1,54 @@
 import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import { AnyGridColumn } from "@/components/grid/columns/Column";
-import { GridState } from "@/components/grid/GridState";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 
 export const useColumnDragManager = (
   gridState: GridState,
+  gridConfiguration: GridConfiguration<AnyWithGridIndex>,
   direction: "vertical" | "horizontal"
 ) => {
   let draggedColumn: AnyGridColumn | null = null;
   let targetColumn: AnyGridColumn | null = null;
   let lastDragPos = 0;
 
-  function getDragPos(event: DragEvent) {
-    return direction === "horizontal" ? event.clientX : event.clientY;
-  }
-
-  function dragStart(event: DragEvent, column: AnyGridColumn) {
+  function dragStart(event: DragEvent | TouchEvent, column: AnyGridColumn) {
     draggedColumn = column;
     lastDragPos = getDragPos(event);
+    gridState.columnDragged = column;
   }
 
-  function dragOver(event: DragEvent, column: AnyGridColumn) {
-    if (column instanceof ActionColumn) {
+  function drag(event: DragEvent | TouchEvent) {
+    const eventPosition = isTouchEvent(event) ? event.touches[0] : event;
+
+    const elementTouchIsOver = document.elementFromPoint(
+      eventPosition.clientX,
+      eventPosition.clientY
+    );
+
+    const elementColumnId =
+      elementTouchIsOver?.attributes.getNamedItem("col-key")?.value;
+
+    if (!elementColumnId) {
       return;
     }
 
-    event.preventDefault();
-
     // Don't swap with our last column
     if (
-      targetColumn?.key === column.key &&
+      targetColumn?.key === elementColumnId &&
       !isDraggingAwayFromDraggedColumn(event)
     ) {
       lastDragPos = getDragPos(event);
       return;
     }
 
-    targetColumn = column;
+    targetColumn = gridConfiguration.columns.find(
+      (column) => column.key === elementColumnId
+    )!;
+
+    if (targetColumn instanceof ActionColumn) {
+      return;
+    }
 
     // Don't try swap with ourselves
     if (targetColumn.key === draggedColumn?.key) {
@@ -43,7 +56,7 @@ export const useColumnDragManager = (
     }
 
     if (draggedColumn && targetColumn) {
-      gridState.rearrangeColumnOrders(draggedColumn, targetColumn);
+      gridState.rearrangeColumnOrders(draggedColumn!, targetColumn!);
     }
 
     lastDragPos = getDragPos(event);
@@ -52,11 +65,24 @@ export const useColumnDragManager = (
   function dragEnd() {
     draggedColumn = null;
     targetColumn = null;
+    gridState.columnDragged = null;
+  }
+
+  function getDragPos(event: DragEvent | TouchEvent) {
+    const eventPosition = isTouchEvent(event) ? event.touches[0] : event;
+
+    return direction === "horizontal"
+      ? eventPosition.clientX
+      : eventPosition.clientY;
+  }
+
+  function isTouchEvent(event: DragEvent | TouchEvent): event is TouchEvent {
+    return (event as TouchEvent).touches !== undefined;
   }
 
   // As we prevent swapping with the same column twice in a row
   // We need to allow going back where we just where
-  function isDraggingAwayFromDraggedColumn(event: DragEvent) {
+  function isDraggingAwayFromDraggedColumn(event: DragEvent | TouchEvent) {
     if (!draggedColumn || !targetColumn) {
       return true;
     }
@@ -84,7 +110,7 @@ export const useColumnDragManager = (
 
   return {
     dragStart,
-    dragOver,
+    drag,
     dragEnd,
   };
 };

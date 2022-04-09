@@ -25,9 +25,13 @@
     <v-expansion-panels accordian flat>
       <v-expansion-panel v-for="column in manageableColumns" :key="column.key">
         <v-expansion-panel-header
+          :col-key="column.key"
           @dragstart="(event) => dragStart(event, column)"
-          @dragover="(event) => dragOver(event, column)"
+          @drag="drag"
           @dragend="dragEnd"
+          @touchstart="(event) => dragStart(event, column)"
+          @touchmove="drag"
+          @touchend="dragEnd"
           draggable
         >
           <v-container class="pa-0" fluid>
@@ -54,7 +58,8 @@ import ManageGroup from "@/components/grid/manage/ManageGroup.vue";
 import { GridManager } from "@/components/grid/GridManager";
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { useColumnDragManager } from "@/components/grid/events/ColumnDragManager";
-import { GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 
 export default defineComponent({
   name: "ManageMenu",
@@ -67,9 +72,12 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridManager = inject<GridManager>("gridManager")!;
+    const gridConfiguration =
+      inject<GridConfiguration<AnyWithGridIndex>>("gridConfiguration")!;
     const gridState = inject<GridState>("gridState")!;
-    const { dragStart, dragOver, dragEnd } = useColumnDragManager(
+    const { dragStart, drag, dragEnd } = useColumnDragManager(
       gridState,
+      gridConfiguration,
       "vertical"
     );
 
@@ -79,7 +87,7 @@ export default defineComponent({
 
     return {
       dragStart,
-      dragOver,
+      drag,
       dragEnd,
       manageableColumns,
       cols: gridManager.columns,

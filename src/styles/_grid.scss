@@ -59,6 +59,10 @@ $border-colour: lightgray;
   background-color: $hover-colour;
 }
 
+.grid-column-dragged {
+  background-color: $hover-colour;
+}
+
 // Grid cells
 .grid-header-cell,
 .grid-row-cell {
@@ -84,7 +88,7 @@ $border-colour: lightgray;
   text-overflow: ellipsis;
 }
 
-.grid-header-cell:hover {
+.grid-header-cell:hover:not(.grid-header-no-hover) {
   background-color: $hover-colour;
 }
 

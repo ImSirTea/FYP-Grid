@@ -29,6 +29,7 @@ export interface ColumnOptions {
   isFilterable: boolean;
   isDraggable: boolean;
   isSortable: boolean;
+  isResizeable: boolean;
   ascIcon: string;
   descIcon: string;
 }
@@ -57,6 +58,7 @@ export abstract class Column<T, RenderableType, O extends ColumnOptions> {
     this.setOption("isFilterable", true);
     this.setOption("isSortable", true);
     this.setOption("isDraggable", true);
+    this.setOption("isResizeable", true);
     this.setOption("defaultWidth", GridWidthEnum.MEDIUM);
     this.setOption("defaultHidden", false);
     this.setOption("defaultPin", "centre");
