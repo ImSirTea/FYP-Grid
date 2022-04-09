@@ -63,7 +63,6 @@ import {
   FilterConnection,
   FilterOption,
 } from "@/components/grid/filters/types";
-import { GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
   PropType,
@@ -72,6 +71,7 @@ import {
 } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { debounce } from "lodash";
+import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
   name: "FilterItem",
@@ -91,7 +91,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const gridState = inject<GridState>("gridState")!;
+    const { gridState } = inject<GridManager>("gridManager")!;
 
     const updateCondition = (newFilter: FilterCondition<any>) => {
       gridState.setFilterProperty(

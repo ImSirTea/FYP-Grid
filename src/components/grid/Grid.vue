@@ -69,8 +69,6 @@ export default defineComponent({
       gridState as GridState,
       props.gridConfiguration
     );
-    provide("gridState", gridState);
-    provide("gridConfiguration", props.gridConfiguration);
     provide("gridManager", gridManager);
 
     const centreBar = ref<HTMLElement | null>(null);
@@ -93,7 +91,13 @@ export default defineComponent({
 
     // If our indexes, config, or state has changed, we should re-filter and sort
     watch(
-      () => [props.gridConfiguration, gridState, indexedItems.value],
+      () => [
+        props.gridConfiguration,
+        gridState.searchValue,
+        gridState.columnStates,
+        gridState.sortOptions,
+        indexedItems.value,
+      ],
       () => {
         internalItems.value.length = 0;
         internalItems.value = gridState

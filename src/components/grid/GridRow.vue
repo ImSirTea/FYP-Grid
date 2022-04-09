@@ -24,10 +24,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const gridConfiguration =
-      inject<GridConfiguration<AnyWithGridIndex>>("gridConfiguration")!;
-    const gridState = inject<GridState>("gridState")!;
-    const gridManager = inject<GridManager>("gridManager")!;
+    const { gridState, gridConfiguration } =
+      inject<GridManager>("gridManager")!;
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn) => {
@@ -55,7 +53,6 @@ export default defineComponent({
     return {
       gridState,
       gridConfiguration,
-      gridManager,
       buildCell,
     };
   },

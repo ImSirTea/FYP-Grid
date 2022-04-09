@@ -29,7 +29,7 @@ interface ColumnState {
 
 export class GridState {
   public searchValue: string = "";
-  private sortOptions: SortOptions[] = [];
+  public sortOptions: SortOptions[] = [];
   private sortFunction: IThenBy<AnyWithGridIndex> = firstBy("_grid-index");
   columnStates: Record<string, ColumnState> = {};
   // Can't rely on :hover as our rows aren't all in the same row due to pins

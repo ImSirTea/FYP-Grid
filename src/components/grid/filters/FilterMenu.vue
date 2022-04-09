@@ -51,9 +51,7 @@
 <script lang="ts">
 import { defineComponent, inject, computed } from "@vue/composition-api";
 import $tc from "@/textConstants";
-import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import FilterGroup from "@/components/grid/filters/FilterGroup.vue";
-import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridManager } from "@/components/grid/GridManager";
 
@@ -69,12 +67,8 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const gridConfiguration =
-      inject<GridConfiguration<AnyWithGridIndex>>("gridConfiguration")!;
-    const gridState = inject<GridState>("gridState")!;
-    const gridManager = inject<GridManager>("gridManager")!;
-
-    const filterableColumns = computed(() => gridManager.filterableColumns);
+    const { gridState, gridConfiguration, filterableColumns } =
+      inject<GridManager>("gridManager")!;
 
     return {
       gridConfiguration,

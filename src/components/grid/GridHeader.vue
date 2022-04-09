@@ -30,10 +30,8 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const gridConfiguration =
-      inject<GridConfiguration<AnyWithGridIndex>>("gridConfiguration")!;
-    const gridState = inject<GridState>("gridState")!;
-    const gridManager = inject<GridManager>("gridManager")!;
+    const { gridState, gridConfiguration, columns, columnSizes } =
+      inject<GridManager>("gridManager")!;
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Drag vars
@@ -56,8 +54,8 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeaderRow = () => {
-      const { left, centre, right } = gridManager.columns;
-      const { leftWidth, centreWidth, rightWidth } = gridManager.columnSizes;
+      const { left, centre, right } = columns;
+      const { leftWidth, centreWidth, rightWidth } = columnSizes;
 
       const leftCells: VNode[] = [];
       const centreCells: VNode[] = centre.map((column) => buildCell(column));
@@ -269,7 +267,6 @@ export default defineComponent({
       buildHeaderRow,
       totalGridWidth,
       gridState,
-      gridManager,
       scrollableDiv,
       isResizing,
     };

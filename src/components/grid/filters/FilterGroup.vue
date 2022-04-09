@@ -29,7 +29,6 @@
 
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
-import { GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
   PropType,
@@ -39,6 +38,7 @@ import {
 } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import FilterItem from "@/components/grid/filters/FilterItem.vue";
+import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
   name: "FilterGroup",
@@ -50,7 +50,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const gridState = inject<GridState>("gridState")!;
+    const { gridState } = inject<GridManager>("gridManager")!;
     const form = ref(null);
 
     const validate = () => (form.value as any)?.validate();

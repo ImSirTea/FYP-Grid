@@ -13,6 +13,7 @@ import {
   ref,
 } from "@vue/composition-api";
 import { VNode } from "vue";
+import { debounce } from "lodash";
 
 /**
  * Container for all grid rows, handling scroll events, offsets, and rendering
@@ -48,8 +49,8 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const gridState = inject<GridState>("gridState")!;
-    const gridManager = inject<GridManager>("gridManager")!;
+    const { gridState, columns, columnSizes } =
+      inject<GridManager>("gridManager")!;
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Total height of all rows, used for scrolling
@@ -149,16 +150,17 @@ export default defineComponent({
       rowsOffset,
       totalGridHeight,
       rowIndexBoundaries,
-      gridManager,
       gridState,
+      columns,
+      columnSizes,
       scrollableDiv,
     };
   },
   render(): VNode {
     const { min, max } = this.rowIndexBoundaries;
-    const { left, centre, right } = this.gridManager.columns;
+    const { left, centre, right } = this.columns;
 
-    const { leftWidth, centreWidth, rightWidth } = this.gridManager.columnSizes;
+    const { leftWidth, centreWidth, rightWidth } = this.columnSizes;
 
     const leftRows: VNode[] = [];
     const centreRows: VNode[] = [];

@@ -19,8 +19,8 @@ import {
   computed,
 } from "@vue/composition-api";
 import { AnyGridColumn, pinValues } from "@/components/grid/columns/Column";
-import { GridState } from "@/components/grid/GridState";
 import $tc from "@/textConstants";
+import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
   name: "ManageGroup",
@@ -31,7 +31,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const gridState = inject<GridState>("gridState")!;
+    const { gridState } = inject<GridManager>("gridManager")!;
 
     const isHidden = computed({
       get: () => gridState.columnStates[props.column.key].isHidden,
