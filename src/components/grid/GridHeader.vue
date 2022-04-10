@@ -1,8 +1,6 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
-import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
-import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 import {
   defineComponent,
   inject,
@@ -14,7 +12,7 @@ import {
 import { VNode } from "vue";
 import { VIcon } from "vuetify/lib/components";
 import { debounce } from "lodash";
-import { useColumnDragManager } from "@/components/grid/events/ColumnDragManager";
+import { useColumnOrderEvents } from "@/components/grid/events/ColumnOrderEvents";
 
 export default defineComponent({
   name: "GridHeader",
@@ -35,7 +33,7 @@ export default defineComponent({
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Drag vars
-    const { dragStart, drag, dragEnd } = useColumnDragManager(
+    const { dragStart, drag, dragEnd } = useColumnOrderEvents(
       gridState,
       gridConfiguration,
       "horizontal"

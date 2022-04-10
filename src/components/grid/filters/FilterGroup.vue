@@ -7,7 +7,14 @@
           v-for="(filter, index) in relevantFilters"
           cols="12"
         >
-          <filter-item :column="column" :filter="filter" :index="index" />
+          <filter-item
+            :column="column"
+            :filter="filter"
+            :index="index"
+            @update:filter-function="filter.filterFunction = $event"
+            @update:value="filter.value = $event"
+            @update:operator="filter.operator = $event"
+          />
         </v-col>
         <v-col cols="auto" class="pt-0">
           <v-btn

@@ -93,32 +93,20 @@ export default defineComponent({
   setup(props, context) {
     const { gridState } = inject<GridManager>("gridManager")!;
 
-    const updateCondition = (newFilter: FilterCondition<any>) => {
-      gridState.setFilterProperty(
-        props.filter,
-        "filterFunction",
-        newFilter.filterFunction,
-        props.column.key
-      );
+    const updateCondition = (newCondition: FilterCondition<any>) => {
+      context.emit("update:filter-function", newCondition.filterFunction);
+      gridState.buildFilterFunctionsForColumn(props.column.key);
     };
 
     // Debounce value changes to allow for inputs to be typed
     const updateValue = debounce((newValue: any) => {
-      gridState.setFilterProperty(
-        props.filter,
-        "value",
-        newValue,
-        props.column.key
-      );
+      context.emit("update:value", newValue);
+      gridState.buildFilterFunctionsForColumn(props.column.key);
     }, 250);
 
     const updateOperator = (newOperator: FilterConnection) => {
-      gridState.setFilterProperty(
-        props.filter,
-        "operator",
-        newOperator.operator,
-        props.column.key
-      );
+      context.emit("update:operator", newOperator);
+      gridState.buildFilterFunctionsForColumn(props.column.key);
     };
 
     const removeFilter = () => {

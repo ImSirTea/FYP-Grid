@@ -3,7 +3,7 @@ import { AnyGridColumn } from "@/components/grid/columns/Column";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 
-export const useColumnDragManager = (
+export const useColumnOrderEvents = (
   gridState: GridState,
   gridConfiguration: GridConfiguration<AnyWithGridIndex>,
   direction: "vertical" | "horizontal"

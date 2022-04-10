@@ -10,15 +10,11 @@ class NumberFilterOptions extends FilterOptions<number> {
   public conditions: FilterCondition<number>[] = [
     {
       name: $tc.lessThan,
-      filterFunction: (item: number, value: number) => {
-        return item <= value;
-      },
+      filterFunction: (item: number, value: number) => item <= value,
     },
     {
       name: $tc.greaterThan,
-      filterFunction: (item: number, value: number) => {
-        return item >= value;
-      },
+      filterFunction: (item: number, value: number) => item >= value,
     },
   ];
 }

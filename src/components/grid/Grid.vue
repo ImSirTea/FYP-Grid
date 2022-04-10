@@ -17,7 +17,6 @@ import {
 } from "@vue/composition-api";
 import GridBody from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/grid/GridControlPanel.vue";
-import Vue from "vue";
 
 /**
  * Manages creating a grid with given specifications

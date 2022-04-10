@@ -37,7 +37,7 @@ export class GridConfiguration<T> {
         isHidden: column.options.defaultHidden!,
         order: index,
         filterOptions: [],
-        filterChain: () => true,
+        filterChain: undefined,
       };
     });
 

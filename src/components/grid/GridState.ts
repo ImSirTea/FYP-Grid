@@ -20,7 +20,7 @@ interface ColumnState {
   isHidden: ColumnOptions["defaultHidden"];
   order: number;
   filterOptions: FilterOption<any>[];
-  filterChain: (itemValue: any) => boolean;
+  filterChain?: (itemValue: any) => boolean;
 }
 
 export class GridState {
@@ -153,11 +153,7 @@ export class GridState {
         );
 
         for (const column of columnsToFilter) {
-          const itemValueForColumn = column
-            .value(item)
-            .toString()
-            .toLowerCase()
-            .trim();
+          const itemValueForColumn = column.value(item);
 
           const searchByValue = this.searchValue.toLowerCase().trim();
 
@@ -211,25 +207,6 @@ export class GridState {
   }
 
   /**
-   * Updates a filter with given values, for a specified column
-   * @param filter The filter to be updated
-   * @param propertyName The filter property to update
-   * @param value The value for the filter property to become
-   * @param columnKey The column's key which the filter belongs to
-   */
-  public setFilterProperty(
-    filter: FilterOption<any>,
-    propertyName: keyof FilterOption<any>,
-    value: any,
-    columnKey: string
-  ) {
-    Vue.set(filter, propertyName, value);
-
-    const filterChain = this.#buildFilterFunctionsForColumn(columnKey);
-    Vue.set(this.columnStates[columnKey], "filterChain", filterChain);
-  }
-
-  /**
    * Removes a filter against a column, with a given index
    * @param column The column the filter should be removed for
    * @param index The index of the filter
@@ -237,7 +214,7 @@ export class GridState {
   public removeFilter(column: AnyGridColumn, index: number) {
     this.columnStates[column.key].filterOptions.splice(index, 1);
 
-    const filterChain = this.#buildFilterFunctionsForColumn(column.key);
+    const filterChain = this.buildFilterFunctionsForColumn(column.key);
     Vue.set(this.columnStates[column.key], "filterChain", filterChain);
   }
 
@@ -268,7 +245,7 @@ export class GridState {
    * @param key The column's key to build the chain for
    * @returns All column's filter options, chained together
    */
-  #buildFilterFunctionsForColumn(key: string) {
+  buildFilterFunctionsForColumn(key: string) {
     const options = this.columnStates[key].filterOptions;
 
     if (typeof options === "undefined") {
@@ -291,7 +268,7 @@ export class GridState {
       (itemValue: any) => true
     );
 
-    return filterChain;
+    this.columnStates[key].filterChain = filterChain;
   }
 
   public rearrangeColumnOrders(
