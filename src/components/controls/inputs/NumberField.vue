@@ -6,7 +6,6 @@
     :max="max"
     type="number"
     @input="updateValue"
-    @dblclick="$emit('dblclick')"
   />
 </template>
 

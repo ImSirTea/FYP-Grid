@@ -102,6 +102,11 @@ export default defineComponent({
           index,
           columns,
         },
+        on: {
+          "update:items": () => {
+            context.emit("update:items");
+          },
+        },
         nativeOn: {
           mouseenter: () => {
             gridState.rowHovered = item["_grid-index"];

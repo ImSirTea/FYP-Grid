@@ -20,4 +20,5 @@ export default {
   manage: "Manage",
   hide: "Hide",
   pin: "Pin",
+  save: "Save",
 };

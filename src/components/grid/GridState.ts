@@ -1,9 +1,5 @@
 import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
-import {
-  AnyGridColumn,
-  ColumnOptions,
-  RenderableType,
-} from "@/components/grid/columns/Column";
+import { AnyGridColumn, ColumnOptions } from "@/components/grid/columns/Column";
 import { FilterOperator, FilterOption } from "@/components/grid/filters/types";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { hasAllProperties } from "@/components/util/helpers";
@@ -23,8 +19,8 @@ interface ColumnState {
   pin: ColumnOptions["defaultPin"];
   isHidden: ColumnOptions["defaultHidden"];
   order: number;
-  filterOptions: FilterOption<RenderableType>[];
-  filterChain: (itemValue: RenderableType) => boolean;
+  filterOptions: FilterOption<any>[];
+  filterChain: (itemValue: any) => boolean;
 }
 
 export class GridState {
@@ -37,6 +33,12 @@ export class GridState {
 
   // Which column are we dragging, highlight it so dragging is clearer
   columnDragged: AnyGridColumn | null = null;
+
+  //
+  cellEdited: {
+    rowId: AnyWithGridIndex[typeof gridIndexId];
+    columnKey: AnyGridColumn["key"];
+  } | null = null;
 
   get totalWidth() {
     return Object.entries(this.columnStates).reduce(
@@ -216,8 +218,8 @@ export class GridState {
    * @param columnKey The column's key which the filter belongs to
    */
   public setFilterProperty(
-    filter: FilterOption<RenderableType>,
-    propertyName: keyof FilterOption<RenderableType>,
+    filter: FilterOption<any>,
+    propertyName: keyof FilterOption<any>,
     value: any,
     columnKey: string
   ) {
@@ -248,7 +250,7 @@ export class GridState {
    * @returns
    */
   #isValidFilterOption(
-    options: FilterOption<RenderableType>,
+    options: FilterOption<any>,
     totalNumberOfOptions: number,
     index: number
   ) {

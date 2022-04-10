@@ -1,13 +1,16 @@
 <template>
-  <div ref="container" @click="onCellClick">
+  <div
+    :class="{ 'grid-cell-editing': isEditing }"
+    @click="onCellClick"
+    @dblclick="onCellDoubleClick"
+  >
     <component
-      ref="renderer"
       v-bind="$attrs"
       :is="component"
       :item="item"
       :column="column"
       :value="internalValue"
-      @input="$emit('input', value)"
+      @input="$emit('input', $event)"
       role="gridcell"
       :col-key="column.key"
     />
@@ -16,8 +19,15 @@
 
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { GridManager } from "@/components/grid/GridManager";
 import { AnyWithGridIndex } from "@/components/grid/GridState";
-import { defineComponent, PropType, ref, computed } from "@vue/composition-api";
+import {
+  defineComponent,
+  PropType,
+  computed,
+  inject,
+  ref,
+} from "@vue/composition-api";
 import Vue from "vue";
 
 export default defineComponent({
@@ -33,12 +43,19 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    // Decides if we show view or edit renderers
-    const readonly = ref(true);
+    const { gridState } = inject<GridManager>("gridManager")!;
 
-    // References to DOM elements, used for overflow detection and click target detection
-    const container = ref<HTMLAnchorElement | null>(null);
-    const renderer = ref<Vue | null>(null);
+    // Decides if we show view or edit renderers
+    const isEditing = computed(() => {
+      if (!gridState.cellEdited) {
+        return false;
+      }
+
+      const { rowId, columnKey } = gridState.cellEdited;
+      return (
+        rowId === props.item["_grid-index"] && columnKey === props.column.key
+      );
+    });
 
     const internalValue = computed({
       get: () => props.column.value(props.item),
@@ -46,28 +63,35 @@ export default defineComponent({
     });
 
     const component = computed(() =>
-      readonly.value ? props.column.viewRenderer : props.column.editRenderer
+      isEditing.value ? props.column.editRenderer : props.column.viewRenderer
     );
 
     // Cells handle row clicks so they can do cell-specific actions instead of row actions if needed
     const onCellClick = (event: PointerEvent) => {
-      if (renderer.value && container.value) {
-        const isOverflowing =
-          renderer.value.$el.scrollWidth > container.value.clientWidth;
+      // Will also need preventDefault so we don't click link rows if we want this behaviour
+      if (props.column.isEditable) {
+        event.stopPropagation();
+        return;
+      }
+    };
 
-        if (isOverflowing) {
-          console.log("Show truncated text");
-          event.preventDefault();
-        }
+    const onCellDoubleClick = (event: PointerEvent) => {
+      if (props.column.isEditable) {
+        gridState.cellEdited = {
+          rowId: props.item["_grid-index"],
+          columnKey: props.column.key,
+        };
+      } else {
+        // TODO: Show error state
       }
     };
 
     return {
+      isEditing,
       component,
       internalValue,
       onCellClick,
-      container,
-      renderer,
+      onCellDoubleClick,
     };
   },
 });

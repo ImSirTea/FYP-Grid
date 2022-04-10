@@ -4,6 +4,7 @@ import { Component } from "vue";
 
 /** General Types */
 export type ValueExtractor<T, U> = (item: T) => U;
+// export type ValueEditor<T, U> = (item: T, key: , value: U) => void;
 
 export enum GridWidthEnum {
   SMALL = 100,
@@ -35,23 +36,19 @@ export interface ColumnOptions {
 }
 
 // Would like to look into this, not a fan
-export type RenderableType = string | number | boolean; // Could be { toString(): string }?
-export type AnyGridColumn = Column<
-  AnyWithGridIndex,
-  RenderableType,
-  ColumnOptions
->;
+export type AnyGridColumn = Column<AnyWithGridIndex, any, ColumnOptions>;
 
-export abstract class Column<T, RenderableType, O extends ColumnOptions> {
+export abstract class Column<T, U, O extends ColumnOptions> {
   key: string;
-  private itemValue: ValueExtractor<T, RenderableType>;
+  private itemValue: ValueExtractor<T, U>;
+  private boundProperty?: keyof T; //ValueEditor<T, T[key]>;
   options: Partial<O> = {};
 
   abstract viewRenderer: Component;
   abstract editRenderer?: Component;
   abstract filterOptions?: FilterOptions<any>;
 
-  constructor(key: string, itemValue: ValueExtractor<T, RenderableType>) {
+  constructor(key: string, itemValue: ValueExtractor<T, U>) {
     this.key = key;
     this.itemValue = itemValue;
 
@@ -67,12 +64,27 @@ export abstract class Column<T, RenderableType, O extends ColumnOptions> {
   }
 
   // Create a getter function so we can override behaviours if needed, consistently
-  value(item: T): RenderableType {
+  value(item: T): U {
     return this.itemValue(item);
   }
 
-  setOption<K extends keyof O>(key: K, value: O[K]) {
-    this.options[key] = value;
+  setValue(item: T, value: U) {
+    if (this.isEditable) {
+      const propertyName = this.boundProperty!.toString();
+      item[propertyName] = value;
+    }
+  }
+
+  get isEditable() {
+    return !!this.boundProperty;
+  }
+
+  setOption<K extends keyof O>(name: K, value: O[K]) {
+    this.options[name] = value;
     return this;
+  }
+
+  bindProperty(property: keyof T) {
+    this.boundProperty = property;
   }
 }

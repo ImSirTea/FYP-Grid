@@ -2,7 +2,6 @@ import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import {
   Column,
   ColumnOptions,
-  RenderableType,
   ValueExtractor,
 } from "@/components/grid/columns/Column";
 import { NumberColumn } from "@/components/grid/columns/number/NumberColumn";
@@ -15,7 +14,7 @@ type RowRoute<T> = (item: T) => RawLocation;
 type RowAction<T> = (item: T) => void;
 
 export class GridConfiguration<T> {
-  #columns: Column<T, RenderableType, ColumnOptions>[] = [];
+  #columns: Column<T, any, ColumnOptions>[] = [];
   #actionColumn?: ActionColumn<T>;
   rowAction?: RowAction<T>;
   rowRoute?: RowRoute<T>;

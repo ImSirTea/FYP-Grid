@@ -1,9 +1,8 @@
 <script lang="ts">
 import { VNode } from "vue";
 import GridCell from "@/components/grid/GridCell.vue";
-import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
-import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex } from "@/components/grid/GridState";
 import { GridManager } from "@/components/grid/GridManager";
 import { AnyGridColumn } from "@/components/grid/columns/Column";
 
@@ -23,7 +22,7 @@ export default defineComponent({
       required: true,
     },
   },
-  setup(props) {
+  setup(props, context) {
     const { gridState, gridConfiguration } =
       inject<GridManager>("gridManager")!;
 
@@ -40,11 +39,8 @@ export default defineComponent({
         props: { item: props.item, column },
         on: {
           input: (value) => {
-            console.log(
-              "Logic on assignment will need to be applied",
-              value,
-              props.item
-            );
+            column.setValue(props.item, value);
+            context.emit("update:items");
           },
         },
       });
@@ -76,7 +72,18 @@ export default defineComponent({
 
     return h(
       rowType,
-      { class: { "grid-row-clickable": isRowClickable } },
+      {
+        class: {
+          "grid-row-clickable": isRowClickable,
+        },
+        on: {
+          click: () => {
+            if (isRowClickable) {
+              this.gridConfiguration.rowAction!(this.item);
+            }
+          },
+        },
+      },
       this.columns.map((column) => this.buildCell(column))
     );
   },

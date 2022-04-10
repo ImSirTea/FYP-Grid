@@ -17,6 +17,7 @@ import {
 } from "@vue/composition-api";
 import GridBody from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/grid/GridControlPanel.vue";
+import Vue from "vue";
 
 /**
  * Manages creating a grid with given specifications
@@ -24,9 +25,13 @@ import GridControlPanel from "@/components/grid/GridControlPanel.vue";
 export default defineComponent({
   name: "Grid",
   components: { GridHeader, GridBody, GridControlPanel },
+  model: {
+    event: "update:items",
+    prop: "items",
+  },
   props: {
     items: {
-      type: Array as PropType<AnyWithGridIndex[]>,
+      type: Array as PropType<any[]>,
       required: true,
       default: () => [],
     },
@@ -59,7 +64,11 @@ export default defineComponent({
       default: 1,
     },
   },
-  setup(props) {
+  setup(props, context) {
+    // A copy of our items, indexed with their original positions
+    // Keep this seperate so we only build it once per props.items change
+    const indexedItems = shallowRef<AnyWithGridIndex[]>([]);
+
     // Desperately avoid using ref here, it's painfully slow
     const internalItems = shallowRef<AnyWithGridIndex[]>([]);
     const gridState = reactive(
@@ -79,14 +88,24 @@ export default defineComponent({
       left: 0,
     });
 
-    // Copy our items, with inserted indexes of their original sorting order
-    // Pulled out seperately to prevent iterating over the same list of items and injecting what existed
-    const indexedItems = computed(() =>
-      gridState.injectGridIndexes(props.items)
-    );
-
     const totalGridWidth = computed(() =>
       props.width ? props.width + "px" : "100%"
+    );
+
+    watch(
+      () => props.items,
+      () => {
+        // Reset, and remake when we update our items
+        indexedItems.value.length = 0;
+        indexedItems.value = gridState.injectGridIndexes(props.items);
+
+        // Now update our items
+
+        internalItems.value = gridState
+          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
+          .slice();
+      },
+      { immediate: true, deep: true }
     );
 
     // If our indexes, config, or state has changed, we should re-filter and sort
@@ -96,15 +115,14 @@ export default defineComponent({
         gridState.searchValue,
         gridState.columnStates,
         gridState.sortOptions,
-        indexedItems.value,
       ],
       () => {
         internalItems.value.length = 0;
         internalItems.value = gridState
           .filterAndSortItems(indexedItems.value, props.gridConfiguration)
-          .slice(); // Create a clone
+          .slice();
       },
-      { immediate: true, deep: true }
+      { deep: true }
     );
 
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
@@ -148,6 +166,17 @@ export default defineComponent({
         props: {
           gridState: gridState,
           gridConfiguration: props.gridConfiguration,
+        },
+        on: {
+          "update:items": () => {
+            context.emit(
+              "update:items",
+              internalItems.value.map((item): any => {
+                delete (item as any)["_grid-index"];
+                return item;
+              })
+            );
+          },
         },
       });
     };

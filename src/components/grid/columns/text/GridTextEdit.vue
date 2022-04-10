@@ -1,5 +1,5 @@
 <template>
-  <text-field v-model="internalValue" />
+  <text-field v-model="internalValue" class="pa-0 ma-0" dense hide-details />
 </template>
 
 <script lang="ts">

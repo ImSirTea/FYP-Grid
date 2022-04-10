@@ -129,6 +129,7 @@ export default defineComponent({
         {
           style: {
             width: gridState.columnStates[column.key].width + "px",
+            "min-width": gridState.columnStates[column.key].width + "px",
           },
           attrs: {
             "col-key": column.key,
@@ -218,10 +219,16 @@ export default defineComponent({
           // Get our widest visible cell, and resize our column to fit
           dblclick: () => {
             const relevantCells = Array.from(
-              document.querySelectorAll(`[col-key=${column.key}]`)
+              document.querySelectorAll(
+                `[col-key=${column.key}][role=gridcell]`
+              )
             );
             const largestWidth = Math.max(
-              ...relevantCells.map((cell) => cell.clientWidth)
+              ...relevantCells.map((cell) => {
+                const htmlCell = cell as HTMLElement;
+                // Total size, plus a little padding
+                return htmlCell.offsetWidth + htmlCell.offsetLeft + 10;
+              })
             );
             gridState.columnStates[column.key].width = largestWidth;
           },

@@ -1,7 +1,7 @@
 $base-colour: #fff;
-$hover-colour: #eee;
-$cell-hover-colour: #e4e4e4;
+$hover-colour: #f0faff;
 $border-colour: #e4e4e4;
+$highlight-colour: #00aeff;
 
 // Grid containers
 .grid-container {
@@ -37,6 +37,11 @@ $border-colour: #e4e4e4;
   position: absolute;
 }
 
+[role=gridcell] {
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
 .grid-row {
   border-bottom: 1px solid $border-colour;
   text-decoration: none;
@@ -60,16 +65,9 @@ $border-colour: #e4e4e4;
 .grid-header-cell,
 .grid-row-cell {
   padding-left: 0.75em;
-  display: inline-block;
   position: relative;
-}
-
-.grid-header-cell::before,
-.grid-row-cell::before {
-  content: "";
-  display: inline-block;
-  vertical-align: middle;
-  height: 100%;
+  display: flex;
+  align-items: center;
 }
 
 .grid-row-cell {
@@ -80,10 +78,6 @@ $border-colour: #e4e4e4;
 
 .grid-header-cell:hover:not(.grid-header-no-hover) {
   background-color: $hover-colour;
-}
-
-.grid-row-cell:hover {
-  background-color: $cell-hover-colour;
 }
 
 .grid-sort-icon:not(.grid-sort-active) {
@@ -150,4 +144,8 @@ $border-colour: #e4e4e4;
 .grid-column-wrapper {
   display: flex;
   height: 100%;
+}
+
+.grid-cell-editing {
+  border: 2px solid $highlight-colour;
 }

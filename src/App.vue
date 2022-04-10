@@ -2,9 +2,9 @@
   <v-app>
     <v-main>
       <grid
+        v-model="items"
         :grid-configuration="builder"
         :grid-state="builder.defaultState"
-        :items="items"
         :grid-height="550"
       />
       <v-btn @click="updateItems">Update Items</v-btn>
@@ -63,7 +63,7 @@ export default defineComponent({
     builder.addTextColumn("wide", (item) =>
       (item.first + " " + item.last + " ").repeat(8)
     );
-    builder.addNumberColumn("age", (item) => item.age);
+    builder.addNumberColumn("age", (item) => item.age).bindProperty("age");
     builder.addTextColumn(
       "updated",
       (item) => "updated" + item.index + item.first
@@ -78,9 +78,9 @@ export default defineComponent({
         `redirect to /actionRoute/index/{index}`,
         (item) => `/actionRoute/index/${item.index}`
       );
-    // builder.withRowAction((item) =>
-    //   console.log(`/rowRoute/index/${item.index}`)
-    // );
+    builder.withRowAction((item) =>
+      console.log(`/rowRoute/index/${item.index}`)
+    );
     // builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
     builder
       .addTextColumn("first1", (item) => item.first + "- 1")

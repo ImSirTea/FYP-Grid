@@ -22,6 +22,12 @@
           {{ $tc.filter }}
         </v-btn>
       </v-col>
+      <v-col cols="auto">
+        <v-btn outlined @click="context.emit('update:items')">
+          <v-icon class="mr-2">mdi-content-save</v-icon>
+          {{ $tc.save }}
+        </v-btn>
+      </v-col>
     </v-row>
     <filter-menu v-show="showFilterMenu" v-model="showFilterMenu" />
     <manage-menu v-show="showManageMenu" v-model="showManageMenu" />
@@ -31,7 +37,6 @@
 <script lang="ts">
 import FilterMenu from "@/components/grid/filters/FilterMenu.vue";
 import ManageMenu from "@/components/grid/manage/ManageMenu.vue";
-import { GridState } from "@/components/grid/GridState";
 import { defineComponent, ref, inject } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { debounce } from "lodash";
@@ -43,7 +48,7 @@ import { GridManager } from "@/components/grid/GridManager";
 export default defineComponent({
   name: "GridControlPanel",
   components: { FilterMenu, ManageMenu },
-  setup(props) {
+  setup(props, context) {
     const showFilterMenu = ref(false);
     const showManageMenu = ref(false);
     const { gridState } = inject<GridManager>("gridManager")!;

@@ -5,7 +5,6 @@
     :value="value"
     :type="$attrs.type || 'text'"
     @input="updateValue"
-    @dblclick="$emit('dblclick')"
   />
   <span v-else> {{ value }} </span>
 </template>
