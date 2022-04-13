@@ -2,9 +2,9 @@
 import { VNode } from "vue";
 import GridCell from "@/components/grid/GridCell.vue";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
 import { GridManager } from "@/components/grid/GridManager";
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
+import { AnyWithGridIndex } from "@/components/grid/GridState";
 
 export default defineComponent({
   name: "GridRow",
@@ -40,7 +40,7 @@ export default defineComponent({
         on: {
           input: (value) => {
             column.setValue(props.item, value);
-            context.emit("update:items");
+            gridState.isDirty = true;
           },
         },
       });

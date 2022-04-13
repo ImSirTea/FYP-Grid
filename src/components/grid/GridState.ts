@@ -1,5 +1,8 @@
 import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
-import { AnyGridColumn, ColumnOptions } from "@/components/grid/columns/Column";
+import {
+  AnyGridColumn,
+  ColumnOptions,
+} from "@/components/grid/columns/AbstractColumn";
 import { FilterOperator, FilterOption } from "@/components/grid/filters/types";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { hasAllProperties } from "@/components/util/helpers";
@@ -34,11 +37,16 @@ export class GridState {
   // Which column are we dragging, highlight it so dragging is clearer
   columnDragged: AnyGridColumn | null = null;
 
-  //
+  // The cell currently being edited
   cellEdited: {
     rowId: AnyWithGridIndex[typeof gridIndexId];
     columnKey: AnyGridColumn["key"];
   } | null = null;
+
+  // Have changes been made to the data
+  isDirty = false;
+
+  selectedRows: any[] = [];
 
   get totalWidth() {
     return Object.entries(this.columnStates).reduce(
@@ -143,6 +151,11 @@ export class GridState {
       return items.sort(this.sortFunction);
     }
 
+    // If our filters aren't valid, then return the items as they are
+    if (!this.filtersAreValid) {
+      return items;
+    }
+
     return items
       .filter((item) => {
         // !searchValue allows for being true if we don't have a search value to check against
@@ -154,11 +167,16 @@ export class GridState {
 
         for (const column of columnsToFilter) {
           const itemValueForColumn = column.value(item);
+          const itemValueAsString = column
+            .value(item)
+            .toString()
+            .toLowerCase()
+            .trim();
 
           const searchByValue = this.searchValue.toLowerCase().trim();
 
           // If our item value matches our search term, just return true
-          if (this.searchValue && itemValueForColumn.includes(searchByValue)) {
+          if (this.searchValue && itemValueAsString.includes(searchByValue)) {
             searchPassed = true;
           }
 
@@ -271,6 +289,10 @@ export class GridState {
     this.columnStates[key].filterChain = filterChain;
   }
 
+  /**
+   * @param draggedColumn The column we want to move
+   * @param targetColumn Where we want to move the column to
+   */
   public rearrangeColumnOrders(
     draggedColumn: AnyGridColumn,
     targetColumn: AnyGridColumn
@@ -306,5 +328,22 @@ export class GridState {
 
       draggedColumnState.order = targetOrder;
     }
+  }
+
+  /**
+   * Are all of our filters valid, used to prevent re-filtering with invalid filters wastefully
+   */
+  get filtersAreValid() {
+    const columnStatesValues = Array.from(Object.values(this.columnStates));
+
+    for (const { filterOptions } of columnStatesValues) {
+      for (const [index, option] of filterOptions.entries()) {
+        if (!this.#isValidFilterOption(option, filterOptions.length, index)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
   }
 }

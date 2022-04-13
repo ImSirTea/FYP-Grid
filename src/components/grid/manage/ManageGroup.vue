@@ -18,7 +18,10 @@ import {
   PropType,
   computed,
 } from "@vue/composition-api";
-import { AnyGridColumn, pinValues } from "@/components/grid/columns/Column";
+import {
+  AnyGridColumn,
+  pinValues,
+} from "@/components/grid/columns/AbstractColumn";
 import $tc from "@/textConstants";
 import { GridManager } from "@/components/grid/GridManager";
 

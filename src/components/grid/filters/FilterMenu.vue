@@ -49,10 +49,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, inject, computed } from "@vue/composition-api";
+import { defineComponent, inject } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import FilterGroup from "@/components/grid/filters/FilterGroup.vue";
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({

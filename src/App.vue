@@ -31,7 +31,7 @@ export default defineComponent({
     let count = 0;
 
     const items = shallowRef(
-      Array(100)
+      Array(500000)
         .fill(0)
         .map((_, index) => {
           // add some variance so we can mess aboot with checking filters
@@ -51,6 +51,7 @@ export default defineComponent({
     builder
       .addNumberColumn("index", (item) => item.index)
       .setOption("defaultPin", "left");
+    builder.withSelectColumn();
     builder.addTextColumn("last1", (item) => item.last + "- 1");
     builder.addTextColumn("first2", (item) => item.first + "- 2");
     builder.addTextColumn("last2", (item) => item.last + "- 2");

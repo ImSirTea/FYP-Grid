@@ -1,6 +1,5 @@
 import { FilterOptions } from "@/components/grid/filters/types";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
-import { Component } from "vue";
+import { VueConstructor } from "vue";
 
 /** General Types */
 export type ValueExtractor<T, U> = (item: T) => U;
@@ -36,16 +35,16 @@ export interface ColumnOptions {
 }
 
 // Would like to look into this, not a fan
-export type AnyGridColumn = Column<AnyWithGridIndex, any, ColumnOptions>;
+export type AnyGridColumn = AbstractColumn<any, any, ColumnOptions>;
 
-export abstract class Column<T, U, O extends ColumnOptions> {
+export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
   key: string;
   private itemValue: ValueExtractor<T, U>;
   private boundProperty?: keyof T; //ValueEditor<T, T[key]>;
   options: Partial<O> = {};
 
-  abstract viewRenderer: Component;
-  abstract editRenderer?: Component;
+  abstract viewRenderer: VueConstructor;
+  abstract editRenderer?: VueConstructor;
   abstract filterOptions?: FilterOptions<any>;
 
   constructor(key: string, itemValue: ValueExtractor<T, U>) {
@@ -82,6 +81,10 @@ export abstract class Column<T, U, O extends ColumnOptions> {
   setOption<K extends keyof O>(name: K, value: O[K]) {
     this.options[name] = value;
     return this;
+  }
+
+  setViewRenderer(newRenderer: VueConstructor<Vue>) {
+    this.viewRenderer = newRenderer;
   }
 
   bindProperty(property: keyof T) {

@@ -1,28 +1,27 @@
 <template>
-  <v-text-field
-    v-bind="$attrs"
-    :value="value"
-    :type="$attrs.type || 'text'"
-    @input="updateValue"
-  />
+  <v-checkbox v-bind="$attrs" :value="internalValue" @input="updateValue" />
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from "@vue/composition-api";
 
 export default defineComponent({
-  name: "TextField",
+  name: "CheckboxField",
+  model: {
+    prop: "value",
+    event: "input",
+  },
   props: {
     value: {
-      type: String,
+      type: Boolean,
       required: false,
-      default: "",
+      default: () => undefined,
     },
   },
   setup(props, context) {
     const internalValue = ref(props.value);
 
-    const updateValue = (newValue: string) => {
+    const updateValue = (newValue: boolean) => {
       context.emit("input", newValue);
     };
 

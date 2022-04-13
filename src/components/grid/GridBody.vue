@@ -1,8 +1,8 @@
 <script lang="ts">
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
 import GridRow from "@/components/grid/GridRow.vue";
-import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
+import { AnyWithGridIndex } from "@/components/grid/GridState";
 import {
   defineComponent,
   h,
@@ -13,7 +13,6 @@ import {
   ref,
 } from "@vue/composition-api";
 import { VNode } from "vue";
-import { debounce } from "lodash";
 
 /**
  * Container for all grid rows, handling scroll events, offsets, and rendering
@@ -101,11 +100,6 @@ export default defineComponent({
           item,
           index,
           columns,
-        },
-        on: {
-          "update:items": () => {
-            context.emit("update:items");
-          },
         },
         nativeOn: {
           mouseenter: () => {

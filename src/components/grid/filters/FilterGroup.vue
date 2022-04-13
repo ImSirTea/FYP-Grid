@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import {
   defineComponent,
   PropType,

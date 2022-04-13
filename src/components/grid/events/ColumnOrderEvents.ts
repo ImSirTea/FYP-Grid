@@ -1,11 +1,11 @@
 import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
+import { GridState } from "@/components/grid/GridState";
 
 export const useColumnOrderEvents = (
   gridState: GridState,
-  gridConfiguration: GridConfiguration<AnyWithGridIndex>,
+  gridConfiguration: GridConfiguration<any>,
   direction: "vertical" | "horizontal"
 ) => {
   let draggedColumn: AnyGridColumn | null = null;

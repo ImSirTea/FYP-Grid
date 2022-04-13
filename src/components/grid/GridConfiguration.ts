@@ -1,30 +1,33 @@
 import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
 import {
-  Column,
-  ColumnOptions,
+  AnyGridColumn,
   ValueExtractor,
-} from "@/components/grid/columns/Column";
+} from "@/components/grid/columns/AbstractColumn";
 import { NumberColumn } from "@/components/grid/columns/number/NumberColumn";
 import { TextColumn } from "@/components/grid/columns/text/TextColumn";
 import { GridState } from "@/components/grid/GridState";
 import $tc from "@/textConstants";
 import { RawLocation } from "vue-router";
+import { SelectColumn } from "@/components/grid/columns/select/SelectColumn";
 
 type RowRoute<T> = (item: T) => RawLocation;
 type RowAction<T> = (item: T) => void;
 
 export class GridConfiguration<T> {
-  #columns: Column<T, any, ColumnOptions>[] = [];
+  #columns: AnyGridColumn[] = [];
   #actionColumn?: ActionColumn<T>;
+  #selectColumn?: SelectColumn<T>;
   rowAction?: RowAction<T>;
   rowRoute?: RowRoute<T>;
+  allowRowSelection: boolean = false;
 
-  get columns() {
-    if (this.#actionColumn) {
-      return this.#columns.concat(this.#actionColumn);
-    }
-
-    return this.#columns;
+  get columns(): AnyGridColumn[] {
+    const allColumns = [
+      this.#selectColumn,
+      ...this.#columns,
+      this.#actionColumn,
+    ].filter((column) => column !== undefined);
+    return allColumns as AnyGridColumn[];
   }
 
   get defaultState(): GridState {
@@ -72,6 +75,12 @@ export class GridConfiguration<T> {
     this.#actionColumn = new ActionColumn(name, () => null);
 
     return this.#actionColumn;
+  }
+
+  withSelectColumn(): SelectColumn<T> {
+    this.#selectColumn = new SelectColumn<T>("", () => true);
+
+    return this.#selectColumn;
   }
 
   withRowAction(action: RowAction<T>): void {

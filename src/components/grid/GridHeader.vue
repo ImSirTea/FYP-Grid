@@ -1,5 +1,5 @@
 <script lang="ts">
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
 import {
   defineComponent,

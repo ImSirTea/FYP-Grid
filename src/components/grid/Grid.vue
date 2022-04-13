@@ -35,7 +35,7 @@ export default defineComponent({
       default: () => [],
     },
     gridConfiguration: {
-      type: Object as PropType<GridConfiguration<AnyWithGridIndex>>,
+      type: Object as PropType<GridConfiguration<any>>,
       required: true,
     },
     gridState: {
@@ -64,12 +64,10 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    // A copy of our items, indexed with their original positions
-    // Keep this seperate so we only build it once per props.items change
+    const internalItems = computed(() =>
+      gridState.filterAndSortItems(indexedItems.value, props.gridConfiguration)
+    );
     const indexedItems = shallowRef<AnyWithGridIndex[]>([]);
-
-    // Desperately avoid using ref here, it's painfully slow
-    const internalItems = shallowRef<AnyWithGridIndex[]>([]);
     const gridState = reactive(
       props.gridState ?? props.gridConfiguration.defaultState
     );
@@ -91,38 +89,13 @@ export default defineComponent({
       props.width ? props.width + "px" : "100%"
     );
 
-    watch(
-      () => props.items,
-      () => {
-        // Reset, and remake when we update our items
-        indexedItems.value.length = 0;
-        indexedItems.value = gridState.injectGridIndexes(props.items);
+    const refreshItems = () => {
+      indexedItems.value = gridState.injectGridIndexes(
+        props.items.map((item) => Object.assign({}, item))
+      );
+    };
 
-        // Now update our items
-
-        internalItems.value = gridState
-          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
-          .slice();
-      },
-      { immediate: true, deep: true }
-    );
-
-    // If our indexes, config, or state has changed, we should re-filter and sort
-    watch(
-      () => [
-        props.gridConfiguration,
-        gridState.searchValue,
-        gridState.columnStates,
-        gridState.sortOptions,
-      ],
-      () => {
-        internalItems.value.length = 0;
-        internalItems.value = gridState
-          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
-          .slice();
-      },
-      { deep: true }
-    );
+    watch(() => props.items, refreshItems, { immediate: true, deep: true });
 
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
     const buildBody = () => {
@@ -167,14 +140,13 @@ export default defineComponent({
           gridConfiguration: props.gridConfiguration,
         },
         on: {
-          "update:items": () => {
-            context.emit(
-              "update:items",
-              internalItems.value.map((item): any => {
-                delete (item as any)["_grid-index"];
-                return item;
-              })
-            );
+          "apply:item-changes": () => {
+            context.emit("update:items", internalItems.value);
+            gridState.isDirty = false;
+          },
+          "reset:item-changes": () => {
+            refreshItems();
+            gridState.isDirty = false;
           },
         },
       });

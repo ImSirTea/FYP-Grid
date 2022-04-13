@@ -1,9 +1,9 @@
 import {
-  Column,
+  AbstractColumn,
   ColumnOptions,
   ValueExtractor,
   GridWidthEnum,
-} from "@/components/grid/columns/Column";
+} from "@/components/grid/columns/AbstractColumn";
 import GridNumberView from "@/components/grid/columns/number/GridNumberView.vue";
 import GridNumberEdit from "@/components/grid/columns/number/GridNumberEdit.vue";
 import NumberFilterOptions from "@/components/grid/columns/number/NumberFilterOptions";
@@ -18,7 +18,11 @@ export interface NumberColumnOptions extends ColumnOptions {
 /**
  * NumberColumn type, used when building grids using number fields
  */
-export class NumberColumn<T> extends Column<T, number, NumberColumnOptions> {
+export class NumberColumn<T> extends AbstractColumn<
+  T,
+  number,
+  NumberColumnOptions
+> {
   public viewRenderer = GridNumberView;
   public editRenderer = GridNumberEdit;
   public filterOptions = NumberFilterOptions;

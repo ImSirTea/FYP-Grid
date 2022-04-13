@@ -1,8 +1,8 @@
 import {
-  Column,
+  AbstractColumn,
   ColumnOptions,
   ValueExtractor,
-} from "@/components/grid/columns/Column";
+} from "@/components/grid/columns/AbstractColumn";
 import GridTextView from "@/components/grid/columns/text/GridTextView.vue";
 import GridTextEdit from "@/components/grid/columns/text/GridTextEdit.vue";
 import TextFilterOptions from "@/components/grid/columns/text/TextFilterOptions";
@@ -15,7 +15,11 @@ export interface TextColumnOptions extends ColumnOptions {}
 /**
  * TextColumn type, used when building grids using string fields
  */
-export class TextColumn<T> extends Column<T, string, TextColumnOptions> {
+export class TextColumn<T> extends AbstractColumn<
+  T,
+  string,
+  TextColumnOptions
+> {
   public viewRenderer = GridTextView;
   public editRenderer = GridTextEdit;
   public filterOptions = TextFilterOptions;

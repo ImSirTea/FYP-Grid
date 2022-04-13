@@ -57,7 +57,7 @@
 <script lang="ts">
 import NumberField from "@/components/controls/inputs/NumberField.vue";
 import TextField from "@/components/controls/inputs/TextField.vue";
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import {
   FilterCondition,
   FilterConnection,

@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
 import { AnyWithGridIndex } from "@/components/grid/GridState";
 import {
@@ -26,9 +26,7 @@ import {
   PropType,
   computed,
   inject,
-  ref,
 } from "@vue/composition-api";
-import Vue from "vue";
 
 export default defineComponent({
   name: "GridCell",

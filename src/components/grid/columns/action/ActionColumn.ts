@@ -1,9 +1,9 @@
 import {
-  Column,
+  AbstractColumn,
   ColumnOptions,
   GridWidthEnum,
   ValueExtractor,
-} from "@/components/grid/columns/Column";
+} from "@/components/grid/columns/AbstractColumn";
 import GridActionView from "@/components/grid/columns/action/GridActionView.vue";
 import { RawLocation } from "vue-router";
 
@@ -18,11 +18,15 @@ export interface ActionDefinition<T> {
   text: string;
 }
 
-export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
-  viewRenderer = GridActionView;
-  editRenderer = undefined;
-  filterOptions = undefined;
-  actions: ActionDefinition<T>[] = [];
+export class ActionColumn<T> extends AbstractColumn<
+  T,
+  any,
+  ActionColumnOptions
+> {
+  public viewRenderer = GridActionView;
+  public editRenderer = undefined;
+  public filterOptions = undefined;
+  public actions: ActionDefinition<T>[] = [];
 
   constructor(key: string, itemValue: ValueExtractor<T, any>) {
     super(key, itemValue);
@@ -30,7 +34,6 @@ export class ActionColumn<T> extends Column<T, any, ActionColumnOptions> {
     this.setOption("isFilterable", false);
     this.setOption("isSortable", false);
     this.setOption("isDraggable", false);
-    this.setOption("isResizeable", false);
     this.setOption("defaultWidth", GridWidthEnum.SMALL);
     this.setOption("defaultPin", "right");
   }

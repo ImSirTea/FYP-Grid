@@ -1,4 +1,4 @@
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
 
@@ -13,12 +13,9 @@ export interface PinnedColumnGroups {
 }
 export class GridManager {
   gridState!: GridState;
-  gridConfiguration!: GridConfiguration<AnyWithGridIndex>;
+  gridConfiguration!: GridConfiguration<any>;
 
-  constructor(
-    gridState: GridState,
-    gridConfiguration: GridConfiguration<AnyWithGridIndex>
-  ) {
+  constructor(gridState: GridState, gridConfiguration: GridConfiguration<any>) {
     this.gridState = gridState;
     this.gridConfiguration = gridConfiguration;
   }

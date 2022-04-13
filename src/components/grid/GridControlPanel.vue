@@ -23,9 +23,23 @@
         </v-btn>
       </v-col>
       <v-col cols="auto">
-        <v-btn outlined @click="context.emit('update:items')">
+        <v-btn
+          :disabled="!gridState.isDirty"
+          outlined
+          @click="$emit('apply:item-changes')"
+        >
           <v-icon class="mr-2">mdi-content-save</v-icon>
-          {{ $tc.save }}
+          {{ $tc.apply }}
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn
+          :disabled="!gridState.isDirty"
+          outlined
+          @click="$emit('reset:item-changes')"
+        >
+          <v-icon class="mr-2">mdi-trash-can</v-icon>
+          {{ $tc.reset }}
         </v-btn>
       </v-col>
     </v-row>

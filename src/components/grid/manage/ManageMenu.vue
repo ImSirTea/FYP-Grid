@@ -56,7 +56,7 @@ import { defineComponent, inject, computed } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import ManageGroup from "@/components/grid/manage/ManageGroup.vue";
 import { GridManager } from "@/components/grid/GridManager";
-import { AnyGridColumn } from "@/components/grid/columns/Column";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { useColumnOrderEvents } from "@/components/grid/events/ColumnOrderEvents";
 
 export default defineComponent({
