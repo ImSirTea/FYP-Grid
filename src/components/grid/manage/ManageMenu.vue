@@ -58,6 +58,8 @@ import ManageGroup from "@/components/grid/manage/ManageGroup.vue";
 import { GridManager } from "@/components/grid/GridManager";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { useColumnOrderEvents } from "@/components/grid/events/ColumnOrderEvents";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { GridState } from "@/components/grid/GridState";
 
 export default defineComponent({
   name: "ManageMenu",
@@ -69,15 +71,19 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { gridState, gridConfiguration, sortedColumns } =
-      inject<GridManager>("gridManager")!;
+    const gridConfiguration =
+      inject<GridConfiguration<any>>("gridConfiguration")!;
+    const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
     const { dragStart, drag, dragEnd } = useColumnOrderEvents(
       gridState,
       gridConfiguration,
       "vertical"
     );
 
-    const manageableColumns = computed<AnyGridColumn[]>(() => sortedColumns);
+    const manageableColumns = computed<AnyGridColumn[]>(
+      () => gridManager.sortedColumns
+    );
 
     return {
       dragStart,

@@ -13,6 +13,8 @@ import { VNode } from "vue";
 import { VIcon } from "vuetify/lib/components";
 import { debounce } from "lodash";
 import { useColumnOrderEvents } from "@/components/grid/events/ColumnOrderEvents";
+import { GridState } from "@/components/grid/GridState";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 
 export default defineComponent({
   name: "GridHeader",
@@ -28,8 +30,10 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const { gridState, gridConfiguration, columns, columnSizes } =
-      inject<GridManager>("gridManager")!;
+    const gridConfiguration =
+      inject<GridConfiguration<any>>("gridConfiguration")!;
+    const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Drag vars
@@ -52,9 +56,8 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeaderRow = () => {
-      console.log("rebuilin");
-      const { left, centre, right } = columns;
-      const { leftWidth, centreWidth, rightWidth } = columnSizes;
+      const { left, centre, right } = gridManager.columns;
+      const { leftWidth, centreWidth, rightWidth } = gridManager.columnSizes;
 
       const leftCells: VNode[] = [];
       const centreCells: VNode[] = centre.map((column) => buildCell(column));
@@ -272,10 +275,8 @@ export default defineComponent({
     );
 
     return {
-      columns,
       buildHeaderRow,
       totalGridWidth,
-      gridState,
       scrollableDiv,
       isResizing,
     };

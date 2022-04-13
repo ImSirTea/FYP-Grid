@@ -2,9 +2,9 @@
 import { VNode } from "vue";
 import GridCell from "@/components/grid/GridCell.vue";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
-import { GridManager } from "@/components/grid/GridManager";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
-import { AnyWithRowIndex } from "@/components/grid/GridState";
+import { AnyWithRowIndex, GridState } from "@/components/grid/GridState";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 
 export default defineComponent({
   name: "GridRow",
@@ -23,8 +23,9 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { gridState, gridConfiguration } =
-      inject<GridManager>("gridManager")!;
+    const gridConfiguration =
+      inject<GridConfiguration<any>>("gridConfiguration")!;
+    const gridState = inject<GridState>("gridState")!;
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn) => {

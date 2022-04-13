@@ -2,7 +2,11 @@
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
 import GridRow from "@/components/grid/GridRow.vue";
-import { AnyWithRowIndex, rowIndex } from "@/components/grid/GridState";
+import {
+  AnyWithRowIndex,
+  GridState,
+  rowIndex,
+} from "@/components/grid/GridState";
 import {
   defineComponent,
   h,
@@ -48,8 +52,8 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { gridState, columns, columnSizes } =
-      inject<GridManager>("gridManager")!;
+    const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Total height of all rows, used for scrolling
@@ -149,17 +153,15 @@ export default defineComponent({
       rowsOffset,
       totalGridHeight,
       rowIndexBoundaries,
-      gridState,
-      columns,
-      columnSizes,
+      gridManager,
       scrollableDiv,
     };
   },
   render(): VNode {
     const { min, max } = this.rowIndexBoundaries;
-    const { left, centre, right } = this.columns;
+    const { left, centre, right } = this.gridManager.columns;
 
-    const { leftWidth, centreWidth, rightWidth } = this.columnSizes;
+    const { leftWidth, centreWidth, rightWidth } = this.gridManager.columnSizes;
 
     const leftRows: VNode[] = [];
     const centreRows: VNode[] = [];

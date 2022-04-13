@@ -23,7 +23,7 @@ import {
   pinValues,
 } from "@/components/grid/columns/AbstractColumn";
 import $tc from "@/textConstants";
-import { GridManager } from "@/components/grid/GridManager";
+import { GridState } from "@/components/grid/GridState";
 
 export default defineComponent({
   name: "ManageGroup",
@@ -34,7 +34,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { gridState } = inject<GridManager>("gridManager")!;
+    const gridState = inject<GridState>("gridState")!;
 
     const isHidden = computed({
       get: () => gridState.columnStates[props.column.key].isHidden,

@@ -53,6 +53,7 @@ import { defineComponent, inject } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import FilterGroup from "@/components/grid/filters/FilterGroup.vue";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
+import { GridState } from "@/components/grid/GridState";
 import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
@@ -67,15 +68,14 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { gridState, gridConfiguration, filterableColumns } =
-      inject<GridManager>("gridManager")!;
+    const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
 
     return {
-      gridConfiguration,
       toggleMenu: (isVisible) => context.emit("input", isVisible),
       numberOfFiltersForColumn: (column: AnyGridColumn) =>
         gridState.columnStates[column.key].filterOptions.length ?? 0,
-      filterableColumns,
+      filterableColumns: gridManager.filterableColumns,
       $tc,
     };
   },

@@ -79,6 +79,8 @@ export default defineComponent({
       gridState as GridState,
       props.gridConfiguration
     );
+    provide("gridState", gridState);
+    provide("gridConfiguration", props.gridConfiguration);
     provide("gridManager", gridManager);
 
     const centreBar = ref<HTMLElement | null>(null);
@@ -245,10 +247,8 @@ export default defineComponent({
     );
 
     return {
-      gridManager: gridManager.columns,
       buildTable,
       centreBar,
-      gridOffsets,
     };
   },
   render(): VNode {

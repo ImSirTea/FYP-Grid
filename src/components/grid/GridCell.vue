@@ -20,7 +20,11 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
-import { AnyWithRowIndex, rowIndex } from "@/components/grid/GridState";
+import {
+  AnyWithRowIndex,
+  GridState,
+  rowIndex,
+} from "@/components/grid/GridState";
 import {
   defineComponent,
   PropType,
@@ -41,7 +45,8 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { gridState } = inject<GridManager>("gridManager")!;
+    const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
 
     // Decides if we show view or edit renderers
     const isEditing = computed(() => {

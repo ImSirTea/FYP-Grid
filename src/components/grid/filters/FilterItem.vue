@@ -72,6 +72,7 @@ import {
 import $tc from "@/textConstants";
 import { debounce } from "lodash";
 import { GridManager } from "@/components/grid/GridManager";
+import { GridState } from "@/components/grid/GridState";
 
 export default defineComponent({
   name: "FilterItem",
@@ -91,7 +92,7 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const { gridState } = inject<GridManager>("gridManager")!;
+    const gridState = inject<GridState>("gridState")!;
 
     const updateCondition = (newCondition: FilterCondition<any>) => {
       context.emit("update:filter-function", newCondition.filterFunction);

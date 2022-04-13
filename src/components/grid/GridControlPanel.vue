@@ -54,7 +54,7 @@ import ManageMenu from "@/components/grid/manage/ManageMenu.vue";
 import { defineComponent, ref, inject } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { debounce } from "lodash";
-import { GridManager } from "@/components/grid/GridManager";
+import { GridState } from "@/components/grid/GridState";
 
 /**
  * Parent component to all (mostly state) management functions
@@ -65,7 +65,7 @@ export default defineComponent({
   setup(props, context) {
     const showFilterMenu = ref(false);
     const showManageMenu = ref(false);
-    const { gridState } = inject<GridManager>("gridManager")!;
+    const gridState = inject<GridState>("gridState")!;
 
     const updateSearchValue = debounce((newValue: string) => {
       gridState.setSearchValue(newValue);
