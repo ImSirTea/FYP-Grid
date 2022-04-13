@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import { ActionColumn } from "@/components/grid/columns/action/ActionColumn";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
+import { AnyWithRowIndex } from "@/components/grid/GridState";
 import { defineComponent, PropType, ref } from "@vue/composition-api";
 
 export default defineComponent({
@@ -32,11 +32,11 @@ export default defineComponent({
   inheritAttrs: false,
   props: {
     item: {
-      type: Object as PropType<AnyWithGridIndex>,
+      type: Object as PropType<AnyWithRowIndex>,
       required: true,
     },
     column: {
-      type: Object as PropType<ActionColumn<AnyWithGridIndex>>,
+      type: Object as PropType<ActionColumn<AnyWithRowIndex>>,
       required: true,
     },
   },

@@ -4,18 +4,18 @@
 
 <script lang="ts">
 import { TextColumn } from "@/components/grid/columns/text/TextColumn";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
+import { AnyWithRowIndex } from "@/components/grid/GridState";
 import { defineComponent, PropType } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridTextView",
   props: {
     item: {
-      type: Object as PropType<AnyWithGridIndex>,
+      type: Object as PropType<AnyWithRowIndex>,
       required: true,
     },
     column: {
-      type: Object as PropType<TextColumn<AnyWithGridIndex>>,
+      type: Object as PropType<TextColumn<AnyWithRowIndex>>,
       required: true,
     },
     value: {

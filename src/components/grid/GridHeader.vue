@@ -33,7 +33,7 @@ export default defineComponent({
     const scrollableDiv = ref<HTMLElement | null>(null);
 
     // Drag vars
-    const { dragStart, drag, dragEnd } = useColumnOrderEvents(
+    const { dragStart, drag, dragEnd, showDragging } = useColumnOrderEvents(
       gridState,
       gridConfiguration,
       "horizontal"
@@ -52,6 +52,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeaderRow = () => {
+      console.log("rebuilin");
       const { left, centre, right } = columns;
       const { leftWidth, centreWidth, rightWidth } = columnSizes;
 
@@ -128,6 +129,7 @@ export default defineComponent({
           style: {
             width: gridState.columnStates[column.key].width + "px",
             "min-width": gridState.columnStates[column.key].width + "px",
+            "justify-content": column.alignment,
           },
           attrs: {
             "col-key": column.key,
@@ -156,6 +158,7 @@ export default defineComponent({
 
               drag(event);
             },
+            dragover: showDragging,
             touchmove: (event: TouchEvent) => {
               // Don't allow moving when we are resizing
               if (isResizing.value) {
@@ -269,6 +272,7 @@ export default defineComponent({
     );
 
     return {
+      columns,
       buildHeaderRow,
       totalGridWidth,
       gridState,

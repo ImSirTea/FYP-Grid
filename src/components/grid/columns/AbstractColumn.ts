@@ -26,6 +26,7 @@ export interface ColumnOptions {
   defaultWidth: GridWidthEnum | number;
   defaultPin: PinTypes;
   defaultHidden: boolean;
+  defaultAlignment: PinTypes;
   isFilterable: boolean;
   isDraggable: boolean;
   isSortable: boolean;
@@ -58,6 +59,7 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
     this.setOption("defaultWidth", GridWidthEnum.MEDIUM);
     this.setOption("defaultHidden", false);
     this.setOption("defaultPin", "centre");
+    this.setOption("defaultAlignment", "left");
     this.setOption("ascIcon", "mdi-sort-ascending");
     this.setOption("descIcon", "mdi-sort-descending");
   }
@@ -76,6 +78,20 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
 
   get isEditable() {
     return !!this.boundProperty;
+  }
+
+  get alignment() {
+    switch (this.options.defaultAlignment) {
+      case "left":
+      default:
+        return "start";
+
+      case "centre":
+        return "center";
+
+      case "right":
+        return "end";
+    }
   }
 
   setOption<K extends keyof O>(name: K, value: O[K]) {

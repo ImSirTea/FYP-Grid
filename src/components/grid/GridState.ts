@@ -9,8 +9,8 @@ import { hasAllProperties } from "@/components/util/helpers";
 import { firstBy, IThenBy } from "thenby";
 import Vue from "vue";
 
-const gridIndexId = "_grid-index" as const;
-export type AnyWithGridIndex = { [gridIndexId]: number };
+export const rowIndex = "row-index" as const;
+export type AnyWithRowIndex = { [rowIndex]: number };
 
 interface SortOptions {
   column: AnyGridColumn;
@@ -29,17 +29,17 @@ interface ColumnState {
 export class GridState {
   public searchValue: string = "";
   public sortOptions: SortOptions[] = [];
-  private sortFunction: IThenBy<AnyWithGridIndex> = firstBy("_grid-index");
+  private sortFunction: IThenBy<AnyWithRowIndex> = firstBy(rowIndex);
   columnStates: Record<string, ColumnState> = {};
   // Can't rely on :hover as our rows aren't all in the same row due to pins
-  rowHovered: AnyWithGridIndex[typeof gridIndexId] | null = null;
+  rowHovered: AnyWithRowIndex[typeof rowIndex] | null = null;
 
   // Which column are we dragging, highlight it so dragging is clearer
   columnDragged: AnyGridColumn | null = null;
 
   // The cell currently being edited
   cellEdited: {
-    rowId: AnyWithGridIndex[typeof gridIndexId];
+    rowId: AnyWithRowIndex[typeof rowIndex];
     columnKey: AnyGridColumn["key"];
   } | null = null;
 
@@ -62,22 +62,22 @@ export class GridState {
 
       this.sortOptions.forEach((opt) => {
         if (!sortBy) {
-          sortBy = firstBy((item: AnyWithGridIndex) => {
+          sortBy = firstBy((item: AnyWithRowIndex) => {
             return opt.column.value(item);
           }, opt.direction);
         } else {
-          sortBy = sortBy.thenBy((item: AnyWithGridIndex) => {
+          sortBy = sortBy.thenBy((item: AnyWithRowIndex) => {
             return opt.column.value(item);
           }, opt.direction);
         }
       });
 
-      this.sortFunction = sortBy.thenBy("_grid-index");
+      this.sortFunction = sortBy.thenBy(rowIndex);
       return;
     }
 
     // Otherwise, default to original order
-    this.sortFunction = firstBy("_grid-index");
+    this.sortFunction = firstBy(rowIndex);
   }
 
   /**
@@ -140,9 +140,9 @@ export class GridState {
    * @returns Items with filtering and sorting
    */
   public filterAndSortItems(
-    items: AnyWithGridIndex[],
-    gridConfiguration: GridConfiguration<AnyWithGridIndex>
-  ): AnyWithGridIndex[] {
+    items: AnyWithRowIndex[],
+    gridConfiguration: GridConfiguration<AnyWithRowIndex>
+  ): AnyWithRowIndex[] {
     const filtersExist = Object.entries(this.columnStates).some(
       ([key, column]) => column.filterOptions.length
     );
@@ -201,7 +201,7 @@ export class GridState {
    */
   public injectGridIndexes(items: Record<string, any>[]) {
     return items.map((item, index) => ({
-      [gridIndexId]: index,
+      [rowIndex]: index,
       ...item,
     }));
   }
@@ -311,7 +311,7 @@ export class GridState {
       (stateA, stateB) => stateA.order - stateB.order
     );
 
-    // Going up
+    // Going up (right on screen)
     if (targetOrder > initialOrder) {
       for (let i = targetOrder; i > initialOrder; i--) {
         orderedColumns[i].order--;
@@ -320,7 +320,7 @@ export class GridState {
       draggedColumnState.order = targetOrder;
     }
 
-    // Going down
+    // Going down (left on screen)
     if (initialOrder > targetOrder) {
       for (let i = targetOrder; i <= initialOrder; i++) {
         orderedColumns[i].order++;

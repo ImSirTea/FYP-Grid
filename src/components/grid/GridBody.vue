@@ -2,7 +2,7 @@
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
 import GridRow from "@/components/grid/GridRow.vue";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
+import { AnyWithRowIndex, rowIndex } from "@/components/grid/GridState";
 import {
   defineComponent,
   h,
@@ -22,7 +22,7 @@ export default defineComponent({
   components: { GridRow },
   props: {
     internalItems: {
-      type: Array as PropType<AnyWithGridIndex[]>,
+      type: Array as PropType<AnyWithRowIndex[]>,
       required: true,
       default: () => [],
     },
@@ -80,7 +80,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildRow = (
-      item: AnyWithGridIndex,
+      item: AnyWithRowIndex,
       index: number,
       columns: AnyGridColumn[]
     ) => {
@@ -90,7 +90,7 @@ export default defineComponent({
         },
         class: {
           "grid-row": true,
-          "grid-row-hovered": item["_grid-index"] === gridState.rowHovered,
+          "grid-row-hovered": item[rowIndex] === gridState.rowHovered,
         },
         style: {
           top: index * props.rowHeight + "px",
@@ -103,7 +103,7 @@ export default defineComponent({
         },
         nativeOn: {
           mouseenter: () => {
-            gridState.rowHovered = item["_grid-index"];
+            gridState.rowHovered = item[rowIndex];
           },
           mouseleave: () => {
             gridState.rowHovered = null;

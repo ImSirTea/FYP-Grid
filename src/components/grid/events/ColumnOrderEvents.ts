@@ -68,6 +68,10 @@ export const useColumnOrderEvents = (
     gridState.columnDragged = null;
   }
 
+  function showDragging(event: DragEvent | TouchEvent) {
+    event.preventDefault();
+  }
+
   function getDragPos(event: DragEvent | TouchEvent) {
     const eventPosition = isTouchEvent(event) ? event.touches[0] : event;
 
@@ -112,5 +116,6 @@ export const useColumnOrderEvents = (
     dragStart,
     drag,
     dragEnd,
+    showDragging,
   };
 };

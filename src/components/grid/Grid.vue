@@ -2,7 +2,11 @@
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
 import GridHeader from "@/components/grid/GridHeader.vue";
-import { AnyWithGridIndex, GridState } from "@/components/grid/GridState";
+import {
+  AnyWithRowIndex,
+  rowIndex,
+  GridState,
+} from "@/components/grid/GridState";
 import { VNode } from "vue";
 import {
   h,
@@ -64,13 +68,13 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const internalItems = computed(() =>
-      gridState.filterAndSortItems(indexedItems.value, props.gridConfiguration)
-    );
-    const indexedItems = shallowRef<AnyWithGridIndex[]>([]);
+    const internalItems = shallowRef<AnyWithRowIndex[]>([]);
+    const indexedItems = shallowRef<AnyWithRowIndex[]>([]);
+
     const gridState = reactive(
       props.gridState ?? props.gridConfiguration.defaultState
     );
+
     const gridManager = new GridManager(
       gridState as GridState,
       props.gridConfiguration
@@ -89,13 +93,32 @@ export default defineComponent({
       props.width ? props.width + "px" : "100%"
     );
 
-    const refreshItems = () => {
-      indexedItems.value = gridState.injectGridIndexes(
-        props.items.map((item) => Object.assign({}, item))
-      );
-    };
+    watch(
+      () => props.items,
+      () => {
+        indexedItems.value = gridState.injectGridIndexes(props.items);
 
-    watch(() => props.items, refreshItems, { immediate: true, deep: true });
+        internalItems.value = gridState
+          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
+          .slice();
+      },
+      { immediate: true, deep: true }
+    );
+
+    watch(
+      () => [
+        props.gridConfiguration,
+        gridState.searchValue,
+        gridState.columnStates,
+        gridState.sortOptions,
+      ],
+      () => {
+        internalItems.value = gridState
+          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
+          .slice();
+      },
+      { deep: true }
+    );
 
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
     const buildBody = () => {
@@ -141,11 +164,19 @@ export default defineComponent({
         },
         on: {
           "apply:item-changes": () => {
-            context.emit("update:items", internalItems.value);
+            context.emit(
+              "update:items",
+              internalItems.value.map((item) => {
+                delete (item as any)[rowIndex];
+                return item;
+              })
+            );
             gridState.isDirty = false;
           },
           "reset:item-changes": () => {
-            refreshItems();
+            internalItems.value = indexedItems.value.map((item) =>
+              Object.assign({}, item)
+            );
             gridState.isDirty = false;
           },
         },
@@ -214,6 +245,7 @@ export default defineComponent({
     );
 
     return {
+      gridManager: gridManager.columns,
       buildTable,
       centreBar,
       gridOffsets,

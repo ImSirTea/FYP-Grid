@@ -4,7 +4,7 @@ import GridCell from "@/components/grid/GridCell.vue";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
 import { GridManager } from "@/components/grid/GridManager";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
+import { AnyWithRowIndex } from "@/components/grid/GridState";
 
 export default defineComponent({
   name: "GridRow",
@@ -14,7 +14,7 @@ export default defineComponent({
       required: true,
     },
     item: {
-      type: Object as PropType<AnyWithGridIndex>,
+      type: Object as PropType<AnyWithRowIndex>,
       required: true,
     },
     columns: {
@@ -31,6 +31,7 @@ export default defineComponent({
       return h(GridCell, {
         style: {
           width: gridState.columnStates[column.key].width + "px",
+          "justify-content": column.alignment,
         },
         class: {
           "grid-row-cell": true,

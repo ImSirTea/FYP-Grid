@@ -4,18 +4,18 @@
 
 <script lang="ts">
 import { NumberColumn } from "@/components/grid/columns/number/NumberColumn";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
+import { AnyWithRowIndex } from "@/components/grid/GridState";
 import { defineComponent, PropType } from "@vue/composition-api";
 
 export default defineComponent({
   name: "GridNumberView",
   props: {
     item: {
-      type: Object as PropType<AnyWithGridIndex>,
+      type: Object as PropType<AnyWithRowIndex>,
       required: true,
     },
     column: {
-      type: Object as PropType<NumberColumn<AnyWithGridIndex>>,
+      type: Object as PropType<NumberColumn<AnyWithRowIndex>>,
       required: true,
     },
     value: {

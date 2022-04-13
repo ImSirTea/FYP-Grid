@@ -34,5 +34,6 @@ export class NumberColumn<T> extends AbstractColumn<
     this.setOption("defaultWidth", GridWidthEnum.SMALL);
     this.setOption("ascIcon", "mdi-sort-numeric-ascending");
     this.setOption("descIcon", "mdi-sort-numeric-descending");
+    this.setOption("defaultAlignment", "centre");
   }
 }

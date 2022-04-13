@@ -20,7 +20,7 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
-import { AnyWithGridIndex } from "@/components/grid/GridState";
+import { AnyWithRowIndex, rowIndex } from "@/components/grid/GridState";
 import {
   defineComponent,
   PropType,
@@ -32,7 +32,7 @@ export default defineComponent({
   name: "GridCell",
   props: {
     item: {
-      type: Object as PropType<AnyWithGridIndex>,
+      type: Object as PropType<AnyWithRowIndex>,
       required: true,
     },
     column: {
@@ -50,9 +50,7 @@ export default defineComponent({
       }
 
       const { rowId, columnKey } = gridState.cellEdited;
-      return (
-        rowId === props.item["_grid-index"] && columnKey === props.column.key
-      );
+      return rowId === props.item[rowIndex] && columnKey === props.column.key;
     });
 
     const internalValue = computed({
@@ -76,7 +74,7 @@ export default defineComponent({
     const onCellDoubleClick = (event: PointerEvent) => {
       if (props.column.isEditable) {
         gridState.cellEdited = {
-          rowId: props.item["_grid-index"],
+          rowId: props.item[rowIndex],
           columnKey: props.column.key,
         };
       } else {

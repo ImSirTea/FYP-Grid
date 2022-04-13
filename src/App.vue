@@ -31,7 +31,7 @@ export default defineComponent({
     let count = 0;
 
     const items = shallowRef(
-      Array(500000)
+      Array(500)
         .fill(0)
         .map((_, index) => {
           // add some variance so we can mess aboot with checking filters

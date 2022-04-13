@@ -22,7 +22,8 @@ export class SelectColumn<T> extends AbstractColumn<
 
     this.setOption("isFilterable", false);
     this.setOption("isSortable", false);
-    this.setOption("defaultWidth", GridWidthEnum.SMALL);
+    this.setOption("defaultWidth", 50);
     this.setOption("defaultPin", "left");
+    this.setOption("defaultAlignment", "centre");
   }
 }
