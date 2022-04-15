@@ -34,7 +34,7 @@ export default defineComponent({
     let count = 0;
 
     const items = shallowRef(
-      Array(1)
+      Array(500)
         .fill(0)
         .map((_, index) => {
           // add some variance so we can mess aboot with checking filters
@@ -53,7 +53,7 @@ export default defineComponent({
 
     builder
       .addNumberColumn("index", (item) => item.index)
-      .setOption("defaultPin", "left");
+      .setOptions({ defaultPin: "left" });
     builder.withSelectColumn();
     builder.addTextColumn("last1", (item) => item.last + "- 1");
     builder.addTextColumn("first2", (item) => item.first + "- 2");
@@ -88,7 +88,7 @@ export default defineComponent({
     // builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
     builder
       .addTextColumn("first1", (item) => item.first + "- 1")
-      .setOption("defaultPin", "right");
+      .setOptions({ defaultPin: "right" });
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);

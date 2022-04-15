@@ -22,7 +22,9 @@ export class TextColumn<T> extends AbstractColumn<T, string, TextOptions> {
     super(key, itemValue);
 
     // Apply defaults
-    this.setOption("ascIcon", "mdi-sort-alphabetical-ascending");
-    this.setOption("descIcon", "mdi-sort-alphabetical-descending");
+    this.setOptions({
+      ascIcon: "mdi-sort-alphabetical-ascending",
+      descIcon: "mdi-sort-alphabetical-descending",
+    });
   }
 }

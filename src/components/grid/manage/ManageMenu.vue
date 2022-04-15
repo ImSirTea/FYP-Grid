@@ -82,7 +82,7 @@ export default defineComponent({
     );
 
     const manageableColumns = computed<AnyGridColumn[]>(
-      () => gridManager.sortedColumns
+      () => gridManager.manageableColumns
     );
 
     return {

@@ -121,7 +121,7 @@ export default defineComponent({
         ? buildSortIcon(column)
         : undefined;
 
-      const resizeBar = column.options.isResizeable
+      const resizeBar = column.options.isManageable
         ? buildResizeBar(column)
         : undefined;
 
@@ -153,7 +153,13 @@ export default defineComponent({
           on: {
             // Toggle our sorting behaviours
             click: () => {
-              gridState.toggleSort(column);
+              if (column.options.isSortable) {
+                gridState.toggleSort(column);
+              }
+
+              if (column instanceof SelectColumn) {
+                gridState.selectAllRows = !gridState.selectAllRows;
+              }
             },
             // Set our drag type and data
             dragstart: (event: DragEvent) => dragStart(event, column),
@@ -180,7 +186,7 @@ export default defineComponent({
             touchend: dragEnd,
           },
           domProps: {
-            draggable: column.options.isDraggable,
+            draggable: column.options.isManageable,
           },
         },
         [headerContent, sortIcon, resizeBar]
@@ -233,11 +239,25 @@ export default defineComponent({
                 `[col-key=${column.key}][role=gridcell]`
               )
             );
+            // Largest size, plus the parent's padding, and extra for kindness
             const largestWidth = Math.max(
               ...relevantCells.map((cell) => {
-                const htmlCell = cell as HTMLElement;
-                // Total size, plus a little padding
-                return htmlCell.offsetWidth + htmlCell.offsetLeft + 10;
+                //const parentPadding = cell.parentElement.wid
+                const parentStyle = window.getComputedStyle(
+                  cell.parentElement!
+                );
+
+                // Strips out all non-number values
+                const parentPaddingLeft = Number(
+                  parentStyle.paddingLeft.replace(/\D/g, "")
+                );
+                const parentPaddingRight = Number(
+                  parentStyle.paddingLeft.replace(/\D/g, "")
+                );
+
+                return (
+                  cell.scrollWidth + parentPaddingLeft + parentPaddingRight + 1 // +1 so we aren't a tiny fraction off
+                );
               })
             );
             gridState.columnStates[column.key].width = largestWidth;

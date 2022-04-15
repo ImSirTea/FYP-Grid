@@ -26,11 +26,13 @@ export class ActionColumn<T> extends AbstractColumn<T, null, ActionOptions> {
   constructor(key: string, itemValue: ValueExtractor<T, null>) {
     super(key, itemValue);
 
-    this.setOption("isFilterable", false);
-    this.setOption("isSortable", false);
-    this.setOption("isDraggable", false);
-    this.setOption("defaultWidth", GridWidthEnum.SMALL);
-    this.setOption("defaultPin", "right");
+    this.setOptions({
+      isFilterable: false,
+      isSortable: false,
+      isManageable: false,
+      defaultWidth: GridWidthEnum.SMALL,
+      defaultPin: "right",
+    });
   }
 
   addAction(

@@ -76,16 +76,17 @@ $highlight-colour: #00aeff;
 }
 
 .grid-sort-icon:not(.grid-sort-active) {
-  display: none;
+  opacity: 0;
 }
 
 .grid-sort-icon {
+  opacity: 1;
   padding-left: 0.5ch;
 }
 
 .grid-header-cell:hover .grid-sort-icon,
 .grid-sort-active {
-  display: inline-block;
+  opacity: 1;
 }
 
 .grid-header-resize {

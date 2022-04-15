@@ -14,10 +14,14 @@ export class SelectColumn<T> extends AbstractColumn<T, boolean, SelectOptions> {
   constructor(key: string, itemValue: ValueExtractor<T, boolean>) {
     super(key, itemValue);
 
-    this.setOption("isFilterable", false);
-    this.setOption("isSortable", false);
-    this.setOption("defaultWidth", 50);
-    this.setOption("defaultPin", "left");
-    this.setOption("defaultAlignment", "centre");
+    this.setOptions({
+      isFilterable: false,
+      isSortable: false,
+      isInteractable: false,
+      isManageable: false,
+      defaultWidth: 40,
+      defaultPin: "left",
+      defaultAlignment: "centre",
+    });
   }
 }

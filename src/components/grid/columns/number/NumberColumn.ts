@@ -26,9 +26,11 @@ export class NumberColumn<T> extends AbstractColumn<T, number, NumberOptions> {
     super(key, itemValue);
 
     // Apply defaults
-    this.setOption("defaultWidth", GridWidthEnum.SMALL);
-    this.setOption("ascIcon", "mdi-sort-numeric-ascending");
-    this.setOption("descIcon", "mdi-sort-numeric-descending");
-    this.setOption("defaultAlignment", "centre");
+    this.setOptions({
+      defaultWidth: GridWidthEnum.SMALL,
+      ascIcon: "mdi-sort-numeric-ascending",
+      descIcon: "mdi-sort-numeric-descending",
+      defaultAlignment: "centre",
+    });
   }
 }

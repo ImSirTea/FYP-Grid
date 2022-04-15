@@ -28,20 +28,19 @@ export interface ColumnOptions {
   defaultHidden: boolean;
   defaultAlignment: PinTypes;
   isFilterable: boolean;
-  isDraggable: boolean;
   isSortable: boolean;
-  isResizeable: boolean;
+  isInteractable: boolean;
+  isManageable: boolean;
   ascIcon: string;
   descIcon: string;
 }
 
-// Would like to look into this, not a fan
 export type AnyGridColumn = AbstractColumn<any, any, ColumnOptions>;
 
 export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
   key: string;
   private itemValue: ValueExtractor<T, U>;
-  private boundProperty?: keyof T; //ValueEditor<T, T[key]>;
+  private boundProperty?: keyof T;
   options: Partial<O> = {};
 
   abstract renderer: VueConstructor;
@@ -51,16 +50,18 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
     this.key = key;
     this.itemValue = itemValue;
 
-    this.setOption("isFilterable", true);
-    this.setOption("isSortable", true);
-    this.setOption("isDraggable", true);
-    this.setOption("isResizeable", true);
-    this.setOption("defaultWidth", GridWidthEnum.MEDIUM);
-    this.setOption("defaultHidden", false);
-    this.setOption("defaultPin", "centre");
-    this.setOption("defaultAlignment", "left");
-    this.setOption("ascIcon", "mdi-sort-ascending");
-    this.setOption("descIcon", "mdi-sort-descending");
+    this.setOptions({
+      defaultWidth: GridWidthEnum.MEDIUM,
+      defaultPin: "centre",
+      defaultHidden: false,
+      defaultAlignment: "left",
+      isFilterable: true,
+      isSortable: true,
+      isInteractable: true,
+      isManageable: true,
+      ascIcon: "mdi-sort-ascending",
+      descIcon: "mdi-sort-descending",
+    } as Partial<O>);
   }
 
   // Create a getter function so we can override behaviours if needed, consistently
@@ -93,8 +94,8 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
     }
   }
 
-  setOption<K extends keyof O>(name: K, value: O[K]) {
-    this.options[name] = value;
+  setOptions(newOptions: Partial<O>) {
+    Object.assign(this.options, newOptions);
     return this;
   }
 

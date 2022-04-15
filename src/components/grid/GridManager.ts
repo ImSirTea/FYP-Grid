@@ -36,6 +36,12 @@ export class GridManager {
       .sort(this.sortOnOrder);
   }
 
+  get manageableColumns() {
+    return this.#gridConfiguration.columns
+      .filter((column) => column.options.isManageable)
+      .sort(this.sortOnOrder);
+  }
+
   get columns() {
     const columns: PinnedColumnGroups = {
       left: [],

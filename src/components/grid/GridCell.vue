@@ -11,8 +11,8 @@
       :item="item"
       :column="column"
       :is-editing="isEditing"
-      role="gridcell"
       :col-key="column.key"
+      role="gridcell"
     />
   </div>
 </template>

@@ -41,20 +41,18 @@ export default defineComponent({
 
     const rowIsSelected = computed({
       get: () => {
+        if (gridState.selectAllRows) {
+          return true;
+        }
+
         if (!props.item) {
           return false;
         }
 
-        return (
-          gridState.selectAllRows ||
-          gridState.selectedRowIds.includes(props.item[rowIndex])
-        );
+        return gridState.selectedRowIds.includes(props.item[rowIndex]);
       },
       set: (isSelected) => {
         if (!props.item) {
-          if (props.isHeaderRow) {
-            gridState.selectAllRows = isSelected;
-          }
           return;
         }
 
