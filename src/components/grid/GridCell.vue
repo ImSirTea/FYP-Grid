@@ -6,11 +6,11 @@
   >
     <component
       v-bind="$attrs"
-      :is="component"
+      v-model="internalValue"
+      :is="column.renderer"
       :item="item"
       :column="column"
-      :value="internalValue"
-      @input="$emit('input', $event)"
+      :is-editing="isEditing"
       role="gridcell"
       :col-key="column.key"
     />
@@ -19,7 +19,6 @@
 
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
-import { GridManager } from "@/components/grid/GridManager";
 import {
   AnyWithRowIndex,
   GridState,
@@ -46,7 +45,6 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
-    const gridManager = inject<GridManager>("gridManager")!;
 
     // Decides if we show view or edit renderers
     const isEditing = computed(() => {
@@ -62,10 +60,6 @@ export default defineComponent({
       get: () => props.column.value(props.item),
       set: (value) => context.emit("input", value),
     });
-
-    const component = computed(() =>
-      isEditing.value ? props.column.editRenderer : props.column.viewRenderer
-    );
 
     // Cells handle row clicks so they can do cell-specific actions instead of row actions if needed
     const onCellClick = (event: PointerEvent) => {
@@ -89,7 +83,6 @@ export default defineComponent({
 
     return {
       isEditing,
-      component,
       internalValue,
       onCellClick,
       onCellDoubleClick,

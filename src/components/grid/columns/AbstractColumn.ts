@@ -44,8 +44,7 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
   private boundProperty?: keyof T; //ValueEditor<T, T[key]>;
   options: Partial<O> = {};
 
-  abstract viewRenderer: VueConstructor;
-  abstract editRenderer?: VueConstructor;
+  abstract renderer: VueConstructor;
   abstract filterOptions?: FilterOptions<any>;
 
   constructor(key: string, itemValue: ValueExtractor<T, U>) {
@@ -97,10 +96,6 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
   setOption<K extends keyof O>(name: K, value: O[K]) {
     this.options[name] = value;
     return this;
-  }
-
-  setViewRenderer(newRenderer: VueConstructor<Vue>) {
-    this.viewRenderer = newRenderer;
   }
 
   bindProperty(property: keyof T) {

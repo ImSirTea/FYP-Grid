@@ -4,13 +4,13 @@ import {
   GridWidthEnum,
   ValueExtractor,
 } from "@/components/grid/columns/AbstractColumn";
-import GridActionView from "@/components/grid/columns/action/GridActionView.vue";
+import GridActionRenderer from "@/components/grid/columns/action/GridActionRenderer.vue";
 import { RawLocation } from "vue-router";
 
 /**
  * Optional and column specific properties to configure NumberColumn behaviours
  */
-export interface ActionColumnOptions extends ColumnOptions {}
+export interface ActionOptions extends ColumnOptions {}
 
 export interface ActionDefinition<T> {
   onClick?: (item: T) => void;
@@ -18,17 +18,12 @@ export interface ActionDefinition<T> {
   text: string;
 }
 
-export class ActionColumn<T> extends AbstractColumn<
-  T,
-  any,
-  ActionColumnOptions
-> {
-  public viewRenderer = GridActionView;
-  public editRenderer = undefined;
+export class ActionColumn<T> extends AbstractColumn<T, null, ActionOptions> {
+  public renderer = GridActionRenderer;
   public filterOptions = undefined;
   public actions: ActionDefinition<T>[] = [];
 
-  constructor(key: string, itemValue: ValueExtractor<T, any>) {
+  constructor(key: string, itemValue: ValueExtractor<T, null>) {
     super(key, itemValue);
 
     this.setOption("isFilterable", false);

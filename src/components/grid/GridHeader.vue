@@ -15,6 +15,7 @@ import { debounce } from "lodash";
 import { useColumnOrderEvents } from "@/components/grid/events/ColumnOrderEvents";
 import { GridState } from "@/components/grid/GridState";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { SelectColumn } from "@/components/grid/columns/select/SelectColumn";
 
 export default defineComponent({
   name: "GridHeader",
@@ -126,6 +127,11 @@ export default defineComponent({
 
       const draggedColumnKey = gridState.columnDragged?.key ?? null;
 
+      const isSelectColumn = column instanceof SelectColumn;
+      const headerContent = isSelectColumn
+        ? buildSelectCell(column)
+        : column.key;
+
       return h(
         "div",
         {
@@ -177,7 +183,7 @@ export default defineComponent({
             draggable: column.options.isDraggable,
           },
         },
-        [column.key, sortIcon, resizeBar]
+        [headerContent, sortIcon, resizeBar]
       );
     };
 
@@ -262,6 +268,12 @@ export default defineComponent({
             isResizing.value = false;
           },
         },
+      });
+    };
+
+    const buildSelectCell = (column: SelectColumn<any>) => {
+      return h(column.renderer, {
+        props: { value: gridState.selectAllRows, isHeaderRow: true },
       });
     };
 

@@ -24,10 +24,11 @@
       <!-- Value -->
       <v-col cols="12">
         <component
-          :is="column.editRenderer"
+          :is="column.renderer"
           :value="filter.value"
           :label="$tc.value"
           :rules="[required]"
+          :is-editing="true"
           dense
           @input="updateValue"
         />
@@ -43,9 +44,9 @@
           @change="updateOperator"
         >
           <v-radio
-            v-for="operator in column.filterOptions.operators"
-            :key="column.key + operator.name"
-            :label="operator.name"
+            v-for="{ name, operator } in column.filterOptions.operators"
+            :key="column.key + name"
+            :label="name"
             :value="operator"
           />
         </v-radio-group>

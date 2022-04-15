@@ -28,7 +28,7 @@ import { AnyWithRowIndex } from "@/components/grid/GridState";
 import { defineComponent, PropType, ref } from "@vue/composition-api";
 
 export default defineComponent({
-  name: "GridActionView",
+  name: "GridActionRenderer",
   inheritAttrs: false,
   props: {
     item: {

@@ -1,9 +1,9 @@
 <template>
-  <v-checkbox v-bind="$attrs" :value="internalValue" @input="updateValue" />
+  <v-checkbox v-bind="$attrs" v-model="internalValue" />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api";
+import { defineComponent, computed } from "@vue/composition-api";
 
 export default defineComponent({
   name: "CheckboxField",
@@ -19,15 +19,13 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const internalValue = ref(props.value);
-
-    const updateValue = (newValue: boolean) => {
-      context.emit("input", newValue);
-    };
+    const internalValue = computed({
+      get: () => props.value,
+      set: (newValue) => context.emit("input", newValue),
+    });
 
     return {
       internalValue,
-      updateValue,
     };
   },
 });

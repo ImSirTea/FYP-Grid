@@ -3,25 +3,19 @@ import {
   ColumnOptions,
   ValueExtractor,
 } from "@/components/grid/columns/AbstractColumn";
-import GridTextView from "@/components/grid/columns/text/GridTextView.vue";
-import GridTextEdit from "@/components/grid/columns/text/GridTextEdit.vue";
+import GridTextRenderer from "@/components/grid/columns/text/GridTextRenderer.vue";
 import TextFilterOptions from "@/components/grid/columns/text/TextFilterOptions";
 
 /**
  * Optional and column specific properties to configure TextColumn behaviours
  */
-export interface TextColumnOptions extends ColumnOptions {}
+export interface TextOptions extends ColumnOptions {}
 
 /**
  * TextColumn type, used when building grids using string fields
  */
-export class TextColumn<T> extends AbstractColumn<
-  T,
-  string,
-  TextColumnOptions
-> {
-  public viewRenderer = GridTextView;
-  public editRenderer = GridTextEdit;
+export class TextColumn<T> extends AbstractColumn<T, string, TextOptions> {
+  public renderer = GridTextRenderer;
   public filterOptions = TextFilterOptions;
 
   constructor(key: string, itemValue: ValueExtractor<T, string>) {

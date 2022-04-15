@@ -1,14 +1,13 @@
 <template>
   <v-text-field
     v-bind="$attrs"
-    :value="value"
+    v-model="internalValue"
     :type="$attrs.type || 'text'"
-    @input="updateValue"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "@vue/composition-api";
+import { defineComponent, computed } from "@vue/composition-api";
 
 export default defineComponent({
   name: "TextField",
@@ -20,15 +19,12 @@ export default defineComponent({
     },
   },
   setup(props, context) {
-    const internalValue = ref(props.value);
-
-    const updateValue = (newValue: string) => {
-      context.emit("input", newValue);
-    };
-
+    const internalValue = computed({
+      get: () => props.value,
+      set: (newValue) => context.emit("input", newValue),
+    });
     return {
       internalValue,
-      updateValue,
     };
   },
 });

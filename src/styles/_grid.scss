@@ -3,11 +3,6 @@ $hover-colour: #f4fbff;
 $border-colour: #e4e4e4;
 $highlight-colour: #00aeff;
 
-// Grid containers
-.grid-container {
-  max-width: 100%;
-}
-
 .grid-header-container {
   border-bottom: 2px solid $border-colour;
   cursor: pointer;
@@ -64,7 +59,7 @@ $highlight-colour: #00aeff;
 // Grid cells
 .grid-header-cell,
 .grid-row-cell {
-  padding-left: 0.75em;
+  padding: 0 0.5em;
   position: relative;
   display: flex;
   align-items: center;

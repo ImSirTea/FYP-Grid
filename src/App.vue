@@ -2,12 +2,14 @@
   <v-app>
     <v-main>
       <grid
+        ref="gridRef"
         v-model="items"
         :grid-configuration="builder"
         :grid-state="builder.defaultState"
         :grid-height="550"
       />
-      <v-btn @click="updateItems">Update Items</v-btn>
+      <!-- <v-btn @click="updateItems">Update Items</v-btn> -->
+      <v-btn v-if="gridRef" @click="getRows">Get Selected</v-btn>
     </v-main>
   </v-app>
 </template>
@@ -15,7 +17,7 @@
 <script lang="ts">
 import { defineComponent, shallowRef } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import Grid from "@/components/grid/Grid.vue";
+import Grid, { useGrid } from "@/components/grid/Grid.vue";
 
 interface Item {
   first: string;
@@ -28,10 +30,11 @@ export default defineComponent({
   name: "App",
   components: { Grid },
   setup(props, context) {
+    const { gridRef } = useGrid<Item>();
     let count = 0;
 
     const items = shallowRef(
-      Array(500)
+      Array(1)
         .fill(0)
         .map((_, index) => {
           // add some variance so we can mess aboot with checking filters
@@ -99,10 +102,18 @@ export default defineComponent({
         })) as Item[];
     };
 
+    const getRows = () => {
+      if (gridRef.value) {
+        console.log(gridRef.value.getSelectedRows());
+      }
+    };
+
     return {
       builder,
       items,
       updateItems,
+      gridRef,
+      getRows,
     };
   },
 });

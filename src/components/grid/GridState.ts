@@ -9,7 +9,7 @@ import { hasAllProperties } from "@/components/util/helpers";
 import { firstBy, IThenBy } from "thenby";
 import Vue from "vue";
 
-export const rowIndex = "row-index" as const;
+export const rowIndex = "rowIndex" as const;
 export type AnyWithRowIndex = { [rowIndex]: number };
 
 interface SortOptions {
@@ -44,9 +44,10 @@ export class GridState {
   } | null = null;
 
   // Have changes been made to the data
-  isDirty = false;
+  isDirty: boolean = false;
 
-  selectedRows: any[] = [];
+  selectAllRows: boolean = false;
+  selectedRowIds: AnyWithRowIndex[typeof rowIndex][] = [];
 
   get totalWidth() {
     return Object.entries(this.columnStates).reduce(
@@ -195,15 +196,27 @@ export class GridState {
   }
 
   /**
-   * TODO: This is probably wasteful
    * @param items The list of items to inject grid indexes into
    * @returns A list of items, with grid indexes injected
    */
   public injectGridIndexes(items: Record<string, any>[]) {
+    // This also doubles as creating a deep clone, as to not mess with the original items
     return items.map((item, index) => ({
       [rowIndex]: index,
       ...item,
     }));
+  }
+
+  /**
+   * @param items The list of items to remove grid indexes from
+   * @returns A list of items, with grid indexes removed
+   */
+  public removeGridIndexes(items: AnyWithRowIndex[]) {
+    return items.map((item) => {
+      const itemClone = Object.assign({}, item);
+      delete (itemClone as any)[rowIndex];
+      return itemClone;
+    });
   }
 
   /**
@@ -220,7 +233,7 @@ export class GridState {
     columnState.filterOptions.push({
       filterFunction: undefined,
       value: undefined,
-      operator: undefined,
+      operator: FilterOperator.and,
     });
   }
 

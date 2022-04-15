@@ -1,9 +1,7 @@
-And/OR connections don't highlight on first click? dunno why lmao
-
 Deleting filters doesn't correctly update the filter components
-
-Prevent swapping with actions column
 
 resize icon is sadge :( make it resize icon all time
 
 re-ordering columns is weird for pinned stuff
+
+Top cell to be selected when all rows are selected without toggle?

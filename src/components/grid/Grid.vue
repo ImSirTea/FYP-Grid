@@ -22,6 +22,18 @@ import {
 import GridBody from "@/components/grid/GridBody.vue";
 import GridControlPanel from "@/components/grid/GridControlPanel.vue";
 
+export function useGrid<T>() {
+  const gridRef = ref<GridComponent<T> | null>(null);
+
+  return {
+    gridRef,
+  };
+}
+
+export interface GridComponent<T> {
+  getSelectedRows: () => T[];
+}
+
 /**
  * Manages creating a grid with given specifications
  */
@@ -121,6 +133,19 @@ export default defineComponent({
       },
       { deep: true }
     );
+
+    // Provide a function to externally call this, so we don't keep another copy of items in memory
+    const getSelectedRows: GridComponent<any>["getSelectedRows"] = () => {
+      if (gridState.selectAllRows) {
+        return gridState.removeGridIndexes(internalItems.value);
+      }
+
+      return gridState.removeGridIndexes(
+        internalItems.value.filter((item) =>
+          gridState.selectedRowIds.includes(item[rowIndex])
+        )
+      );
+    };
 
     // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
     const buildBody = () => {
@@ -249,6 +274,7 @@ export default defineComponent({
     return {
       buildTable,
       centreBar,
+      getSelectedRows,
     };
   },
   render(): VNode {

@@ -78,7 +78,7 @@ export class GridConfiguration<T> {
   }
 
   withSelectColumn(): SelectColumn<T> {
-    this.#selectColumn = new SelectColumn<T>("", () => true);
+    this.#selectColumn = new SelectColumn<T>("", () => false);
 
     return this.#selectColumn;
   }
