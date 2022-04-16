@@ -1,5 +1,6 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
 import GridRow from "@/components/grid/GridRow.vue";
 import {
@@ -53,6 +54,8 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
+    const gridConfiguration =
+      inject<GridConfiguration<any>>("gridConfiguration")!;
     const gridManager = inject<GridManager>("gridManager")!;
     const scrollableDiv = ref<HTMLElement | null>(null);
 
@@ -81,6 +84,15 @@ export default defineComponent({
         rowsOffset.value + maximumVisibleRows.value + props.bufferRows
       ),
     }));
+
+    const gridRowData = computed(() =>
+      gridState
+        .filterAndSortItems(
+          props.internalItems.map((item) => item),
+          gridConfiguration
+        )
+        .slice(rowIndexBoundaries.value.min, rowIndexBoundaries.value.max)
+    );
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildRow = (
@@ -157,10 +169,11 @@ export default defineComponent({
       rowIndexBoundaries,
       gridManager,
       scrollableDiv,
+      gridRowData,
     };
   },
   render(): VNode {
-    const { min, max } = this.rowIndexBoundaries;
+    const { min } = this.rowIndexBoundaries;
     const { left, centre, right } = this.gridManager.columns;
 
     const { leftWidth, centreWidth, rightWidth } = this.gridManager.columnSizes;
@@ -169,25 +182,25 @@ export default defineComponent({
     const centreRows: VNode[] = [];
     const rightRows: VNode[] = [];
 
-    for (let i = min; i < max; i++) {
+    this.gridRowData.forEach((rowData, index) => {
       if (left.length)
-        leftRows.push(this.buildRow(this.internalItems[i], i, left, 0));
+        leftRows.push(this.buildRow(rowData, index + min, left, 0));
 
       if (centre.length)
         centreRows.push(
-          this.buildRow(this.internalItems[i], i, centre, left.length)
+          this.buildRow(rowData, index + min, centre, left.length)
         );
 
       if (right.length)
         rightRows.push(
           this.buildRow(
-            this.internalItems[i],
-            i,
+            rowData,
+            index + min,
             right,
             left.length + centre.length
           )
         );
-    }
+    });
 
     return h(
       "div",
