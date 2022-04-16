@@ -19,6 +19,7 @@ export class SelectColumn<T> extends AbstractColumn<T, boolean, SelectOptions> {
       isSortable: false,
       isInteractable: false,
       isManageable: false,
+      useRendererForHeader: true,
       defaultWidth: 40,
       defaultPin: "left",
       defaultAlignment: "centre",

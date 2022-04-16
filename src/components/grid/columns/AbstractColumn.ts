@@ -33,6 +33,7 @@ export interface ColumnOptions {
   isManageable: boolean;
   ascIcon: string;
   descIcon: string;
+  useRendererForHeader: boolean;
 }
 
 export type AnyGridColumn = AbstractColumn<any, any, ColumnOptions>;
@@ -61,6 +62,7 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
       isManageable: true,
       ascIcon: "mdi-sort-ascending",
       descIcon: "mdi-sort-descending",
+      useRendererForHeader: false,
     } as Partial<O>);
   }
 
