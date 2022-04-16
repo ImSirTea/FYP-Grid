@@ -42,12 +42,13 @@ export type AnyGridColumn = AbstractColumn<any, any, ColumnOptions>;
 export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
   key: string;
   private itemValue: ValueExtractor<T, U>;
-  private boundProperty?: keyof T;
   options: Partial<O> = {};
   rules: ValidationRule<U>[] = [];
 
   abstract renderer: VueConstructor;
   abstract filterOptions?: FilterOptions<any>;
+
+  valueSetter?: (item: T, value: U) => void;
 
   constructor(key: string, itemValue: ValueExtractor<T, U>) {
     this.key = key;
@@ -74,14 +75,19 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
   }
 
   setValue(item: T, value: U) {
-    if (this.isEditable) {
-      const propertyName = this.boundProperty!.toString();
-      item[propertyName] = value;
+    if (this.valueSetter) {
+      this.valueSetter(item, value);
     }
   }
 
+  setValueSetter(setter: (item: T, value: U) => void) {
+    this.valueSetter = setter;
+
+    return this;
+  }
+
   get isEditable() {
-    return !!this.boundProperty;
+    return !!this.valueSetter;
   }
 
   get alignment() {
@@ -100,11 +106,6 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
 
   setOptions(newOptions: Partial<O>) {
     Object.assign(this.options, newOptions);
-    return this;
-  }
-
-  bindProperty(property: keyof T) {
-    this.boundProperty = property;
     return this;
   }
 

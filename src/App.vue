@@ -25,6 +25,10 @@ interface Item {
   last: string;
   age: number;
   index: number;
+  address: {
+    postcode: string;
+    addressLine1: string;
+  };
 }
 
 export default defineComponent({
@@ -37,7 +41,7 @@ export default defineComponent({
     const items = shallowRef(
       Array(1000)
         .fill(0)
-        .map((_, index) => {
+        .map((_, index): Item => {
           // add some variance so we can mess aboot with checking filters
           index % 20 === 0 ? count++ : null;
 
@@ -46,8 +50,12 @@ export default defineComponent({
             first: `Adam${index % 20}`,
             last: `Lansley${index % 20}`,
             age: (index % 20) + count,
+            address: {
+              postcode: `PO${index % 20} 000`,
+              addressLine1: "Address Line 1",
+            },
           };
-        }) as Item[]
+        })
     );
 
     const builder = new GridConfiguration<Item>();
@@ -63,14 +71,24 @@ export default defineComponent({
     builder.addTextColumn("last3", (item) => item.last + "- 3");
     builder.addTextColumn("first4", (item) => item.first + "- 4");
     builder.addTextColumn("last4", (item) => item.last + "- 4");
-    builder.addTextColumn("first5", (item) => item.first + "- 5");
-    builder.addTextColumn("last5", (item) => item.last + "- 5");
+    builder
+      .addTextColumn("postcode", (item) => item.address.postcode)
+      .setValueSetter((item, value) => {
+        item.address.postcode = value;
+      });
+    builder
+      .addTextColumn("addressline1", (item) => item.address.addressLine1)
+      .setValueSetter((item, value) => {
+        item.address.addressLine1 = value;
+      });
     builder.addTextColumn("wide", (item) =>
       (item.first + " " + item.last + " ").repeat(8)
     );
     builder
       .addNumberColumn("age", (item) => item.age)
-      .bindProperty("age")
+      .setValueSetter((item, value) => {
+        item.age = value;
+      })
       .addRules([numberInRange(0, 100)]);
     builder.addTextColumn(
       "updated",
