@@ -5,14 +5,12 @@
     @dblclick="onCellDoubleClick"
   >
     <component
-      v-bind="$attrs"
       v-model="internalValue"
       :is="column.renderer"
       :item="item"
       :column="column"
       :is-editing="isEditing"
       :col-key="column.key"
-      role="gridcell"
     />
   </div>
 </template>

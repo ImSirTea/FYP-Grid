@@ -78,6 +78,10 @@ export default defineComponent({
           {
             class: "grid-column-wrapper",
             style: { width: leftWidth + "px", "min-width": leftWidth + "px" },
+            attrs: {
+              role: "row",
+              "aria-rowindex": 1,
+            },
           },
           leftCells
         ),
@@ -86,6 +90,9 @@ export default defineComponent({
           {
             ref: "scrollableDiv",
             class: "grid-column-cropper",
+            attrs: {
+              role: "presentation",
+            },
           },
           [
             h(
@@ -94,6 +101,10 @@ export default defineComponent({
                 class: "grid-column-wrapper",
                 style: {
                   width: centreWidth + "px",
+                },
+                attrs: {
+                  role: "row",
+                  "aria-rowindex": 1,
                 },
               },
               centreCells
@@ -108,6 +119,10 @@ export default defineComponent({
               width: rightWidth + "px",
               "min-width": rightWidth + "px",
               "margin-right": "17px",
+            },
+            attrs: {
+              role: "row",
+              "aria-rowindex": 1,
             },
           },
           rightCells
@@ -324,6 +339,9 @@ export default defineComponent({
         },
         style: {
           height: this.rowHeight + "px",
+        },
+        attrs: {
+          role: "rowgroup",
         },
       },
       [this.buildHeaderRow()]

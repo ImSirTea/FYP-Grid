@@ -9,16 +9,16 @@ import { GridConfiguration } from "@/components/grid/GridConfiguration";
 export default defineComponent({
   name: "GridRow",
   props: {
-    index: {
-      type: Number,
-      required: true,
-    },
     item: {
       type: Object as PropType<AnyWithRowIndex>,
       required: true,
     },
     columns: {
       type: Array as PropType<AnyGridColumn[]>,
+      required: true,
+    },
+    columnStartIndex: {
+      type: Number,
       required: true,
     },
   },
@@ -28,7 +28,7 @@ export default defineComponent({
     const gridState = inject<GridState>("gridState")!;
 
     // ONLY USE IN CONTEXT OF RENDERING
-    const buildCell = (column: AnyGridColumn) => {
+    const buildCell = (column: AnyGridColumn, columnIndex: number) => {
       return h(GridCell, {
         style: {
           width: gridState.columnStates[column.key].width + "px",
@@ -44,6 +44,10 @@ export default defineComponent({
             column.setValue(props.item, value);
             gridState.isDirty = true;
           },
+        },
+        attrs: {
+          role: "gridcell",
+          tabindex: props.columnStartIndex + columnIndex,
         },
       });
     };
@@ -66,7 +70,7 @@ export default defineComponent({
           props: { to: this.gridConfiguration.rowRoute(this.item) },
           class: { "grid-row-clickable": isRowClickable },
         },
-        this.columns.map((column) => this.buildCell(column))
+        this.columns.map((column, index) => this.buildCell(column, index))
       );
     }
 
@@ -86,7 +90,7 @@ export default defineComponent({
           },
         },
       },
-      this.columns.map((column) => this.buildCell(column))
+      this.columns.map((column, index) => this.buildCell(column, index))
     );
   },
 });

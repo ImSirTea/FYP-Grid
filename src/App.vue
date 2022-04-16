@@ -82,9 +82,9 @@ export default defineComponent({
         `redirect to /actionRoute/index/{index}`,
         (item) => `/actionRoute/index/${item.index}`
       );
-    builder.withRowAction((item) =>
-      console.log(`/rowRoute/index/${item.index}`)
-    );
+    // builder.withRowAction((item) =>
+    //   console.log(`/rowRoute/index/${item.index}`)
+    // );
     // builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
     builder
       .addTextColumn("first1", (item) => item.first + "- 1")

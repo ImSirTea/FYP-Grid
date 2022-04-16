@@ -252,6 +252,10 @@ export default defineComponent({
         {
           class: "grid-container",
           style: { width: totalGridWidth.value },
+          attrs: {
+            role: "grid",
+            "aria-rowcount": props.items.length + 1, // +1 For the header
+          },
         },
         [
           buildControlPanel(),

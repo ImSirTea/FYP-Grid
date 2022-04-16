@@ -86,11 +86,13 @@ export default defineComponent({
     const buildRow = (
       item: AnyWithRowIndex,
       index: number,
-      columns: AnyGridColumn[]
+      columns: AnyGridColumn[],
+      columnStartIndex: number
     ) => {
       return h(GridRow, {
         attrs: {
           role: "row",
+          "aria-rowindex": index + 1,
         },
         class: {
           "grid-row": true,
@@ -102,12 +104,12 @@ export default defineComponent({
         },
         props: {
           item,
-          index,
           columns,
+          columnStartIndex,
         },
         nativeOn: {
           mouseenter: () => {
-            gridState.rowHovered = item[rowIndex];
+            gridState.rowHovered = item[index];
           },
           mouseleave: () => {
             gridState.rowHovered = null;
@@ -169,13 +171,22 @@ export default defineComponent({
 
     for (let i = min; i < max; i++) {
       if (left.length)
-        leftRows.push(this.buildRow(this.internalItems[i], i, left));
+        leftRows.push(this.buildRow(this.internalItems[i], i, left, 0));
 
       if (centre.length)
-        centreRows.push(this.buildRow(this.internalItems[i], i, centre));
+        centreRows.push(
+          this.buildRow(this.internalItems[i], i, centre, left.length)
+        );
 
       if (right.length)
-        rightRows.push(this.buildRow(this.internalItems[i], i, right));
+        rightRows.push(
+          this.buildRow(
+            this.internalItems[i],
+            i,
+            right,
+            left.length + centre.length
+          )
+        );
     }
 
     return h(
@@ -188,6 +199,9 @@ export default defineComponent({
         on: {
           scroll: this.gridTopScroll,
         },
+        attrs: {
+          role: "presentation",
+        },
       },
       [
         h(
@@ -197,6 +211,9 @@ export default defineComponent({
               height: this.totalGridHeight + "px",
               width: leftWidth + "px",
               "min-width": leftWidth + "px",
+            },
+            attrs: {
+              role: "rowgroup",
             },
           },
           leftRows
@@ -209,6 +226,9 @@ export default defineComponent({
               height: this.totalGridHeight + "px",
               width: centreWidth + "px",
             },
+            attrs: {
+              role: "presentation",
+            },
           },
           [
             h(
@@ -219,11 +239,11 @@ export default defineComponent({
                 style: {
                   height: this.totalGridHeight + "px",
                 },
-                attrs: {
-                  role: "grid",
-                },
                 on: {
                   scroll: this.gridLeftScroll,
+                },
+                attrs: {
+                  role: "rowgroup",
                 },
               },
               centreRows
@@ -237,6 +257,9 @@ export default defineComponent({
               height: this.totalGridHeight + "px",
               width: rightWidth + "px",
               "min-width": rightWidth + "px",
+            },
+            attrs: {
+              role: "rowgroup",
             },
           },
           rightRows
