@@ -13,6 +13,7 @@
       :col-key="column.key"
       @input="updateValue"
     />
+    <div v-if="cellErrors.length" class="grid-row-validation-error"></div>
   </div>
 </template>
 
@@ -47,6 +48,11 @@ export default defineComponent({
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
     const internalValue = ref(props.column.value(props.item));
+    const cellErrors = computed(() =>
+      props.column.rules
+        .map((rule) => rule(internalValue.value))
+        .filter((ruleResult) => ruleResult !== true)
+    );
 
     // Decides if we show view or edit renderers
     const isEditing = computed(() => {
@@ -67,6 +73,7 @@ export default defineComponent({
       }
     };
 
+    // TODO: Add mobile support for dbl click
     const onCellDoubleClick = (event: PointerEvent) => {
       if (props.column.isEditable) {
         gridState.cellEdited = {
@@ -82,6 +89,7 @@ export default defineComponent({
       props.column.setValue(props.item, newValue);
       internalValue.value = newValue;
       gridState.isDirty = true;
+      validateCell();
     };
 
     // Make sure we're always updating on item change
@@ -93,12 +101,22 @@ export default defineComponent({
       { deep: true }
     );
 
+    const validateCell = () => {
+      // If we have errors, add them to our global record so we can prevent saving, or remove if not
+      if (cellErrors.value.length) {
+        gridState.addCellError(props.item[rowIndex], props.column.key);
+      } else {
+        gridState.removeCellError(props.item[rowIndex], props.column.key);
+      }
+    };
+
     return {
       isEditing,
       internalValue,
       updateValue,
       onCellClick,
       onCellDoubleClick,
+      cellErrors,
     };
   },
 });

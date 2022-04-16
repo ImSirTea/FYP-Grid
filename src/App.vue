@@ -18,6 +18,7 @@
 import { defineComponent, shallowRef } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid, { useGrid } from "@/components/grid/Grid.vue";
+import { numberInRange } from "@/components/util/rules";
 
 interface Item {
   first: string;
@@ -34,7 +35,7 @@ export default defineComponent({
     let count = 0;
 
     const items = shallowRef(
-      Array(500)
+      Array(1000)
         .fill(0)
         .map((_, index) => {
           // add some variance so we can mess aboot with checking filters
@@ -67,7 +68,10 @@ export default defineComponent({
     builder.addTextColumn("wide", (item) =>
       (item.first + " " + item.last + " ").repeat(8)
     );
-    builder.addNumberColumn("age", (item) => item.age).bindProperty("age");
+    builder
+      .addNumberColumn("age", (item) => item.age)
+      .bindProperty("age")
+      .addRules([numberInRange(0, 100)]);
     builder.addTextColumn(
       "updated",
       (item) => "updated" + item.index + item.first

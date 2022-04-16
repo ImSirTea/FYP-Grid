@@ -6,11 +6,17 @@ import {
 import { FilterOperator, FilterOption } from "@/components/grid/filters/types";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { hasAllProperties } from "@/components/util/helpers";
-import { firstBy, IThenBy } from "thenby";
+import { firstBy } from "thenby";
 import Vue from "vue";
 
 export const rowIndex = "rowIndex" as const;
 export type AnyWithRowIndex = { [rowIndex]: number };
+
+interface GridCellsWithErrors {
+  [rowIndex: number]: {
+    [columnKey: string]: boolean;
+  };
+}
 
 interface SortOptions {
   column: AnyGridColumn;
@@ -29,7 +35,7 @@ interface ColumnState {
 export class GridState {
   public searchValue: string = "";
   public sortOptions: SortOptions[] = [];
-  private sortFunction: IThenBy<AnyWithRowIndex> = firstBy(rowIndex);
+  private sortFunction = firstBy(rowIndex);
   columnStates: Record<string, ColumnState> = {};
   // Can't rely on :hover as our rows aren't all in the same row due to pins
   rowHovered: AnyWithRowIndex[typeof rowIndex] | null = null;
@@ -48,6 +54,8 @@ export class GridState {
 
   selectAllRows: boolean = false;
   selectedRowIds: AnyWithRowIndex[typeof rowIndex][] = [];
+
+  rowCellsWithErrors: GridCellsWithErrors = {};
 
   get totalWidth() {
     return Object.entries(this.columnStates).reduce(
@@ -358,5 +366,37 @@ export class GridState {
     }
 
     return true;
+  }
+
+  /**
+   * Adds a cell to our object of known validation errors
+   * @param index The row index of the erroring cell
+   * @param key The column key of the erroring cell
+   */
+  addCellError(index: number, key: string) {
+    const existingErrorForRow = this.rowCellsWithErrors[index];
+
+    if (!existingErrorForRow) {
+      this.rowCellsWithErrors[index] = {};
+    }
+
+    this.rowCellsWithErrors[index][key] = true;
+  }
+
+  /**
+   * Removes a cell from our object of known validation errors
+   * @param index The row index of the erroring cell
+   * @param key The column key of the erroring cell
+   */
+  removeCellError(index: number, key: string) {
+    const existingErrorForRow = this.rowCellsWithErrors[index];
+
+    if (existingErrorForRow) {
+      delete this.rowCellsWithErrors[index][key];
+
+      if (Object.entries(this.rowCellsWithErrors[index]).length === 0) {
+        delete this.rowCellsWithErrors[index];
+      }
+    }
   }
 }

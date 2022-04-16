@@ -3,7 +3,11 @@ import { VNode } from "vue";
 import GridRowCell from "@/components/grid/GridRowCell.vue";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
-import { AnyWithRowIndex, GridState } from "@/components/grid/GridState";
+import {
+  AnyWithRowIndex,
+  GridState,
+  rowIndex,
+} from "@/components/grid/GridState";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 
 export default defineComponent({
@@ -75,6 +79,7 @@ export default defineComponent({
       {
         class: {
           "grid-row-clickable": isRowClickable,
+          "grid-row-hovered": this.item[rowIndex] === this.gridState.rowHovered,
         },
         on: {
           click: () => {

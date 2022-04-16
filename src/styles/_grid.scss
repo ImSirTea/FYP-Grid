@@ -141,3 +141,13 @@ $highlight-colour: #00aeff;
 .grid-cell-editing {
   border: 2px solid $highlight-colour;
 }
+
+.grid-row-validation-error {
+  width: 1.5em;
+  height: 1.5em;
+  position: absolute;
+  top: -0.75em;
+  right: -0.75em;
+  background-color: red;
+  transform: rotate(45deg);
+}

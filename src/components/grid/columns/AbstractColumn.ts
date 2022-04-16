@@ -1,4 +1,5 @@
 import { FilterOptions } from "@/components/grid/filters/types";
+import { ValidationRule } from "@/components/util/rules";
 import { VueConstructor } from "vue";
 
 /** General Types */
@@ -43,6 +44,7 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
   private itemValue: ValueExtractor<T, U>;
   private boundProperty?: keyof T;
   options: Partial<O> = {};
+  rules: ValidationRule<U>[] = [];
 
   abstract renderer: VueConstructor;
   abstract filterOptions?: FilterOptions<any>;
@@ -103,5 +105,11 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
 
   bindProperty(property: keyof T) {
     this.boundProperty = property;
+    return this;
+  }
+
+  addRules(rules: ValidationRule<U>[]) {
+    this.rules.push(...rules);
+    return this;
   }
 }

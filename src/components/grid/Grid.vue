@@ -81,6 +81,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const internalItems = shallowRef<AnyWithRowIndex[]>([]);
+    const indexedItems = shallowRef<AnyWithRowIndex[]>([]);
 
     const gridState = reactive(
       props.gridState ?? props.gridConfiguration.defaultState
@@ -109,7 +110,23 @@ export default defineComponent({
     watch(
       () => props.items,
       () => {
-        internalItems.value = gridState.injectGridIndexes(props.items);
+        indexedItems.value = gridState.injectGridIndexes(props.items);
+      },
+      { immediate: true, deep: true }
+    );
+
+    watch(
+      () => [
+        indexedItems.value,
+        gridState.columnStates,
+        gridState.sortOptions,
+        gridState.searchValue,
+      ],
+      () => {
+        internalItems.value = gridState.filterAndSortItems(
+          indexedItems.value,
+          props.gridConfiguration
+        );
       },
       { immediate: true, deep: true }
     );
@@ -171,6 +188,19 @@ export default defineComponent({
         },
         on: {
           "apply:item-changes": () => {
+            const existingErrors = Object.entries(gridState.rowCellsWithErrors);
+
+            // If we have errors, scroll to them instead of pushing our changes
+            if (existingErrors.length) {
+              const [rowNumber] = existingErrors[0];
+              gridOffsets.top = Math.max(
+                0,
+                Number(rowNumber) * props.rowHeight - props.gridHeight
+              );
+              return;
+            }
+
+            // Otherwise just push our errors up
             context.emit(
               "update:items",
               internalItems.value.map((item) => {
@@ -182,6 +212,7 @@ export default defineComponent({
           },
           "reset:item-changes": () => {
             internalItems.value = gridState.injectGridIndexes(props.items);
+            gridState.rowCellsWithErrors = {};
             gridState.isDirty = false;
           },
         },

@@ -57,7 +57,8 @@ export default defineComponent({
     const gridConfiguration =
       inject<GridConfiguration<any>>("gridConfiguration")!;
     const gridManager = inject<GridManager>("gridManager")!;
-    const scrollableDiv = ref<HTMLElement | null>(null);
+    const horizontalScrollableDiv = ref<HTMLElement | null>(null);
+    const verticalScrollableDiv = ref<HTMLElement | null>(null);
 
     // Total height of all rows, used for scrolling
     const totalGridHeight = computed((): number => {
@@ -85,15 +86,6 @@ export default defineComponent({
       ),
     }));
 
-    const gridRowData = computed(() =>
-      gridState
-        .filterAndSortItems(
-          props.internalItems.map((item) => item),
-          gridConfiguration
-        )
-        .slice(rowIndexBoundaries.value.min, rowIndexBoundaries.value.max)
-    );
-
     // ONLY USE IN CONTEXT OF RENDERING
     const buildRow = (
       item: AnyWithRowIndex,
@@ -108,7 +100,6 @@ export default defineComponent({
         },
         class: {
           "grid-row": true,
-          "grid-row-hovered": item[rowIndex] === gridState.rowHovered,
         },
         style: {
           top: index * props.rowHeight + "px",
@@ -154,8 +145,21 @@ export default defineComponent({
     watch(
       () => props.gridOffsetLeft,
       () => {
-        if (scrollableDiv.value) {
-          scrollableDiv.value.scrollTo({ left: props.gridOffsetLeft });
+        if (horizontalScrollableDiv.value) {
+          horizontalScrollableDiv.value.scrollTo({
+            left: props.gridOffsetLeft,
+          });
+        }
+      }
+    );
+
+    watch(
+      () => props.gridOffsetTop,
+      () => {
+        if (verticalScrollableDiv.value) {
+          verticalScrollableDiv.value.scrollTo({
+            top: props.gridOffsetTop,
+          });
         }
       }
     );
@@ -168,12 +172,12 @@ export default defineComponent({
       totalGridHeight,
       rowIndexBoundaries,
       gridManager,
-      scrollableDiv,
-      gridRowData,
+      horizontalScrollableDiv,
+      verticalScrollableDiv,
     };
   },
   render(): VNode {
-    const { min } = this.rowIndexBoundaries;
+    const { min, max } = this.rowIndexBoundaries;
     const { left, centre, right } = this.gridManager.columns;
 
     const { leftWidth, centreWidth, rightWidth } = this.gridManager.columnSizes;
@@ -182,7 +186,7 @@ export default defineComponent({
     const centreRows: VNode[] = [];
     const rightRows: VNode[] = [];
 
-    this.gridRowData.forEach((rowData, index) => {
+    this.internalItems.slice(min, max).forEach((rowData, index) => {
       if (left.length)
         leftRows.push(this.buildRow(rowData, index + min, left, 0));
 
@@ -205,6 +209,7 @@ export default defineComponent({
     return h(
       "div",
       {
+        ref: "verticalScrollableDiv",
         class: "grid-row-container",
         style: {
           height: this.gridHeight + "px",
@@ -247,7 +252,7 @@ export default defineComponent({
             h(
               "div",
               {
-                ref: "scrollableDiv",
+                ref: "horizontalScrollableDiv",
                 class: "grid-row-center-wrapper",
                 style: {
                   height: this.totalGridHeight + "px",
