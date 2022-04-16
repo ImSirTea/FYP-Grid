@@ -32,7 +32,7 @@ $highlight-colour: #00aeff;
   position: absolute;
 }
 
-[role=gridcell] {
+[role=gridcell] > * {
   overflow: hidden;
   text-overflow: ellipsis
 }
@@ -98,10 +98,6 @@ $highlight-colour: #00aeff;
   top: 0;
   right: 0;
   bottom: 0;
-}
-
-.grid-resizing  * {
-  cursor: e-resize !important;
 }
 
 .grid-column-cropper {
