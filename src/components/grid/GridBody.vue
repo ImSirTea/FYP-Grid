@@ -1,6 +1,7 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
+import { GridData } from "@/components/grid/GridData";
 import GridRow from "@/components/grid/GridRow.vue";
 import {
   AnyWithRowIndex,
@@ -17,6 +18,7 @@ import {
   ref,
 } from "@vue/composition-api";
 import { VNode } from "vue";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
 
 /**
  * Container for all grid rows, handling scroll events, offsets, and rendering
@@ -53,8 +55,16 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
+    const gridConfiguration =
+      inject<GridConfiguration<any>>("gridConfiguration")!;
     const gridManager = inject<GridManager>("gridManager")!;
     const scrollableDiv = ref<HTMLElement | null>(null);
+    const gridData = new GridData(
+      gridConfiguration,
+      gridState,
+      props.internalItems,
+      props.rowHeight
+    );
 
     // Total height of all rows, used for scrolling
     const totalGridHeight = computed((): number => {
@@ -81,42 +91,6 @@ export default defineComponent({
         rowsOffset.value + maximumVisibleRows.value + props.bufferRows
       ),
     }));
-
-    // ONLY USE IN CONTEXT OF RENDERING
-    const buildRow = (
-      item: AnyWithRowIndex,
-      index: number,
-      columns: AnyGridColumn[],
-      columnStartIndex: number
-    ) => {
-      return h(GridRow, {
-        attrs: {
-          role: "row",
-          "aria-rowindex": index + 1,
-        },
-        class: {
-          "grid-row": true,
-          "grid-row-hovered": item[rowIndex] === gridState.rowHovered,
-        },
-        style: {
-          top: index * props.rowHeight + "px",
-          height: props.rowHeight + "px",
-        },
-        props: {
-          item,
-          columns,
-          columnStartIndex,
-        },
-        nativeOn: {
-          mouseenter: () => {
-            gridState.rowHovered = item[index];
-          },
-          mouseleave: () => {
-            gridState.rowHovered = null;
-          },
-        },
-      });
-    };
 
     // Manages scroll events passthrough
     const gridTopScroll = (e: Event) => {
@@ -149,7 +123,6 @@ export default defineComponent({
     );
 
     return {
-      buildRow,
       gridTopScroll,
       gridLeftScroll,
       rowsOffset,
@@ -157,37 +130,13 @@ export default defineComponent({
       rowIndexBoundaries,
       gridManager,
       scrollableDiv,
+      gridData,
     };
   },
   render(): VNode {
     const { min, max } = this.rowIndexBoundaries;
-    const { left, centre, right } = this.gridManager.columns;
-
     const { leftWidth, centreWidth, rightWidth } = this.gridManager.columnSizes;
-
-    const leftRows: VNode[] = [];
-    const centreRows: VNode[] = [];
-    const rightRows: VNode[] = [];
-
-    for (let i = min; i < max; i++) {
-      if (left.length)
-        leftRows.push(this.buildRow(this.internalItems[i], i, left, 0));
-
-      if (centre.length)
-        centreRows.push(
-          this.buildRow(this.internalItems[i], i, centre, left.length)
-        );
-
-      if (right.length)
-        rightRows.push(
-          this.buildRow(
-            this.internalItems[i],
-            i,
-            right,
-            left.length + centre.length
-          )
-        );
-    }
+    const { left, centre, right } = this.gridData.buildBodyRows(min, max);
 
     return h(
       "div",
@@ -216,7 +165,7 @@ export default defineComponent({
               role: "rowgroup",
             },
           },
-          leftRows
+          left
         ),
         h(
           "div",
@@ -246,7 +195,7 @@ export default defineComponent({
                   role: "rowgroup",
                 },
               },
-              centreRows
+              centre
             ),
           ]
         ),
@@ -262,7 +211,7 @@ export default defineComponent({
               role: "rowgroup",
             },
           },
-          rightRows
+          right
         ),
       ]
     );
