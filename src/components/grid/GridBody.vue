@@ -54,8 +54,6 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
-    const gridConfiguration =
-      inject<GridConfiguration<any>>("gridConfiguration")!;
     const gridManager = inject<GridManager>("gridManager")!;
     const horizontalScrollableDiv = ref<HTMLElement | null>(null);
     const verticalScrollableDiv = ref<HTMLElement | null>(null);

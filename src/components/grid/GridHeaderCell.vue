@@ -23,14 +23,12 @@
       {{ column.key }}
     </template>
     <!-- Sorting Icon -->
-    <v-icon
-      v-if="column.options.isSortable"
-      :class="sortingState.classes"
-      small
-    >
-      {{ sortingState.icon }}
+    <template v-if="column.options.isSortable">
+      <v-icon :class="sortingState.classes" small>
+        {{ sortingState.icon }}
+      </v-icon>
       <sup class="grid-sorting-index">{{ sortingState.index }}</sup>
-    </v-icon>
+    </template>
     <!-- Resize bar -->
     <grid-header-resize
       v-if="column.options.isManageable"

@@ -8,6 +8,7 @@ import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { hasAllProperties } from "@/components/util/helpers";
 import { firstBy } from "thenby";
 import Vue from "vue";
+import { cloneDeep } from "lodash";
 
 export const rowIndex = "rowIndex" as const;
 export type AnyWithRowIndex = { [rowIndex]: number };
@@ -207,12 +208,15 @@ export class GridState {
    * @param items The list of items to inject grid indexes into
    * @returns A list of items, with grid indexes injected
    */
-  public injectGridIndexes(items: Record<string, any>[]) {
+  public injectGridIndexes(items: Record<string, any>[]): AnyWithRowIndex[] {
     // This also doubles as creating a deep clone, as to not mess with the original items
-    return items.map((item, index) => ({
-      [rowIndex]: index,
-      ...item,
-    }));
+
+    return items.map((item, index) => {
+      const newItem = cloneDeep(item);
+      newItem[rowIndex] = index;
+
+      return newItem as AnyWithRowIndex;
+    });
   }
 
   /**
