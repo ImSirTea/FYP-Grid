@@ -172,7 +172,13 @@ export default defineComponent({
                 gridState.toggleSort(column);
               }
 
+              // TODO: Would be nice to have some way of setting this behaviour as part of the header cell
               if (column instanceof SelectColumn) {
+                // Reset all selected for convenience
+                if (gridState.selectAllRows) {
+                  gridState.selectedRowIds.length = 0;
+                }
+
                 gridState.selectAllRows = !gridState.selectAllRows;
               }
             },

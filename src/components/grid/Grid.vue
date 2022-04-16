@@ -81,7 +81,6 @@ export default defineComponent({
   },
   setup(props, context) {
     const internalItems = shallowRef<AnyWithRowIndex[]>([]);
-    const indexedItems = shallowRef<AnyWithRowIndex[]>([]);
 
     const gridState = reactive(
       props.gridState ?? props.gridConfiguration.defaultState
@@ -110,28 +109,9 @@ export default defineComponent({
     watch(
       () => props.items,
       () => {
-        indexedItems.value = gridState.injectGridIndexes(props.items);
-
-        internalItems.value = gridState
-          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
-          .slice();
+        internalItems.value = gridState.injectGridIndexes(props.items);
       },
       { immediate: true, deep: true }
-    );
-
-    watch(
-      () => [
-        props.gridConfiguration,
-        gridState.searchValue,
-        gridState.columnStates,
-        gridState.sortOptions,
-      ],
-      () => {
-        internalItems.value = gridState
-          .filterAndSortItems(indexedItems.value, props.gridConfiguration)
-          .slice();
-      },
-      { deep: true }
     );
 
     // Provide a function to externally call this, so we don't keep another copy of items in memory
@@ -201,9 +181,7 @@ export default defineComponent({
             gridState.isDirty = false;
           },
           "reset:item-changes": () => {
-            internalItems.value = indexedItems.value.map((item) =>
-              Object.assign({}, item)
-            );
+            internalItems.value = gridState.injectGridIndexes(props.items);
             gridState.isDirty = false;
           },
         },
