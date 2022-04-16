@@ -1,6 +1,6 @@
 <script lang="ts">
 import { VNode } from "vue";
-import GridCell from "@/components/grid/GridCell.vue";
+import GridRowCell from "@/components/grid/GridRowCell.vue";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { AnyWithRowIndex, GridState } from "@/components/grid/GridState";
@@ -29,7 +29,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn, columnIndex: number) => {
-      return h(GridCell, {
+      return h(GridRowCell, {
         style: {
           width: gridState.columnStates[column.key].width + "px",
           "justify-content": column.alignment,
@@ -39,12 +39,6 @@ export default defineComponent({
           "grid-column-dragged": gridState.columnDragged?.key === column.key,
         },
         props: { item: props.item, column },
-        on: {
-          input: (value) => {
-            column.setValue(props.item, value);
-            gridState.isDirty = true;
-          },
-        },
         attrs: {
           role: "gridcell",
           tabindex: props.columnStartIndex + columnIndex,
