@@ -29,6 +29,7 @@ import {
   computed,
   inject,
   ref,
+  watch,
 } from "@vue/composition-api";
 
 export default defineComponent({
@@ -82,6 +83,15 @@ export default defineComponent({
       internalValue.value = newValue;
       gridState.isDirty = true;
     };
+
+    // Make sure we're always updating on item change
+    watch(
+      () => props.item,
+      () => {
+        internalValue.value = props.column.value(props.item);
+      },
+      { deep: true }
+    );
 
     return {
       isEditing,
