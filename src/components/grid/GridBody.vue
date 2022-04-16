@@ -121,7 +121,7 @@ export default defineComponent({
         },
         nativeOn: {
           mouseenter: () => {
-            gridState.rowHovered = item[index];
+            gridState.rowHovered = item[rowIndex];
           },
           mouseleave: () => {
             gridState.rowHovered = null;
