@@ -24,30 +24,23 @@
 
     <!-- Build all of our filter controls -->
     <v-expansion-panels accordion flat multiple>
-      <v-expansion-panel
-        v-for="column in filterableColumns"
-        :key="column.definition.key"
-      >
+      <v-expansion-panel v-for="column in filterableColumns" :key="column.key">
         <v-expansion-panel-header>
           <v-container class="pa-0" fluid>
             <v-row align="center" no-gutters>
               <v-col cols="auto">
-                {{ column.definition.key }}
+                {{ column.key }}
               </v-col>
               <v-col class="pl-2" cols="auto">
-                <v-chip
-                  small
-                  pill
-                  v-if="numberOfFiltersForColumn(column.definition)"
-                >
-                  {{ numberOfFiltersForColumn(column.definition) }}
+                <v-chip small pill v-if="numberOfFiltersForColumn(column)">
+                  {{ numberOfFiltersForColumn(column) }}
                 </v-chip>
               </v-col>
             </v-row>
           </v-container>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <filter-group :column="column.definition" />
+          <filter-group :column="column" />
         </v-expansion-panel-content>
         <v-divider />
       </v-expansion-panel>
@@ -78,14 +71,7 @@ export default defineComponent({
     const gridState = inject<GridState>("gridState")!;
     const gridManager = inject<GridManager>("gridManager")!;
 
-    const filterableColumns = computed(() => {
-      const { left, centre, right } = gridManager.columns;
-
-      return left
-        .concat(centre)
-        .concat(right)
-        .filter((column) => column.definition.options.isFilterable);
-    });
+    const filterableColumns = computed(() => gridManager.filterableColumns);
 
     return {
       toggleMenu: (isVisible) => context.emit("input", isVisible),

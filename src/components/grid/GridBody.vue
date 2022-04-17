@@ -184,24 +184,12 @@ export default defineComponent({
 
     this.internalItems.slice(min, max).forEach((rowData, index) => {
       if (left.length) {
-        leftRows.push(
-          this.buildRow(
-            rowData,
-            index + min,
-            left.map((column) => column.definition),
-            0
-          )
-        );
+        leftRows.push(this.buildRow(rowData, index + min, left, 0));
       }
 
       if (centre.length) {
         centreRows.push(
-          this.buildRow(
-            rowData,
-            index + min,
-            centre.map((column) => column.definition),
-            left.length
-          )
+          this.buildRow(rowData, index + min, centre, left.length)
         );
       }
 
@@ -210,7 +198,7 @@ export default defineComponent({
           this.buildRow(
             rowData,
             index + min,
-            right.map((column) => column.definition),
+            right,
             left.length + centre.length
           )
         );

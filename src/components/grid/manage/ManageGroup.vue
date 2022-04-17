@@ -46,22 +46,7 @@ export default defineComponent({
     const pinnedColumn = computed({
       get: () => gridState.columnStates[props.column.key].pin,
       set: (newPinned) => {
-        // Set our pin to the appropriate one
         gridState.columnStates[props.column.key].pin = newPinned;
-
-        let targetSortIndex;
-
-        if (newPinned === "left") {
-          return;
-        }
-
-        if (newPinned === "right") {
-          return;
-        }
-
-        if (newPinned === "centre") {
-          return;
-        }
       },
     });
 
