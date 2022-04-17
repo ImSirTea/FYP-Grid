@@ -1,7 +1,7 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridManager } from "@/components/grid/GridManager";
-import GridRow from "@/components/grid/GridBodyRow.vue";
+import GridBodyRow from "@/components/grid/GridBodyRow.vue";
 import {
   AnyWithRowIndex,
   GridState,
@@ -23,7 +23,7 @@ import { VNode } from "vue";
  */
 export default defineComponent({
   name: "GridBody",
-  components: { GridRow },
+  components: { GridBodyRow },
   props: {
     internalItems: {
       type: Array as PropType<AnyWithRowIndex[]>,
@@ -90,7 +90,7 @@ export default defineComponent({
       columns: AnyGridColumn[],
       columnStartIndex: number
     ) => {
-      return h(GridRow, {
+      return h(GridBodyRow, {
         attrs: {
           role: "row",
           "aria-rowindex": index + 1,
