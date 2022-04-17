@@ -1,6 +1,6 @@
 <script lang="ts">
 import { VNode } from "vue";
-import GridRowCell from "@/components/grid/GridRowCell.vue";
+import GridRowCell from "@/components/grid/GridBodyCell.vue";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import {

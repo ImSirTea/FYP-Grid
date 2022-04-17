@@ -1,15 +1,19 @@
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
-import { GridState } from "@/components/grid/GridState";
+import { ColumnState, GridState } from "@/components/grid/GridState";
 
 /**
  * Wraps column states which can be used consistently across the Grid
  */
 
-export interface PinnedColumnGroups {
-  left: AnyGridColumn[];
-  centre: AnyGridColumn[];
-  right: AnyGridColumn[];
+export interface ColumnWithState {
+  definition: AnyGridColumn;
+  state: ColumnState;
+}
+export interface ColumnGroups {
+  left: ColumnWithState[];
+  centre: ColumnWithState[];
+  right: ColumnWithState[];
 }
 export class GridManager {
   #gridState!: GridState;
@@ -20,38 +24,16 @@ export class GridManager {
     this.#gridConfiguration = gridConfiguration;
   }
 
-  get #visibleColumns() {
-    return this.#gridConfiguration.columns
-      .filter((column) => !this.#gridState.columnStates[column.key].isHidden)
-      .sort(this.sortOnOrder);
-  }
-
-  get sortedColumns() {
-    return this.#gridConfiguration.columns.sort(this.sortOnOrder);
-  }
-
-  get filterableColumns() {
-    return this.#gridConfiguration.columns
-      .filter((column) => column.options.isFilterable)
-      .sort(this.sortOnOrder);
-  }
-
-  get manageableColumns() {
-    return this.#gridConfiguration.columns
-      .filter((column) => column.options.isManageable)
-      .sort(this.sortOnOrder);
-  }
-
   get columns() {
-    const columns: PinnedColumnGroups = {
+    const columns: ColumnGroups = {
       left: [],
       centre: [],
       right: [],
     };
 
-    this.#visibleColumns.forEach((column) => {
-      const pin = this.#gridState.columnStates[column.key].pin;
-      columns[pin].push(column);
+    this.#gridConfiguration.columns.sort(this.sortOnOrder).forEach((column) => {
+      const state = this.#gridState.columnStates[column.key];
+      columns[state.pin].push({ definition: column, state });
     });
 
     return columns;
@@ -68,15 +50,15 @@ export class GridManager {
 
   get columnSizes() {
     const leftWidth = this.columns.left.reduce(
-      (acc, column) => acc + this.#gridState.columnStates[column.key].width,
+      (acc, column) => acc + column.state.width,
       0
     );
     const centreWidth = this.columns.centre.reduce(
-      (acc, column) => acc + this.#gridState.columnStates[column.key].width,
+      (acc, column) => acc + column.state.width,
       0
     );
     const rightWidth = this.columns.right.reduce(
-      (acc, column) => acc + this.#gridState.columnStates[column.key].width,
+      (acc, column) => acc + column.state.width,
       0
     );
 

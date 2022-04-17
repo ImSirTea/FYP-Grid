@@ -60,7 +60,7 @@ export default defineComponent({
               "aria-rowindex": 1,
             },
           },
-          left.map((column) => buildCell(column))
+          left.map((column) => buildCell(column.definition))
         ),
         h(
           "div",
@@ -84,7 +84,7 @@ export default defineComponent({
                   "aria-rowindex": 1,
                 },
               },
-              centre.map((column) => buildCell(column))
+              centre.map((column) => buildCell(column.definition))
             ),
           ]
         ),
@@ -102,7 +102,7 @@ export default defineComponent({
               "aria-rowindex": 1,
             },
           },
-          right.map((column) => buildCell(column))
+          right.map((column) => buildCell(column.definition))
         ),
       ];
     };

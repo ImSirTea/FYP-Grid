@@ -23,13 +23,16 @@
     <v-divider />
 
     <v-expansion-panels accordian flat>
-      <v-expansion-panel v-for="column in manageableColumns" :key="column.key">
+      <v-expansion-panel
+        v-for="column in manageableColumns"
+        :key="column.definition.key"
+      >
         <v-expansion-panel-header
-          :col-key="column.key"
-          @dragstart="(event) => dragStart(event, column)"
+          :col-key="column.definition.key"
+          @dragstart="(event) => dragStart(event, column.definition)"
           @drag="drag"
           @dragend="dragEnd"
-          @touchstart="(event) => dragStart(event, column)"
+          @touchstart="(event) => dragStart(event, column.definition)"
           @touchmove="drag"
           @touchend="dragEnd"
           draggable
@@ -37,13 +40,13 @@
           <v-container class="pa-0" fluid>
             <v-row align="center" no-gutters>
               <v-col cols="auto">
-                {{ column.key }}
+                {{ column.definition.key }}
               </v-col>
             </v-row>
           </v-container>
         </v-expansion-panel-header>
         <v-expansion-panel-content>
-          <manage-group :column="column" />
+          <manage-group :column="column.definition" />
         </v-expansion-panel-content>
         <v-divider />
       </v-expansion-panel>
@@ -55,8 +58,7 @@
 import { defineComponent, inject, computed } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import ManageGroup from "@/components/grid/manage/ManageGroup.vue";
-import { GridManager } from "@/components/grid/GridManager";
-import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
+import { ColumnWithState, GridManager } from "@/components/grid/GridManager";
 import { useColumnOrderEvents } from "@/components/grid/events/ColumnOrderEvents";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridState } from "@/components/grid/GridState";
@@ -81,9 +83,14 @@ export default defineComponent({
       "vertical"
     );
 
-    const manageableColumns = computed<AnyGridColumn[]>(
-      () => gridManager.manageableColumns
-    );
+    const manageableColumns = computed<ColumnWithState[]>(() => {
+      const { left, centre, right } = gridManager.columns;
+
+      return left
+        .concat(centre)
+        .concat(right)
+        .filter((column) => column.definition.options.isManageable);
+    });
 
     return {
       dragStart,

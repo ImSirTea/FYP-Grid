@@ -24,7 +24,7 @@ interface SortOptions {
   direction: "asc" | "desc";
 }
 
-interface ColumnState {
+export interface ColumnState {
   width: ColumnOptions["defaultWidth"];
   pin: ColumnOptions["defaultPin"];
   isHidden: ColumnOptions["defaultHidden"];

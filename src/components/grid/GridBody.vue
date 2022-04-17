@@ -1,8 +1,7 @@
 <script lang="ts">
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
-import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
-import GridRow from "@/components/grid/GridRow.vue";
+import GridRow from "@/components/grid/GridBodyRow.vue";
 import {
   AnyWithRowIndex,
   GridState,
@@ -177,7 +176,6 @@ export default defineComponent({
   render(): VNode {
     const { min, max } = this.rowIndexBoundaries;
     const { left, centre, right } = this.gridManager.columns;
-
     const { leftWidth, centreWidth, rightWidth } = this.gridManager.columnSizes;
 
     const leftRows: VNode[] = [];
@@ -186,11 +184,23 @@ export default defineComponent({
 
     this.internalItems.slice(min, max).forEach((rowData, index) => {
       if (left.length)
-        leftRows.push(this.buildRow(rowData, index + min, left, 0));
+        leftRows.push(
+          this.buildRow(
+            rowData,
+            index + min,
+            left.map((column) => column.definition),
+            0
+          )
+        );
 
       if (centre.length)
         centreRows.push(
-          this.buildRow(rowData, index + min, centre, left.length)
+          this.buildRow(
+            rowData,
+            index + min,
+            centre.map((column) => column.definition),
+            left.length
+          )
         );
 
       if (right.length)
@@ -198,7 +208,7 @@ export default defineComponent({
           this.buildRow(
             rowData,
             index + min,
-            right,
+            right.map((column) => column.definition),
             left.length + centre.length
           )
         );

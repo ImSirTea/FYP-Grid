@@ -1,7 +1,7 @@
 <script lang="ts">
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
-import GridHeader from "@/components/grid/GridHeader.vue";
+import GridHeader from "@/components/grid/GridHeaderRow.vue";
 import {
   AnyWithRowIndex,
   rowIndex,
