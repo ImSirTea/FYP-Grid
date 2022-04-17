@@ -34,6 +34,7 @@ export default defineComponent({
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn, columnIndex: number) => {
       return h(GridBodyCell, {
+        key: column.key,
         style: {
           width: gridState.columnStates[column.key].width + "px",
           "justify-content": column.alignment,

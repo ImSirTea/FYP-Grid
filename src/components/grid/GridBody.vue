@@ -183,7 +183,7 @@ export default defineComponent({
     const rightRows: VNode[] = [];
 
     this.internalItems.slice(min, max).forEach((rowData, index) => {
-      if (left.length)
+      if (left.length) {
         leftRows.push(
           this.buildRow(
             rowData,
@@ -192,8 +192,9 @@ export default defineComponent({
             0
           )
         );
+      }
 
-      if (centre.length)
+      if (centre.length) {
         centreRows.push(
           this.buildRow(
             rowData,
@@ -202,8 +203,9 @@ export default defineComponent({
             left.length
           )
         );
+      }
 
-      if (right.length)
+      if (right.length) {
         rightRows.push(
           this.buildRow(
             rowData,
@@ -212,6 +214,7 @@ export default defineComponent({
             left.length + centre.length
           )
         );
+      }
     });
 
     return h(
