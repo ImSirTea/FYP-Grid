@@ -34,7 +34,7 @@ import {
 } from "@vue/composition-api";
 
 export default defineComponent({
-  name: "GridRowCell",
+  name: "GridBodyCell",
   props: {
     item: {
       type: Object as PropType<AnyWithRowIndex>,

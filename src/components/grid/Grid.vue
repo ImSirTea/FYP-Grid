@@ -1,7 +1,7 @@
 <script lang="ts">
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import { GridManager } from "@/components/grid/GridManager";
-import GridHeader from "@/components/grid/GridHeaderRow.vue";
+import GridHeaderRow from "@/components/grid/GridHeaderRow.vue";
 import {
   AnyWithRowIndex,
   rowIndex,
@@ -39,7 +39,7 @@ export interface GridComponent<T> {
  */
 export default defineComponent({
   name: "Grid",
-  components: { GridHeader, GridBody, GridControlPanel },
+  components: { GridHeaderRow, GridBody, GridControlPanel },
   model: {
     event: "update:items",
     prop: "items",
@@ -169,7 +169,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildHeader = () => {
-      return h(GridHeader, {
+      return h(GridHeaderRow, {
         props: {
           gridConfiguration: props.gridConfiguration,
           gridState: gridState,

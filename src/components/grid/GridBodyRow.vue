@@ -1,6 +1,6 @@
 <script lang="ts">
 import { VNode } from "vue";
-import GridRowCell from "@/components/grid/GridBodyCell.vue";
+import GridBodyCell from "@/components/grid/GridBodyCell.vue";
 import { defineComponent, h, PropType, inject } from "@vue/composition-api";
 import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 import {
@@ -11,7 +11,7 @@ import {
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 
 export default defineComponent({
-  name: "GridRow",
+  name: "GridBodyRow",
   props: {
     item: {
       type: Object as PropType<AnyWithRowIndex>,
@@ -33,7 +33,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn, columnIndex: number) => {
-      return h(GridRowCell, {
+      return h(GridBodyCell, {
         style: {
           width: gridState.columnStates[column.key].width + "px",
           "justify-content": column.alignment,

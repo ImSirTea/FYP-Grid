@@ -15,7 +15,7 @@ import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import GridHeaderCell from "@/components/grid/GridHeaderCell.vue";
 
 export default defineComponent({
-  name: "GridHeader",
+  name: "GridHeaderRow",
   components: { GridHeaderCell },
   props: {
     rowHeight: {
