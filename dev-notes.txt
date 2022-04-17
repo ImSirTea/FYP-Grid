@@ -1,0 +1,10 @@
+Virtual scrolling was nice to implement originally
+
+Struggles with optimization, specifically with Vue
+
+Grid definition, concerns for extensions, custom column types?
+
+Action column, required pinning to be able to complete
+
+Struggles with routing, due to Vue
+

@@ -1,0 +1,153 @@
+$base-colour: #fff;
+$hover-colour: #f4fbff;
+$border-colour: #e4e4e4;
+$highlight-colour: #00aeff;
+
+.grid-header-container {
+  border-bottom: 2px solid $border-colour;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+.grid-row-container {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  position: relative;
+  display: flex;
+}
+
+.grid-column-cropper {
+  border-right: solid 1px $border-colour;
+  border-left: solid 1px $border-colour;
+}
+
+// Grid rows
+.grid-row,
+.grid-header {
+  background-color: $base-colour;
+  display: flex;
+  position: absolute;
+}
+
+[role=gridcell] > * {
+  overflow: hidden;
+  text-overflow: ellipsis
+}
+
+.grid-row {
+  border-bottom: 1px solid $border-colour;
+  text-decoration: none;
+  color: inherit !important;
+}
+
+// Don't allow styling on action-able rows
+.grid-row-clickable {
+  cursor: pointer;
+}
+
+.grid-row-hovered {
+  background-color: $hover-colour;
+}
+
+.grid-column-dragged {
+  background-color: $hover-colour;
+}
+
+// Grid cells
+.grid-header-cell,
+.grid-row-cell {
+  padding: 0 0.5em;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.grid-row-cell {
+  overflow: hidden;
+  white-space:nowrap;
+  text-overflow: ellipsis;
+}
+
+.grid-header-cell:hover:not(.grid-header-no-hover) {
+  background-color: $hover-colour;
+}
+
+.grid-sort-icon:not(.grid-sort-active) {
+  opacity: 0;
+}
+
+.grid-sort-icon {
+  opacity: 1;
+  padding-left: 0.5ch;
+}
+
+.grid-header-cell:hover .grid-sort-icon,
+.grid-sort-active {
+  opacity: 1;
+}
+
+.grid-header-resize {
+  width: max(0.5em, 10px);
+  height: 100%;
+  margin-left: auto;
+  cursor: e-resize !important;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.grid-column-cropper {
+  overflow: hidden;
+}
+
+.grid-row-center-wrapper {
+  flex: 1 1 auto;
+  overflow-x: auto;
+  overflow-y: hidden;
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.grid-row-center-wrapper::-webkit-scrollbar {
+  display: none;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.virtual-scroll-bar-container {
+  overflow: hidden;
+  display: flex;
+}
+
+.virtual-scroll-bar {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
+
+.virtual-scroll-bar-container:last-child {
+  padding-right: 17px
+}
+
+.grid-column-wrapper {
+  display: flex;
+  height: 100%;
+}
+
+.grid-cell-editing {
+  border: 2px solid $highlight-colour;
+}
+
+.grid-row-validation-error {
+  width: 1.5em;
+  height: 1.5em;
+  position: absolute;
+  top: -0.75em;
+  right: -0.75em;
+  background-color: red;
+  transform: rotate(45deg);
+}

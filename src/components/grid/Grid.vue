@@ -1,10 +1,49 @@
 <script lang="ts">
-import { GridBuilder } from "@/components/grid/GridBuilder";
+import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { GridManager } from "@/components/grid/GridManager";
+import GridHeaderRow from "@/components/grid/GridHeaderRow.vue";
+import {
+  AnyWithRowIndex,
+  rowIndex,
+  GridState,
+} from "@/components/grid/GridState";
 import { VNode } from "vue";
-import { h, defineComponent, PropType } from "@vue/composition-api";
+import {
+  h,
+  defineComponent,
+  PropType,
+  computed,
+  reactive,
+  provide,
+  watch,
+  shallowRef,
+  ref,
+} from "@vue/composition-api";
+import GridBody from "@/components/grid/GridBody.vue";
+import GridControlPanel from "@/components/grid/GridControlPanel.vue";
 
+export function useGrid<T>() {
+  const gridRef = ref<GridComponent<T> | null>(null);
+
+  return {
+    gridRef,
+  };
+}
+
+export interface GridComponent<T> {
+  getSelectedRows: () => T[];
+}
+
+/**
+ * Manages creating a grid with given specifications
+ */
 export default defineComponent({
   name: "Grid",
+  components: { GridHeaderRow, GridBody, GridControlPanel },
+  model: {
+    event: "update:items",
+    prop: "items",
+  },
   props: {
     items: {
       type: Array as PropType<any[]>,
@@ -12,176 +51,251 @@ export default defineComponent({
       default: () => [],
     },
     gridConfiguration: {
-      type: Object as PropType<GridBuilder<any>>,
+      type: Object as PropType<GridConfiguration<any>>,
       required: true,
+    },
+    gridState: {
+      type: Object as PropType<GridState>,
+      required: false,
     },
     rowHeight: {
       type: Number,
       required: false,
-      default: 20,
+      default: 50,
     },
     gridHeight: {
       type: Number,
       required: false,
-      default: 100,
+      default: 300,
+    },
+    width: {
+      type: Number,
+      required: false,
+      default: undefined,
     },
     bufferRows: {
       type: Number,
       required: false,
-      default: 0,
+      default: 1,
     },
   },
-  data: () => {
-    return {
-      gridOffsetTop: 0,
-    };
-  },
-  computed: {
-    rowsOffset(): number {
-      return Math.floor(this.gridOffsetTop / this.rowHeight);
-    },
-    maximumVisibleRows(): number {
-      return Math.ceil(this.gridHeight / this.rowHeight) + this.bufferRows;
-    },
-    totalGridWidth(): string {
-      return (
-        this.gridConfiguration.columns.reduce(
-          (totalWidth, column) => totalWidth + column.width,
-          0
-        ) + "ch"
-      );
-    },
-    totalHeaderHeight(): string {
-      return this.rowHeight + "px";
-    },
-    totalBodyHeight(): string {
-      return this.items.length * this.rowHeight + "px";
-    },
-  },
-  methods: {
-    gridScroll(e: any) {
-      this.gridOffsetTop = e.target.scrollTop;
-    },
-    header() {
-      // Creates each header cell
-      const headers = this.gridConfiguration.columns.map((column) => {
-        const header = h(
-          "div",
-          {
-            style: {
-              width: column.widthWithUnit,
-            },
-            class: "grid-header-cell",
-          },
-          column.name
+  setup(props, context) {
+    const internalItems = shallowRef<AnyWithRowIndex[]>([]);
+    const indexedItems = shallowRef<AnyWithRowIndex[]>([]);
+
+    const gridState = reactive(
+      props.gridState ?? props.gridConfiguration.defaultState
+    );
+
+    const gridManager = new GridManager(
+      gridState as GridState,
+      props.gridConfiguration
+    );
+    provide("gridState", gridState);
+    provide("gridConfiguration", props.gridConfiguration);
+    provide("gridManager", gridManager);
+
+    const centreBar = ref<HTMLElement | null>(null);
+
+    // Scroll offsets
+    const gridOffsets = reactive({
+      top: 0,
+      left: 0,
+    });
+
+    const totalGridWidth = computed(() =>
+      props.width ? props.width + "px" : "100%"
+    );
+
+    watch(
+      () => props.items,
+      () => {
+        indexedItems.value = gridState.injectGridIndexes(props.items);
+      },
+      { immediate: true, deep: true }
+    );
+
+    watch(
+      () => [
+        indexedItems.value,
+        gridState.columnStates,
+        gridState.sortOptions,
+        gridState.searchValue,
+      ],
+      () => {
+        internalItems.value = gridState.filterAndSortItems(
+          indexedItems.value,
+          props.gridConfiguration
         );
+      },
+      { immediate: true, deep: true }
+    );
 
-        return header;
+    // Provide a function to externally call this, so we don't keep another copy of items in memory
+    const getSelectedRows: GridComponent<any>["getSelectedRows"] = () => {
+      if (gridState.selectAllRows) {
+        return gridState.removeGridIndexes(internalItems.value);
+      }
+
+      return gridState.removeGridIndexes(
+        internalItems.value.filter((item) =>
+          gridState.selectedRowIds.includes(item[rowIndex])
+        )
+      );
+    };
+
+    // Reacts to scroll events, ONLY USE IN CONTEXT OF RENDERING
+    const buildBody = () => {
+      return h(GridBody, {
+        props: {
+          internalItems: internalItems.value,
+          gridOffsetTop: gridOffsets.top,
+          gridOffsetLeft: gridOffsets.left,
+          rowHeight: props.rowHeight,
+          gridHeight: props.gridHeight,
+          bufferRows: props.bufferRows,
+        },
+        on: {
+          // We want the scrolling to be within the rows, not the entire grid, so listen for these events
+          "update:scroll-top": (offsetTop: number) => {
+            gridOffsets.top = offsetTop;
+          },
+          "update:scroll-left": (offsetLeft: number) => {
+            gridOffsets.left = offsetLeft;
+          },
+        },
       });
+    };
 
-      // Returns them has a group, inside their container
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildHeader = () => {
+      return h(GridHeaderRow, {
+        props: {
+          gridConfiguration: props.gridConfiguration,
+          gridState: gridState,
+          rowHeight: props.rowHeight,
+          gridOffsetLeft: gridOffsets.left,
+        },
+      });
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildControlPanel = (): VNode => {
+      return h(GridControlPanel, {
+        props: {
+          gridState: gridState,
+          gridConfiguration: props.gridConfiguration,
+        },
+        on: {
+          "apply:item-changes": () => {
+            const existingErrors = Object.entries(gridState.rowCellsWithErrors);
+
+            // If we have errors, scroll to them instead of pushing our changes
+            if (existingErrors.length) {
+              const [rowNumber] = existingErrors[0];
+              gridOffsets.top = Math.max(
+                0,
+                Number(rowNumber) * props.rowHeight - props.gridHeight
+              );
+              return;
+            }
+
+            // Otherwise just push our errors up
+            context.emit(
+              "update:items",
+              internalItems.value.map((item) => {
+                delete (item as any)[rowIndex];
+                return item;
+              })
+            );
+            gridState.isDirty = false;
+          },
+          "reset:item-changes": () => {
+            internalItems.value = gridState.injectGridIndexes(props.items);
+            gridState.rowCellsWithErrors = {};
+            gridState.isDirty = false;
+          },
+        },
+      });
+    };
+
+    const buildVirtualScrollbars = () => {
+      const { leftWidth, centreWidth, rightWidth } = gridManager.columnSizes;
+
       return h(
         "div",
         {
-          class: "grid-header-container",
-          style: {
-            width: this.totalGridWidth,
-            height: this.totalHeaderHeight,
-          },
+          class: "virtual-scroll-bar-container",
         },
         [
+          h("div", {
+            class: "virtual-scroll-bar",
+            style: { width: leftWidth + "px", "min-width": leftWidth + "px" },
+          }),
           h(
             "div",
             {
-              class: "grid-header",
+              ref: "centreBar",
+              class: "virtual-scroll-bar",
+              style: { width: "100%", height: "17px" },
+              on: {
+                scroll: (event: Event) => {
+                  gridOffsets.left = (event.target as HTMLElement).scrollLeft;
+                },
+              },
             },
-            headers
+            [h("div", { style: { width: centreWidth + "px", height: "17px" } })]
           ),
+          h("div", {
+            class: "virtual-scroll-bar",
+            style: { width: rightWidth + "px", "min-width": rightWidth + "px" },
+          }),
         ]
       );
-    },
-    body() {
-      // For each item, creates a row group with each row-cell inside
-      const rows = this.items.map((item, idx) => {
-        const rowGroup = h(
-          "div",
-          {
-            class: "grid-row",
-            style: {
-              height: this.rowHeight + "px",
-            },
-          },
-          this.gridConfiguration.columns.map((column) => {
-            const rowCell = h(
-              "div",
-              {
-                style: {
-                  width: column.widthWithUnit,
-                },
-                class: "grid-row-cell",
-              },
-              column.value(item)
-            );
-            return rowCell;
-          })
-        );
-        return rowGroup;
-      });
-      // Returns all row groups, inside their container
-      return h(
-        "div",
-        {
-          class: "grid-row-container",
-          style: { width: this.totalGridWidth, height: this.totalBodyHeight },
-        },
-        rows
-      );
-    },
-    table() {
+    };
+
+    // ONLY USE IN CONTEXT OF RENDERING
+    const buildTable = () => {
       return h(
         "div",
         {
           class: "grid-container",
-          on: {
-            scroll: this.gridScroll,
+          style: { width: totalGridWidth.value },
+          attrs: {
+            role: "grid",
+            "aria-rowcount": props.items.length + 1, // +1 For the header
           },
         },
-        [this.header(), this.body()]
+        [
+          buildControlPanel(),
+          buildHeader(),
+          buildBody(),
+          buildVirtualScrollbars(),
+        ]
       );
-    },
+    };
+
+    watch(
+      () => gridOffsets.left,
+      () => {
+        if (centreBar.value) {
+          centreBar.value.scrollTo({ left: gridOffsets.left });
+        }
+      }
+    );
+
+    return {
+      buildTable,
+      centreBar,
+      getSelectedRows,
+    };
   },
   render(): VNode {
-    return this.table();
+    return this.buildTable();
   },
 });
 </script>
 
 <style lang="scss">
-.grid-header-cell,
-.grid-row-cell {
-  display: inline-block;
-  text-align: left;
-  background-color: inherit;
-}
-
-.grid-row:nth-child(even) {
-  background-color: lightgray;
-}
-
-.grid-header-container {
-  position: sticky;
-  top: 0;
-  background-color: magenta;
-  z-index: 1;
-}
-
-.grid-row-container {
-  position: relative;
-}
-
-.grid-container {
-  width: 200ch;
-  height: 300px;
-  overflow: auto;
-}
+@import "@/styles/_grid.scss";
 </style>

@@ -1,0 +1,9 @@
+Deleting filters doesn't correctly update the filter components
+
+resize icon is sadge :( make it resize icon all time
+
+re-ordering columns is weird for pinned stuff
+
+Top cell to be selected when all rows are selected without toggle?
+
+Look into only showing columns within screen?
