@@ -5,15 +5,12 @@ import {
   GridWidthEnum,
 } from "@/components/grid/columns/AbstractColumn";
 import GridNumberRenderer from "@/components/grid/columns/number/GridNumberRenderer.vue";
-import GridNumberEdit from "@/components/grid/columns/number/GridNumberEdit.vue";
 import NumberFilterOptions from "@/components/grid/columns/number/NumberFilterOptions";
 
 /**
  * Optional and column specific properties to configure NumberColumn behaviours
  */
-export interface NumberOptions extends ColumnOptions {
-  max: number;
-}
+export interface NumberOptions extends ColumnOptions {}
 
 /**
  * NumberColumn type, used when building grids using number fields

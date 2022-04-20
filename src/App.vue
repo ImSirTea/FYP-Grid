@@ -107,7 +107,7 @@ export default defineComponent({
     // builder.withRowAction((item) =>
     //   console.log(`/rowRoute/index/${item.index}`)
     // );
-    // builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
+    builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
     builder
       .addTextColumn("first1", (item) => item.first + "- 1")
       .setOptions({ defaultPin: "right" });

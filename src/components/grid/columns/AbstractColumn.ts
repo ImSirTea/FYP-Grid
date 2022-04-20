@@ -90,6 +90,7 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
     return !!this.valueSetter;
   }
 
+  // Converts user-friendly to CSS values
   get alignment() {
     switch (this.options.defaultAlignment) {
       case "left":

@@ -28,7 +28,7 @@
           outlined
           @click="$emit('apply:item-changes')"
         >
-          <v-icon class="mr-2">mdi-content-save</v-icon>
+          <v-icon class="mr-2">mdi-check</v-icon>
           {{ $tc.apply }}
         </v-btn>
       </v-col>
