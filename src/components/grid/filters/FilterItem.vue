@@ -72,7 +72,6 @@ import {
 } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { debounce } from "lodash";
-import { GridManager } from "@/components/grid/GridManager";
 import { GridState } from "@/components/grid/GridState";
 
 export default defineComponent({

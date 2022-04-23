@@ -3,7 +3,7 @@
     :style="style"
     :col-key="column.key"
     :class="classes"
-    :draggable="column.options.isManageable"
+    :draggable="column.options.isManageable && !isResizing"
     @dragstart="dragStart($event, column)"
     @touchstart="dragStart($event, column)"
     @drag="dragOrTouch"

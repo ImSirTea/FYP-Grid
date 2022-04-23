@@ -1,13 +1,11 @@
 <template>
   <div
     class="grid-header-resize"
-    draggable
     @click="onResizeClick"
     @dblclick="onResizeDblClick"
-    @dragstart="dragStart"
-    @drag="drag"
-    @dragover="dragOver"
-    @dragend="dragEnd"
+    @pointerdown="dragStart"
+    @pointermove="drag"
+    @pointerup="dragEnd"
   />
 </template>
 
@@ -27,7 +25,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
-    let lastResizeX: number = 0;
+    let lastResizeX: number | null = null;
 
     const onResizeClick = (event: PointerEvent) => {
       event.stopPropagation();
@@ -64,21 +62,18 @@ export default defineComponent({
       gridState.columnStates[props.column.key].width = largestWidth;
     };
 
-    const dragStart = (event: DragEvent) => {
+    const dragStart = (event: PointerEvent) => {
       context.emit("is-resizing", true);
       lastResizeX = event.clientX;
 
-      // Hide ghost when resizing
-      event.dataTransfer!.setDragImage(new Image(), 0, 0);
+      // Allows the target element to remain the pointer event focus, so events go to the orignal target
+      // rather than the new one if you hover over something else
+      (event.target as Element).setPointerCapture(event.pointerId);
     };
 
-    const dragOver = (event: DragEvent) => {
-      event.preventDefault();
-    };
-
-    const drag = debounce((event: DragEvent) => {
+    const drag = debounce((event: PointerEvent) => {
       // Don't resize if there is no X data provided
-      if (!event.clientX) {
+      if (!event.clientX || lastResizeX === null) {
         return;
       }
 
@@ -88,7 +83,9 @@ export default defineComponent({
       lastResizeX = event.clientX;
     });
 
-    const dragEnd = () => {
+    const dragEnd = (event: PointerEvent) => {
+      lastResizeX = null;
+      (event.target as Element).releasePointerCapture(event.pointerId);
       context.emit("is-resizing", false);
     };
 
@@ -97,7 +94,6 @@ export default defineComponent({
       onResizeDblClick,
 
       dragStart,
-      dragOver,
       drag,
       dragEnd,
     };

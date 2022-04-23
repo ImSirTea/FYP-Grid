@@ -184,12 +184,12 @@ export default defineComponent({
 
     this.internalItems.slice(min, max).forEach((rowData, index) => {
       if (left.length) {
-        leftRows.push(this.buildRow(rowData, index + min, left, 0));
+        leftRows.push(this.buildRow(rowData, index + min, left, 1));
       }
 
       if (centre.length) {
         centreRows.push(
-          this.buildRow(rowData, index + min, centre, left.length)
+          this.buildRow(rowData, index + min, centre, left.length + 1)
         );
       }
 
@@ -199,7 +199,7 @@ export default defineComponent({
             rowData,
             index + min,
             right,
-            left.length + centre.length
+            left.length + centre.length + 1
           )
         );
       }

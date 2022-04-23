@@ -33,6 +33,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn, columnIndex: number) => {
+      const currentColumnIndex = props.columnStartIndex + columnIndex;
       return h(GridBodyCell, {
         key: column.key,
         style: {
@@ -46,7 +47,40 @@ export default defineComponent({
         props: { item: props.item, column },
         attrs: {
           role: "gridcell",
-          tabindex: props.columnStartIndex + columnIndex,
+          "col-index": currentColumnIndex,
+          tabindex: -1,
+        },
+        nativeOn: {
+          keydown: (event: KeyboardEvent) => {
+            if (event.key === "Tab") {
+              // Prevent normal tabbing in this case
+              event.preventDefault();
+
+              // Get the parent, so we can get our current row index
+              const parentElement = (event.target as HTMLElement)
+                .parentElement!;
+              const targetRowIndex = Number(parentElement.ariaRowIndex);
+
+              // Our next to focus element is +1 in column index
+              const nextToFocus = document.querySelector(
+                `[aria-rowindex="${targetRowIndex}"] > [col-index="${
+                  currentColumnIndex + 1
+                }"]`
+              );
+
+              // If we have a next child, focus that
+              if (nextToFocus) {
+                (nextToFocus as HTMLElement).focus();
+              } else {
+                // Otherwise, go to the next row's first child
+                (
+                  document.querySelector(
+                    `[aria-rowindex="${targetRowIndex + 1}"`
+                  )?.firstChild as HTMLElement
+                ).focus();
+              }
+            }
+          },
         },
       });
     };
@@ -62,14 +96,23 @@ export default defineComponent({
       this.gridConfiguration.rowAction || this.gridConfiguration.rowRoute
     );
 
+    const classes = {
+      "grid-row-clickable": isRowClickable,
+      "grid-row-hovered": this.item[rowIndex] === this.gridState.rowHovered,
+    };
+
+    const cells = this.columns.map((column, index) =>
+      this.buildCell(column, index)
+    );
+
     if (this.gridConfiguration.rowRoute) {
       return h(
         "router-link",
         {
           props: { to: this.gridConfiguration.rowRoute(this.item) },
-          class: { "grid-row-clickable": isRowClickable },
+          class: classes,
         },
-        this.columns.map((column, index) => this.buildCell(column, index))
+        cells
       );
     }
 
@@ -78,10 +121,7 @@ export default defineComponent({
     return h(
       rowType,
       {
-        class: {
-          "grid-row-clickable": isRowClickable,
-          "grid-row-hovered": this.item[rowIndex] === this.gridState.rowHovered,
-        },
+        class: classes,
         on: {
           click: () => {
             if (isRowClickable) {
@@ -90,7 +130,7 @@ export default defineComponent({
           },
         },
       },
-      this.columns.map((column, index) => this.buildCell(column, index))
+      cells
     );
   },
 });

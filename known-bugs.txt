@@ -1,11 +1,1 @@
 Deleting filters doesn't correctly update the filter components
-
-resize icon is sadge :( make it resize icon all time
-
-re-ordering columns is weird for pinned stuff
-
-Top cell to be selected when all rows are selected without toggle? - On insert, if length ?
-
-Look into only showing columns within screen?
-
-top header row doesn't line-up when scrollbars shrink (mobile size) - Could use breakpoints to not pin

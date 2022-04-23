@@ -69,6 +69,7 @@ export default defineComponent({
       // Will also need preventDefault so we don't click link rows if we want this behaviour
       if (props.column.isEditable) {
         event.stopPropagation();
+        event.preventDefault();
         return;
       }
     };
