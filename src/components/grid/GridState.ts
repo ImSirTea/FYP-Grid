@@ -257,8 +257,7 @@ export class GridState {
   public removeFilter(column: AnyGridColumn, index: number) {
     this.columnStates[column.key].filterOptions.splice(index, 1);
 
-    const filterChain = this.buildFilterFunctionsForColumn(column.key);
-    Vue.set(this.columnStates[column.key], "filterChain", filterChain);
+    this.buildFilterFunctionsForColumn(column.key);
   }
 
   /**
