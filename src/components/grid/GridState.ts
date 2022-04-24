@@ -243,7 +243,7 @@ export class GridState {
     }
 
     columnState.filterOptions.push({
-      filterFunction: undefined,
+      condition: undefined,
       value: undefined,
       operator: FilterOperator.and,
     });
@@ -274,9 +274,7 @@ export class GridState {
     index: number
   ) {
     if (totalNumberOfOptions === index + 1) {
-      return (
-        options.filterFunction !== undefined && options.value !== undefined
-      );
+      return options.condition !== undefined && options.value !== undefined;
     }
 
     return hasAllProperties(options);
@@ -300,10 +298,11 @@ export class GridState {
           if (option.operator === FilterOperator.or) {
             return (itemValue: any) =>
               chain(itemValue) ||
-              option.filterFunction!(itemValue, option.value);
+              option.condition!.filterFunction(itemValue, option.value);
           }
           return (itemValue: any) =>
-            chain(itemValue) && option.filterFunction!(itemValue, option.value);
+            chain(itemValue) &&
+            option.condition!.filterFunction(itemValue, option.value);
         }
         return chain;
       },

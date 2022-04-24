@@ -11,7 +11,7 @@
             :column="column"
             :filter="filter"
             :index="index"
-            @update:filter-function="filter.filterFunction = $event"
+            @update:condition="filter.condition = $event"
             @update:value="filter.value = $event"
             @update:operator="filter.operator = $event"
           />

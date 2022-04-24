@@ -1,1 +1,0 @@
-Deleting filters doesn't correctly update the filter components
