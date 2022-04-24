@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="{ 'grid-cell-editing': isEditing }"
+    :class="{ 'grid-cell-focused': isFocused, 'grid-cell-editing': isEditing }"
     @click="onCellClick"
     @dblclick="onCellDoubleClick"
   >
@@ -13,7 +13,7 @@
       :col-key="column.key"
       @input="updateValue"
     />
-    <div v-if="cellErrors.length" class="grid-row-validation-error"></div>
+    <div v-if="cellErrors.length" class="grid-row-validation-error" />
   </div>
 </template>
 
@@ -55,6 +55,16 @@ export default defineComponent({
     );
 
     // Decides if we show view or edit renderers
+    const isFocused = computed(() => {
+      if (!gridState.cellFocused) {
+        return false;
+      }
+
+      const { rowId, columnKey } = gridState.cellFocused;
+      return rowId === props.item[rowIndex] && columnKey === props.column.key;
+    });
+
+    // Decides if we show view or edit renderers
     const isEditing = computed(() => {
       if (!gridState.cellEdited) {
         return false;
@@ -66,6 +76,16 @@ export default defineComponent({
 
     // Cells handle row clicks so they can do cell-specific actions instead of row actions if needed
     const onCellClick = (event: PointerEvent) => {
+      gridState.cellFocused = {
+        rowId: props.item[rowIndex],
+        columnKey: props.column.key,
+      };
+
+      // If the cell we clicked on isn't the one we are editing, clear our edit
+      if (!isEditing.value) {
+        gridState.cellEdited = null;
+      }
+
       // Will also need preventDefault so we don't click link rows if we want this behaviour
       if (props.column.isEditable) {
         event.stopPropagation();
@@ -112,6 +132,7 @@ export default defineComponent({
     };
 
     return {
+      isFocused,
       isEditing,
       internalValue,
       updateValue,

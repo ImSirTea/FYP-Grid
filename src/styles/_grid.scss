@@ -138,8 +138,12 @@ $highlight-colour: #00aeff;
   height: 100%;
 }
 
+.grid-cell-focused {
+  outline: -webkit-focus-ring-color auto 1px;
+}
+
 .grid-cell-editing {
-  border: 2px solid $highlight-colour;
+  outline: $highlight-colour auto 2px;
 }
 
 .grid-row-validation-error {

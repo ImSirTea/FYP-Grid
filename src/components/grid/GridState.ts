@@ -44,6 +44,12 @@ export class GridState {
   // Which column are we dragging, highlight it so dragging is clearer
   columnDragged: AnyGridColumn | null = null;
 
+  // Cell focused
+  cellFocused: {
+    rowId: AnyWithRowIndex[typeof rowIndex];
+    columnKey: AnyGridColumn["key"];
+  } | null = null;
+
   // The cell currently being edited
   cellEdited: {
     rowId: AnyWithRowIndex[typeof rowIndex];
