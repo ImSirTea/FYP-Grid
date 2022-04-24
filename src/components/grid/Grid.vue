@@ -126,6 +126,10 @@ export default defineComponent({
         gridState.searchValue,
       ],
       () => {
+        if (!gridState.filtersAreValid) {
+          return;
+        }
+
         internalItems.value = gridState.filterAndSortItems(
           indexedItems.value,
           props.gridConfiguration
