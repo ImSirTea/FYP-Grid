@@ -270,6 +270,9 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildTable = () => {
+      const totalColumns = Object.values(gridManager.columns).flatMap(
+        (col) => col
+      ).length;
       return h(
         "div",
         {
@@ -278,6 +281,7 @@ export default defineComponent({
           attrs: {
             role: "grid",
             "aria-rowcount": props.items.length + 1, // +1 For the header
+            "aria-colcount": totalColumns,
           },
         },
         [
