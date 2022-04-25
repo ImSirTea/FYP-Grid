@@ -110,6 +110,9 @@ export default defineComponent({
     const buildCell = (column: AnyGridColumn) => {
       return h(GridHeaderCell, {
         props: { column },
+        attrs: {
+          role: "columnheader",
+        },
       });
     };
 
