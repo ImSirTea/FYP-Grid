@@ -18,6 +18,7 @@ import TextField from "@/components/controls/inputs/TextField.vue";
 export default defineComponent({
   name: "GridTextRenderer",
   components: { TextField },
+  inheritAttrs: false,
   props: {
     value: {
       type: String,

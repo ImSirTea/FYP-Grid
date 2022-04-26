@@ -18,6 +18,7 @@ import NumberField from "@/components/controls/inputs/NumberField.vue";
 export default defineComponent({
   name: "GridNumberRenderer",
   components: { NumberField },
+  inheritAttrs: false,
   props: {
     value: {
       type: Number,
