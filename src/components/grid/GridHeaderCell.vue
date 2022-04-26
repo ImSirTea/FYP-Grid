@@ -20,7 +20,7 @@
       is-header-row
     />
     <template v-else>
-      {{ column.key }}
+      {{ columnName }}
     </template>
     <!-- Sorting Icon -->
     <template v-if="column.options.isSortable">
@@ -141,10 +141,15 @@ export default defineComponent({
       };
     });
 
+    const columnName = computed(() =>
+      props.column.options.hideColumnName ? "" : props.column.key
+    );
+
     return {
       // General
       style,
       classes,
+      columnName,
       onHeaderClick,
 
       // Sorting

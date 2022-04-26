@@ -23,6 +23,7 @@ export class SelectColumn<T> extends AbstractColumn<T, boolean, SelectOptions> {
       defaultWidth: 40,
       defaultPin: "left",
       defaultAlignment: "centre",
+      hideColumnName: true,
     });
   }
 }

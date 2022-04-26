@@ -407,4 +407,18 @@ export class GridState {
       }
     }
   }
+
+  toggleRowSelect(rowIdToToggle: number) {
+    const rowIsCurrentlySelected = !!this.selectedRowIds.find(
+      (rowId) => rowId === rowIdToToggle
+    );
+
+    if (rowIsCurrentlySelected) {
+      this.selectedRowIds = this.selectedRowIds.filter(
+        (rowId) => rowId !== rowIdToToggle
+      );
+    } else {
+      this.selectedRowIds.push(rowIdToToggle);
+    }
+  }
 }

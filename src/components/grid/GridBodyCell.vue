@@ -4,6 +4,7 @@
     @click="onClick"
     @dblclick="onDoubleClick"
     @keydown="onKeyDown"
+    @focus="onFocus"
   >
     <component
       :value="internalValue"
@@ -12,6 +13,7 @@
       :column="column"
       :is-editing="isEditing"
       :col-key="column.key"
+      autofocus
       @input="updateValue"
     />
     <div v-if="cellErrors.length" class="grid-row-validation-error" />
@@ -33,6 +35,7 @@ import {
   ref,
   watch,
 } from "@vue/composition-api";
+import { GridManager } from "@/components/grid/GridManager";
 
 export default defineComponent({
   name: "GridBodyCell",
@@ -52,6 +55,7 @@ export default defineComponent({
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
+    const gridManager = inject<GridManager>("gridManager")!;
     const internalValue = ref(props.column.value(props.item));
     const cellErrors = computed(() =>
       props.column.rules
@@ -81,15 +85,7 @@ export default defineComponent({
 
     // Cells handle row clicks so they can do cell-specific actions instead of row actions if needed
     const onClick = (event: PointerEvent) => {
-      gridState.cellFocused = {
-        rowId: props.item[rowIndex],
-        columnKey: props.column.key,
-      };
-
-      // If the cell we clicked on isn't the one we are editing, clear our edit
-      if (!isEditing.value) {
-        gridState.cellEdited = null;
-      }
+      onFocus();
 
       // Will also need preventDefault so we don't click link rows if we want this behaviour
       if (props.column.isEditable) {
@@ -99,58 +95,95 @@ export default defineComponent({
       }
     };
 
-    // TODO: Add mobile support for dbl click
-    const onDoubleClick = (event: PointerEvent) => {
+    const toggleEditState = () => {
       if (props.column.isEditable) {
         gridState.cellEdited = {
           rowId: props.item[rowIndex],
           columnKey: props.column.key,
         };
+      }
+    };
+
+    // TODO: Add mobile support for dbl click
+    const onDoubleClick = (event: PointerEvent) => {
+      if (props.column.isEditable) {
+        toggleEditState();
       } else {
-        // TODO: Show error state
+        // TODO: Show unable to edit state
       }
     };
 
     const onKeyDown = (event: KeyboardEvent) => {
       switch (event.key) {
-        case "Tab": {
-          // Prevent normal tabbing in this case
-          event.preventDefault();
-
-          // Get the parent, so we can get our current row index
-          const parentElement = (event.target as HTMLElement).parentElement!;
-          const targetRowIndex = Number(parentElement.ariaRowIndex);
-
-          // Our next to focus element is +1 in column index
-          const nextToFocus = document.querySelector(
-            `[aria-rowindex="${targetRowIndex}"] > [aria-colindex="${
-              props.columnIndex + 1
-            }"]`
-          ) as HTMLElement;
-
-          // If we have a next child, focus that
-          if (nextToFocus) {
-            nextToFocus.focus();
-          } else {
-            // Otherwise, go to the next row's first child
-            const nextRow = document.querySelector(
-              `[aria-rowindex="${targetRowIndex + 1}"`
-            )?.firstChild as HTMLElement;
-
-            nextRow.focus();
-          }
+        case "ArrowDown":
+          focusAdjacentCell(event, 0, 1);
           break;
-        }
+
+        case "ArrowUp":
+          focusAdjacentCell(event, 0, -1);
+          break;
+
+        case "ArrowLeft":
+          focusAdjacentCell(event, -1, 0);
+          break;
+
+        case "Tab":
         case "ArrowRight":
-        
+          focusAdjacentCell(event, 1, 0);
+          break;
+
+        case " ":
+          event.preventDefault();
+          gridState.toggleRowSelect(props.item[rowIndex]);
+          break;
+
+        case "Enter":
+          event.preventDefault();
+          toggleEditState();
+          break;
       }
-      console.log(event.key, props.item[rowIndex], props.column.key);
     };
 
-    const focusAdjacentCell = (rowMod: number, columnMod: number) => {
-      const currentRowIndex = props.item[rowIndex]
-      const cellToTarget = document.querySelector(`[aria-rowindex="${}"`)
-    }
+    const focusAdjacentCell = (
+      event: KeyboardEvent,
+      columnMod: number,
+      rowMod: number
+    ) => {
+      event.preventDefault();
+
+      const currentRow = (event.target as HTMLElement).closest("[role='row']")!;
+      const currentRowIndex = Number(currentRow.ariaRowIndex!);
+      let targetRowIndex = currentRowIndex + rowMod;
+      let targetColumnIndex = props.columnIndex + columnMod;
+
+      if (targetColumnIndex < 1) {
+        targetRowIndex--;
+        targetColumnIndex = gridManager.visibleColumns.length;
+      }
+
+      if (targetColumnIndex > gridManager.visibleColumns.length) {
+        targetRowIndex++;
+        targetColumnIndex = 1;
+      }
+
+      let cellToTarget = document.querySelector(
+        `[aria-rowindex="${targetRowIndex}"] > [aria-colindex="${targetColumnIndex}"]`
+      );
+
+      (cellToTarget as HTMLElement | null)?.focus();
+    };
+
+    const onFocus = () => {
+      gridState.cellFocused = {
+        rowId: props.item[rowIndex],
+        columnKey: props.column.key,
+      };
+
+      // If the cell we clicked on isn't the one we are editing, clear our edit
+      if (!isEditing.value) {
+        gridState.cellEdited = null;
+      }
+    };
 
     const updateValue = (newValue: any) => {
       props.column.setValue(props.item, newValue);
@@ -185,6 +218,7 @@ export default defineComponent({
       onClick,
       onDoubleClick,
       onKeyDown,
+      onFocus,
       cellErrors,
     };
   },

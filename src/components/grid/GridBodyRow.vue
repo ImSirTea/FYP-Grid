@@ -50,14 +50,6 @@ export default defineComponent({
           "aria-colindex": currentColumnIndex,
           tabindex: -1,
         },
-        nativeOn: {
-          focus: () => {
-            gridState.cellFocused = {
-              rowId: props.item[rowIndex],
-              columnKey: column.key,
-            };
-          },
-        },
       });
     };
 
