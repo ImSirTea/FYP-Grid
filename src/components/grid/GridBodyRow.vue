@@ -44,43 +44,13 @@ export default defineComponent({
           "grid-row-cell": true,
           "grid-column-dragged": gridState.columnDragged?.key === column.key,
         },
-        props: { item: props.item, column },
+        props: { item: props.item, column, columnIndex: currentColumnIndex },
         attrs: {
           role: "gridcell",
           "aria-colindex": currentColumnIndex,
           tabindex: -1,
         },
         nativeOn: {
-          keydown: (event: KeyboardEvent) => {
-            if (event.key === "Tab") {
-              // Prevent normal tabbing in this case
-              event.preventDefault();
-
-              // Get the parent, so we can get our current row index
-              const parentElement = (event.target as HTMLElement)
-                .parentElement!;
-              const targetRowIndex = Number(parentElement.ariaRowIndex);
-
-              // Our next to focus element is +1 in column index
-              const nextToFocus = document.querySelector(
-                `[aria-rowindex="${targetRowIndex}"] > [aria-colindex="${
-                  currentColumnIndex + 1
-                }"]`
-              ) as HTMLElement;
-
-              // If we have a next child, focus that
-              if (nextToFocus) {
-                nextToFocus.focus();
-              } else {
-                // Otherwise, go to the next row's first child
-                const nextRow = document.querySelector(
-                  `[aria-rowindex="${targetRowIndex + 1}"`
-                )?.firstChild as HTMLElement;
-
-                nextRow.focus();
-              }
-            }
-          },
           focus: () => {
             gridState.cellFocused = {
               rowId: props.item[rowIndex],

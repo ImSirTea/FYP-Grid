@@ -1,8 +1,9 @@
 <template>
   <div
     :class="{ 'grid-cell-focused': isFocused, 'grid-cell-editing': isEditing }"
-    @click="onCellClick"
-    @dblclick="onCellDoubleClick"
+    @click="onClick"
+    @dblclick="onDoubleClick"
+    @keydown="onKeyDown"
   >
     <component
       :value="internalValue"
@@ -44,6 +45,10 @@ export default defineComponent({
       type: Object as PropType<AnyGridColumn>,
       required: true,
     },
+    columnIndex: {
+      type: Number,
+      required: true,
+    },
   },
   setup(props, context) {
     const gridState = inject<GridState>("gridState")!;
@@ -75,7 +80,7 @@ export default defineComponent({
     });
 
     // Cells handle row clicks so they can do cell-specific actions instead of row actions if needed
-    const onCellClick = (event: PointerEvent) => {
+    const onClick = (event: PointerEvent) => {
       gridState.cellFocused = {
         rowId: props.item[rowIndex],
         columnKey: props.column.key,
@@ -95,7 +100,7 @@ export default defineComponent({
     };
 
     // TODO: Add mobile support for dbl click
-    const onCellDoubleClick = (event: PointerEvent) => {
+    const onDoubleClick = (event: PointerEvent) => {
       if (props.column.isEditable) {
         gridState.cellEdited = {
           rowId: props.item[rowIndex],
@@ -105,6 +110,47 @@ export default defineComponent({
         // TODO: Show error state
       }
     };
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      switch (event.key) {
+        case "Tab": {
+          // Prevent normal tabbing in this case
+          event.preventDefault();
+
+          // Get the parent, so we can get our current row index
+          const parentElement = (event.target as HTMLElement).parentElement!;
+          const targetRowIndex = Number(parentElement.ariaRowIndex);
+
+          // Our next to focus element is +1 in column index
+          const nextToFocus = document.querySelector(
+            `[aria-rowindex="${targetRowIndex}"] > [aria-colindex="${
+              props.columnIndex + 1
+            }"]`
+          ) as HTMLElement;
+
+          // If we have a next child, focus that
+          if (nextToFocus) {
+            nextToFocus.focus();
+          } else {
+            // Otherwise, go to the next row's first child
+            const nextRow = document.querySelector(
+              `[aria-rowindex="${targetRowIndex + 1}"`
+            )?.firstChild as HTMLElement;
+
+            nextRow.focus();
+          }
+          break;
+        }
+        case "ArrowRight":
+        
+      }
+      console.log(event.key, props.item[rowIndex], props.column.key);
+    };
+
+    const focusAdjacentCell = (rowMod: number, columnMod: number) => {
+      const currentRowIndex = props.item[rowIndex]
+      const cellToTarget = document.querySelector(`[aria-rowindex="${}"`)
+    }
 
     const updateValue = (newValue: any) => {
       props.column.setValue(props.item, newValue);
@@ -136,8 +182,9 @@ export default defineComponent({
       isEditing,
       internalValue,
       updateValue,
-      onCellClick,
-      onCellDoubleClick,
+      onClick,
+      onDoubleClick,
+      onKeyDown,
       cellErrors,
     };
   },

@@ -20,7 +20,7 @@ import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid, { useGrid } from "@/components/grid/Grid.vue";
 import { numberInRange } from "@/components/util/rules";
 
-interface Item {
+export interface Item {
   first: string;
   last: string;
   age: number;
@@ -31,6 +31,23 @@ interface Item {
   };
 }
 
+export function buildItems(numberToBuild: number) {
+  return Array(numberToBuild)
+    .fill(0)
+    .map((_, index): Item => {
+      return {
+        index,
+        first: `Adam${index % 20}`,
+        last: `Lansley${index % 20}`,
+        age: index % 20,
+        address: {
+          postcode: `PO${index % 20} 000`,
+          addressLine1: "Address Line 1",
+        },
+      };
+    });
+}
+
 export default defineComponent({
   name: "App",
   components: { Grid },
@@ -38,25 +55,7 @@ export default defineComponent({
     const { gridRef } = useGrid<Item>();
     let count = 0;
 
-    const items = shallowRef(
-      Array(1000)
-        .fill(0)
-        .map((_, index): Item => {
-          // add some variance so we can mess aboot with checking filters
-          index % 20 === 0 ? count++ : null;
-
-          return {
-            index,
-            first: `Adam${index % 20}`,
-            last: `Lansley${index % 20}`,
-            age: (index % 20) + count,
-            address: {
-              postcode: `PO${index % 20} 000`,
-              addressLine1: "Address Line 1",
-            },
-          };
-        })
-    );
+    const items = shallowRef(buildItems(1000));
 
     const builder = new GridConfiguration<Item>();
 
