@@ -150,7 +150,8 @@ export default defineComponent({
       rowMod: number
     ) => {
       event.preventDefault();
-      const currentRowIndex = props.item[rowIndex] + 1;
+      const currentRow = (event.target as HTMLElement).closest("[role='row']")!;
+      const currentRowIndex = Number(currentRow.ariaRowIndex);
       let targetRowIndex = currentRowIndex + rowMod;
       let targetColumnIndex = props.columnIndex + columnMod;
 
@@ -164,11 +165,7 @@ export default defineComponent({
         targetColumnIndex = 1;
       }
 
-      let cellToTarget = document.querySelector(
-        `[aria-rowindex="${targetRowIndex}"] > [aria-colindex="${targetColumnIndex}"]`
-      ) as HTMLElement | null;
-
-      cellToTarget?.focus();
+      context.emit("focus:cell", targetRowIndex, targetColumnIndex);
     };
 
     const onFocus = () => {

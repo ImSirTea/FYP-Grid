@@ -1,5 +1,3 @@
 Trying to save changes when you have errors that are filtered out?
 
-Cannot press down/up to scroll to next row
-
 Tab focus and scrolling will cause two boxes of focus

@@ -50,6 +50,11 @@ export default defineComponent({
           "aria-colindex": currentColumnIndex,
           tabindex: -1,
         },
+        on: {
+          "focus:cell": (targetRowIndex: number, targetColumnIndex: number) => {
+            context.emit("focus:cell", targetRowIndex, targetColumnIndex);
+          },
+        },
       });
     };
 
