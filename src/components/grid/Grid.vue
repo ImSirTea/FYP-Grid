@@ -130,10 +130,13 @@ export default defineComponent({
           return;
         }
 
-        internalItems.value = gridState.filterAndSortItems(
-          indexedItems.value,
-          props.gridConfiguration
-        );
+        // Create a new array instance so Vue correctly reacts to our state changes
+        internalItems.value = [
+          ...gridState.filterAndSortItems(
+            indexedItems.value,
+            props.gridConfiguration
+          ),
+        ];
       },
       { immediate: true, deep: true }
     );
