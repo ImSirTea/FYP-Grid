@@ -3,6 +3,7 @@ import {
   ActionDefinition,
 } from "@/components/grid/columns/action/ActionColumn";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
+import { numberInRange } from "@/components/util/rules";
 import Item from "@/types/item";
 
 describe("GridConfiguration", () => {
@@ -22,11 +23,16 @@ describe("GridConfiguration", () => {
     gridConfiguration.addNumberColumn("index", (item) => item.index);
     expect(gridConfiguration.columns).toHaveLength(2);
 
+    const numberGreaterThanZeroRule = numberInRange(0);
+
     // Adding options works as expected
     const lastNameColumn = gridConfiguration
-      .addTextColumn("last", (item) => item.last)
-      .setOptions({ defaultPin: "right" });
+      .addNumberColumn("age", (item) => item.age)
+      .setOptions({ defaultPin: "right" })
+      .addRules([numberGreaterThanZeroRule]);
     expect(lastNameColumn.options.defaultPin).toEqual("right");
+    expect(lastNameColumn.rules).toHaveLength(1);
+    expect(lastNameColumn.rules[0]).toBe(numberGreaterThanZeroRule);
   });
 
   it("Adds an action column", () => {
