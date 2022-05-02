@@ -1,7 +1,6 @@
 import {
   AbstractColumn,
   ColumnOptions,
-  GridWidthEnum,
   ValueExtractor,
 } from "@/components/grid/columns/AbstractColumn";
 import GridActionRenderer from "@/components/grid/columns/action/GridActionRenderer.vue";

@@ -157,7 +157,7 @@ export class GridState {
    */
   public filterAndSortItems(
     items: AnyWithRowIndex[],
-    gridConfiguration: GridConfiguration<AnyWithRowIndex>
+    gridConfiguration: GridConfiguration<any>
   ): AnyWithRowIndex[] {
     const filtersExist = Object.entries(this.columnStates).some(
       ([key, column]) => column.filterOptions.length

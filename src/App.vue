@@ -19,41 +19,13 @@ import { defineComponent, shallowRef } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid, { useGrid } from "@/components/grid/Grid.vue";
 import { numberInRange } from "@/components/util/rules";
-
-export interface Item {
-  first: string;
-  last: string;
-  age: number;
-  index: number;
-  address: {
-    postcode: string;
-    addressLine1: string;
-  };
-}
-
-export function buildItems(numberToBuild: number) {
-  return Array(numberToBuild)
-    .fill(0)
-    .map((_, index): Item => {
-      return {
-        index,
-        first: `Adam${index % 20}`,
-        last: `Lansley${index % 20}`,
-        age: index % 20,
-        address: {
-          postcode: `PO${index % 20} 000`,
-          addressLine1: "Address Line 1",
-        },
-      };
-    });
-}
+import Item, { buildItems } from "@/types/item";
 
 export default defineComponent({
   name: "App",
   components: { Grid },
   setup(props, context) {
     const { gridRef } = useGrid<Item>();
-    let count = 0;
 
     const items = shallowRef(buildItems(1000));
 
@@ -113,14 +85,7 @@ export default defineComponent({
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);
-      items.value = Array(base)
-        .fill(0)
-        .map((_, index) => ({
-          index,
-          first: `Adam-(${base})-${index % 20}`,
-          last: `Lansley-(${base})-${index % 20}`,
-          age: index % 20,
-        })) as Item[];
+      items.value = buildItems(base);
     };
 
     const getRows = () => {

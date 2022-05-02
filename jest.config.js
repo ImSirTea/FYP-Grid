@@ -1,3 +1,12 @@
+/** @type {import('ts-jest/dist/types').InitialOptionsTsJest} */
 module.exports = {
-  preset: "@vue/cli-plugin-unit-jest/presets/typescript-and-babel",
+  preset: "ts-jest",
+  moduleDirectories: ["node_modules"],
+  moduleFileExtensions: ["js", "jsx", "ts", "tsx", "vue"],
+  moduleNameMapper: {
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
+  transform: {
+    ".*\\.(vue)$": "@vue/vue2-jest",
+  },
 };
