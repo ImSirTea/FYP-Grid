@@ -19,7 +19,6 @@ export class GridConfiguration<T> {
   #selectColumn?: SelectColumn<T>;
   rowAction?: RowAction<T>;
   rowRoute?: RowRoute<T>;
-  allowRowSelection: boolean = false;
 
   get columns(): AnyGridColumn[] {
     const allColumns = [
