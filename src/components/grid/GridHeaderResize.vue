@@ -33,11 +33,15 @@ export default defineComponent({
     };
 
     const onResizeDblClick = () => {
+      console.log("resize dbl");
       const relevantCells = Array.from(
         document.querySelectorAll(
           `[role=gridcell] > [col-key=${props.column.key}]`
         )
       );
+
+      console.log(relevantCells);
+
       // Largest size, plus the parent's padding, and extra for kindness
       const largestWidth = Math.max(
         ...relevantCells.map((cell) => {
@@ -53,11 +57,17 @@ export default defineComponent({
             parentStyle.paddingLeft.replace(/\D/g, "")
           );
 
+          console.log(
+            cell.scrollWidth + parentPaddingLeft + parentPaddingRight + 1
+          );
+
           return (
             cell.scrollWidth + parentPaddingLeft + parentPaddingRight + 1 // +1 so we aren't a tiny fraction off
           );
         })
       );
+
+      console.log(largestWidth);
 
       gridState.columnStates[props.column.key].width = largestWidth;
     };
