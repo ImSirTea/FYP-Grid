@@ -19,7 +19,6 @@ export class GridConfiguration<T> {
   #selectColumn?: SelectColumn<T>;
   rowAction?: RowAction<T>;
   rowRoute?: RowRoute<T>;
-  allowRowSelection: boolean = false;
 
   get columns(): AnyGridColumn[] {
     const allColumns = [
@@ -67,7 +66,9 @@ export class GridConfiguration<T> {
     return numberColumn;
   }
 
-  withActionColumn(name: string = $tc.actions.toLowerCase()): ActionColumn<T> {
+  withActionColumn(
+    name: string = $tc.system_actions.toLowerCase()
+  ): ActionColumn<T> {
     if (this.#actionColumn) {
       throw Error("Action column has already been defined.");
     }
@@ -77,8 +78,13 @@ export class GridConfiguration<T> {
     return this.#actionColumn;
   }
 
-  withSelectColumn(): SelectColumn<T> {
-    this.#selectColumn = new SelectColumn<T>("", () => false);
+  withSelectColumn(
+    name: string = $tc.system_select.toLowerCase()
+  ): SelectColumn<T> {
+    if (this.#selectColumn) {
+      throw Error("Select column has already been defined.");
+    }
+    this.#selectColumn = new SelectColumn<T>(name, () => false);
 
     return this.#selectColumn;
   }

@@ -19,7 +19,7 @@ export class GridManager {
     this.#gridConfiguration = gridConfiguration;
   }
 
-  get #visibleColumns() {
+  get visibleColumns() {
     return this.#gridConfiguration.columns
       .filter((column) => !this.#gridState.columnStates[column.key].isHidden)
       .sort(this.sortOnOrder);
@@ -44,7 +44,7 @@ export class GridManager {
       right: [],
     };
 
-    this.#visibleColumns.forEach((column) => {
+    this.visibleColumns.forEach((column) => {
       const state = this.#gridState.columnStates[column.key];
       columns[state.pin].push(column);
     });

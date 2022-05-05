@@ -138,8 +138,12 @@ $highlight-colour: #00aeff;
   height: 100%;
 }
 
+.grid-cell-focused {
+  outline: -webkit-focus-ring-color auto 1px;
+}
+
 .grid-cell-editing {
-  border: 2px solid $highlight-colour;
+  outline: $highlight-colour auto 2px;
 }
 
 .grid-row-validation-error {
@@ -150,4 +154,16 @@ $highlight-colour: #00aeff;
   right: -0.75em;
   background-color: red;
   transform: rotate(45deg);
+}
+
+.scrollbar-margin {
+  margin-right: 17px;
+}
+
+// Disable right-margin on touch devices
+// We could use pointer: corse, but this is more consistent
+@media (hover: none) {
+  .scrollbar-margin {
+    margin-right: 0px;
+  }
 }

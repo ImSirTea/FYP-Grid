@@ -1,7 +1,6 @@
 import {
   AbstractColumn,
   ColumnOptions,
-  GridWidthEnum,
   ValueExtractor,
 } from "@/components/grid/columns/AbstractColumn";
 import GridActionRenderer from "@/components/grid/columns/action/GridActionRenderer.vue";
@@ -30,8 +29,9 @@ export class ActionColumn<T> extends AbstractColumn<T, null, ActionOptions> {
       isFilterable: false,
       isSortable: false,
       isManageable: false,
-      defaultWidth: GridWidthEnum.SMALL,
+      defaultWidth: 50,
       defaultPin: "right",
+      hideColumnName: true,
     });
   }
 

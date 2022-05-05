@@ -1,8 +1,8 @@
 <template>
   <v-container fluid class="grid-control-panel-container">
-    <v-row align="center" dense>
+    <v-row justify="center" align="center" dense>
       <v-spacer />
-      <v-col cols="8" sm="6" md="4">
+      <v-col cols="12" md="4">
         <v-text-field
           :value="gridState.searchValue"
           :placeholder="$tc.search_for"
@@ -10,32 +10,34 @@
           @input="updateSearchValue"
         />
       </v-col>
-      <v-col cols="auto">
-        <v-btn outlined @click="toggleManageMenu">
+      <v-col cols="6" sm="auto">
+        <v-btn outlined @click="toggleManageMenu" block>
           <v-icon class="mr-2">mdi-view-column</v-icon>
           {{ $tc.manage }}
         </v-btn>
       </v-col>
-      <v-col cols="auto">
-        <v-btn outlined @click="toggleFilterMenu">
+      <v-col cols="6" sm="auto">
+        <v-btn outlined @click="toggleFilterMenu" block>
           <v-icon class="mr-2">mdi-filter-variant</v-icon>
           {{ $tc.filter }}
         </v-btn>
       </v-col>
-      <v-col cols="auto">
+      <v-col cols="6" sm="auto">
         <v-btn
           :disabled="!gridState.isDirty"
           outlined
+          block
           @click="$emit('apply:item-changes')"
         >
-          <v-icon class="mr-2">mdi-content-save</v-icon>
+          <v-icon class="mr-2">mdi-check</v-icon>
           {{ $tc.apply }}
         </v-btn>
       </v-col>
-      <v-col cols="auto">
+      <v-col cols="6" sm="auto">
         <v-btn
           :disabled="!gridState.isDirty"
           outlined
+          block
           @click="$emit('reset:item-changes')"
         >
           <v-icon class="mr-2">mdi-trash-can</v-icon>

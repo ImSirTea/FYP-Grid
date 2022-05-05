@@ -44,6 +44,12 @@ export class GridState {
   // Which column are we dragging, highlight it so dragging is clearer
   columnDragged: AnyGridColumn | null = null;
 
+  // Cell focused
+  cellFocused: {
+    rowId: AnyWithRowIndex[typeof rowIndex];
+    columnKey: AnyGridColumn["key"];
+  } | null = null;
+
   // The cell currently being edited
   cellEdited: {
     rowId: AnyWithRowIndex[typeof rowIndex];
@@ -151,7 +157,7 @@ export class GridState {
    */
   public filterAndSortItems(
     items: AnyWithRowIndex[],
-    gridConfiguration: GridConfiguration<AnyWithRowIndex>
+    gridConfiguration: GridConfiguration<any>
   ): AnyWithRowIndex[] {
     const filtersExist = Object.entries(this.columnStates).some(
       ([key, column]) => column.filterOptions.length
@@ -243,7 +249,7 @@ export class GridState {
     }
 
     columnState.filterOptions.push({
-      filterFunction: undefined,
+      condition: undefined,
       value: undefined,
       operator: FilterOperator.and,
     });
@@ -257,8 +263,7 @@ export class GridState {
   public removeFilter(column: AnyGridColumn, index: number) {
     this.columnStates[column.key].filterOptions.splice(index, 1);
 
-    const filterChain = this.buildFilterFunctionsForColumn(column.key);
-    Vue.set(this.columnStates[column.key], "filterChain", filterChain);
+    this.buildFilterFunctionsForColumn(column.key);
   }
 
   /**
@@ -275,9 +280,7 @@ export class GridState {
     index: number
   ) {
     if (totalNumberOfOptions === index + 1) {
-      return (
-        options.filterFunction !== undefined && options.value !== undefined
-      );
+      return options.condition !== undefined && options.value !== undefined;
     }
 
     return hasAllProperties(options);
@@ -301,10 +304,11 @@ export class GridState {
           if (option.operator === FilterOperator.or) {
             return (itemValue: any) =>
               chain(itemValue) ||
-              option.filterFunction!(itemValue, option.value);
+              option.condition!.filterFunction(itemValue, option.value);
           }
           return (itemValue: any) =>
-            chain(itemValue) && option.filterFunction!(itemValue, option.value);
+            chain(itemValue) &&
+            option.condition!.filterFunction(itemValue, option.value);
         }
         return chain;
       },
@@ -401,6 +405,20 @@ export class GridState {
       if (Object.entries(this.rowCellsWithErrors[index]).length === 0) {
         delete this.rowCellsWithErrors[index];
       }
+    }
+  }
+
+  toggleRowSelect(rowIdToToggle: number) {
+    const rowIsCurrentlySelected = !!this.selectedRowIds.find(
+      (rowId) => rowId === rowIdToToggle
+    );
+
+    if (rowIsCurrentlySelected) {
+      this.selectedRowIds = this.selectedRowIds.filter(
+        (rowId) => rowId !== rowIdToToggle
+      );
+    } else {
+      this.selectedRowIds.push(rowIdToToggle);
     }
   }
 }

@@ -107,6 +107,8 @@ export default defineComponent({
       props.width ? props.width + "px" : "100%"
     );
 
+    // If our prop items change, we need to re-inject grid indexes
+    // This should also trigger a filterAndSort re-render
     watch(
       () => props.items,
       () => {
@@ -115,6 +117,7 @@ export default defineComponent({
       { immediate: true, deep: true }
     );
 
+    // If our items change, or any important state does, re-filter and sort
     watch(
       () => [
         indexedItems.value,
@@ -123,12 +126,32 @@ export default defineComponent({
         gridState.searchValue,
       ],
       () => {
-        internalItems.value = gridState.filterAndSortItems(
-          indexedItems.value,
-          props.gridConfiguration
-        );
+        if (!gridState.filtersAreValid) {
+          return;
+        }
+
+        // Create a new array instance so Vue correctly reacts to our state changes
+        internalItems.value = [
+          ...gridState.filterAndSortItems(
+            indexedItems.value,
+            props.gridConfiguration
+          ),
+        ];
       },
       { immediate: true, deep: true }
+    );
+
+    // Select all if we have done so
+    watch(
+      () => gridState.selectedRowIds,
+      () => {
+        if (gridState.selectedRowIds.length === internalItems.value.length) {
+          gridState.selectAllRows = true;
+          return;
+        }
+
+        gridState.selectAllRows = false;
+      }
     );
 
     // Provide a function to externally call this, so we don't keep another copy of items in memory
@@ -171,8 +194,6 @@ export default defineComponent({
     const buildHeader = () => {
       return h(GridHeaderRow, {
         props: {
-          gridConfiguration: props.gridConfiguration,
-          gridState: gridState,
           rowHeight: props.rowHeight,
           gridOffsetLeft: gridOffsets.left,
         },
@@ -182,10 +203,6 @@ export default defineComponent({
     // ONLY USE IN CONTEXT OF RENDERING
     const buildControlPanel = (): VNode => {
       return h(GridControlPanel, {
-        props: {
-          gridState: gridState,
-          gridConfiguration: props.gridConfiguration,
-        },
         on: {
           "apply:item-changes": () => {
             const existingErrors = Object.entries(gridState.rowCellsWithErrors);
@@ -256,6 +273,9 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildTable = () => {
+      const totalColumns = Object.values(gridManager.columns).flatMap(
+        (col) => col
+      ).length;
       return h(
         "div",
         {
@@ -264,6 +284,7 @@ export default defineComponent({
           attrs: {
             role: "grid",
             "aria-rowcount": props.items.length + 1, // +1 For the header
+            "aria-colcount": totalColumns,
           },
         },
         [

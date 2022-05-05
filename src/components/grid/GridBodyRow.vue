@@ -33,6 +33,7 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn, columnIndex: number) => {
+      const currentColumnIndex = props.columnStartIndex + columnIndex;
       return h(GridBodyCell, {
         key: column.key,
         style: {
@@ -43,10 +44,16 @@ export default defineComponent({
           "grid-row-cell": true,
           "grid-column-dragged": gridState.columnDragged?.key === column.key,
         },
-        props: { item: props.item, column },
+        props: { item: props.item, column, columnIndex: currentColumnIndex },
         attrs: {
           role: "gridcell",
-          tabindex: props.columnStartIndex + columnIndex,
+          "aria-colindex": currentColumnIndex,
+          tabindex: -1,
+        },
+        on: {
+          "focus:cell": (targetRowIndex: number, targetColumnIndex: number) => {
+            context.emit("focus:cell", targetRowIndex, targetColumnIndex);
+          },
         },
       });
     };
@@ -62,14 +69,23 @@ export default defineComponent({
       this.gridConfiguration.rowAction || this.gridConfiguration.rowRoute
     );
 
+    const classes = {
+      "grid-row-clickable": isRowClickable,
+      "grid-row-hovered": this.item[rowIndex] === this.gridState.rowHovered,
+    };
+
+    const cells = this.columns.map((column, index) =>
+      this.buildCell(column, index)
+    );
+
     if (this.gridConfiguration.rowRoute) {
       return h(
         "router-link",
         {
           props: { to: this.gridConfiguration.rowRoute(this.item) },
-          class: { "grid-row-clickable": isRowClickable },
+          class: classes,
         },
-        this.columns.map((column, index) => this.buildCell(column, index))
+        cells
       );
     }
 
@@ -78,10 +94,7 @@ export default defineComponent({
     return h(
       rowType,
       {
-        class: {
-          "grid-row-clickable": isRowClickable,
-          "grid-row-hovered": this.item[rowIndex] === this.gridState.rowHovered,
-        },
+        class: classes,
         on: {
           click: () => {
             if (isRowClickable) {
@@ -90,7 +103,7 @@ export default defineComponent({
           },
         },
       },
-      this.columns.map((column, index) => this.buildCell(column, index))
+      cells
     );
   },
 });

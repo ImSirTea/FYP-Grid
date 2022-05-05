@@ -12,8 +12,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "@vue/composition-api";
+import { defineComponent, PropType } from "@vue/composition-api";
 import TextField from "@/components/controls/inputs/TextField.vue";
+import { AnyGridColumn } from "@/components/grid/columns/AbstractColumn";
 
 export default defineComponent({
   name: "GridTextRenderer",
@@ -27,6 +28,14 @@ export default defineComponent({
       type: Boolean,
       required: false,
       default: false,
+    },
+    item: {
+      type: Object as PropType<any>,
+      required: false,
+    },
+    column: {
+      type: Object as PropType<AnyGridColumn>,
+      required: false,
     },
   },
 });

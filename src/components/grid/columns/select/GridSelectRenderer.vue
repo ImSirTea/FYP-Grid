@@ -56,13 +56,7 @@ export default defineComponent({
           return;
         }
 
-        if (isSelected) {
-          gridState.selectedRowIds.push(props.item[rowIndex]);
-        } else {
-          gridState.selectedRowIds = gridState.selectedRowIds.filter(
-            (rowItem) => rowItem[rowIndex] !== props.item![rowIndex]
-          );
-        }
+        gridState.toggleRowSelect(props.item[rowIndex]);
       },
     });
 

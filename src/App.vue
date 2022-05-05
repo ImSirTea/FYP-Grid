@@ -19,44 +19,15 @@ import { defineComponent, shallowRef } from "@vue/composition-api";
 import { GridConfiguration } from "@/components/grid/GridConfiguration";
 import Grid, { useGrid } from "@/components/grid/Grid.vue";
 import { numberInRange } from "@/components/util/rules";
-
-interface Item {
-  first: string;
-  last: string;
-  age: number;
-  index: number;
-  address: {
-    postcode: string;
-    addressLine1: string;
-  };
-}
+import Item, { buildItems } from "@/types/item";
 
 export default defineComponent({
   name: "App",
   components: { Grid },
   setup(props, context) {
     const { gridRef } = useGrid<Item>();
-    let count = 0;
 
-    const items = shallowRef(
-      Array(1000)
-        .fill(0)
-        .map((_, index): Item => {
-          // add some variance so we can mess aboot with checking filters
-          index % 20 === 0 ? count++ : null;
-
-          return {
-            index,
-            first: `Adam${index % 20}`,
-            last: `Lansley${index % 20}`,
-            age: (index % 20) + count,
-            address: {
-              postcode: `PO${index % 20} 000`,
-              addressLine1: "Address Line 1",
-            },
-          };
-        })
-    );
+    const items = shallowRef(buildItems(1000));
 
     const builder = new GridConfiguration<Item>();
 
@@ -107,21 +78,14 @@ export default defineComponent({
     // builder.withRowAction((item) =>
     //   console.log(`/rowRoute/index/${item.index}`)
     // );
-    // builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
+    builder.withRowRoute((item) => `/rowRoute/index/${item.index}`);
     builder
       .addTextColumn("first1", (item) => item.first + "- 1")
       .setOptions({ defaultPin: "right" });
 
     const updateItems = () => {
       const base = Math.floor(Math.random() * 1000000);
-      items.value = Array(base)
-        .fill(0)
-        .map((_, index) => ({
-          index,
-          first: `Adam-(${base})-${index % 20}`,
-          last: `Lansley-(${base})-${index % 20}`,
-          age: index % 20,
-        })) as Item[];
+      items.value = buildItems(base);
     };
 
     const getRows = () => {

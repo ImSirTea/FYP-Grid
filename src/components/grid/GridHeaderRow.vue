@@ -91,11 +91,10 @@ export default defineComponent({
         h(
           "div",
           {
-            class: "grid-column-wrapper",
+            class: { "grid-column-wrapper": true, "scrollbar-margin": true },
             style: {
               width: rightWidth + "px",
               "min-width": rightWidth + "px",
-              "margin-right": "17px",
             },
             attrs: {
               role: "row",
@@ -109,7 +108,12 @@ export default defineComponent({
 
     // ONLY USE IN CONTEXT OF RENDERING
     const buildCell = (column: AnyGridColumn) => {
-      return h(GridHeaderCell, { props: { column } });
+      return h(GridHeaderCell, {
+        props: { column },
+        attrs: {
+          role: "columnheader",
+        },
+      });
     };
 
     watch(

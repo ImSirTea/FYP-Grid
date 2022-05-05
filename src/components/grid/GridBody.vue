@@ -16,7 +16,7 @@ import {
   inject,
   ref,
 } from "@vue/composition-api";
-import { VNode } from "vue";
+import Vue, { VNode } from "vue";
 
 /**
  * Container for all grid rows, handling scroll events, offsets, and rendering
@@ -90,6 +90,7 @@ export default defineComponent({
       columns: AnyGridColumn[],
       columnStartIndex: number
     ) => {
+      const top = index * props.rowHeight;
       return h(GridBodyRow, {
         attrs: {
           role: "row",
@@ -99,13 +100,67 @@ export default defineComponent({
           "grid-row": true,
         },
         style: {
-          top: index * props.rowHeight + "px",
+          top: top + "px",
           height: props.rowHeight + "px",
         },
         props: {
           item,
           columns,
           columnStartIndex,
+        },
+        on: {
+          "focus:cell": (targetRowIndex: number, targetColumnIndex: number) => {
+            // Our real row/column values
+            const targetColumn =
+              gridManager.visibleColumns[targetColumnIndex - 1];
+            const targetRow = props.internalItems[targetRowIndex - 1];
+
+            // If our row doesn't exist, don't bother, targetColumn already handles clipping
+            if (!targetRow) {
+              return;
+            }
+
+            const maxVisibleRowIndex =
+              rowIndexBoundaries.value.max - props.bufferRows;
+
+            const minVisibleRowIndex =
+              rowIndexBoundaries.value.min + props.bufferRows;
+
+            // If our new row is out of view at the bottom of the grid
+            if (targetRowIndex > maxVisibleRowIndex) {
+              context.emit(
+                "update:scroll-top",
+                props.gridOffsetTop +
+                  (targetRowIndex - maxVisibleRowIndex) * props.rowHeight
+              );
+            }
+
+            // If our new row is out of view at the top of the grid
+            if (targetRowIndex - 1 < minVisibleRowIndex) {
+              context.emit(
+                "update:scroll-top",
+                props.gridOffsetTop -
+                  Math.abs(minVisibleRowIndex - targetRowIndex - 1) *
+                    props.rowHeight
+              );
+            }
+
+            // Once our scroll events have finished, focus our new cell
+            Vue.nextTick(() => {
+              // Focus our cell internally
+              gridState.cellFocused = {
+                rowId: targetRow[rowIndex],
+                columnKey: targetColumn.key,
+              };
+
+              // And then focus the real cell
+              let cellToTarget = document.querySelector(
+                `[aria-rowindex="${targetRowIndex}"] > [aria-colindex="${targetColumnIndex}"]`
+              ) as HTMLElement | null;
+
+              cellToTarget?.focus();
+            });
+          },
         },
         nativeOn: {
           mouseenter: () => {
@@ -184,12 +239,12 @@ export default defineComponent({
 
     this.internalItems.slice(min, max).forEach((rowData, index) => {
       if (left.length) {
-        leftRows.push(this.buildRow(rowData, index + min, left, 0));
+        leftRows.push(this.buildRow(rowData, index + min, left, 1));
       }
 
       if (centre.length) {
         centreRows.push(
-          this.buildRow(rowData, index + min, centre, left.length)
+          this.buildRow(rowData, index + min, centre, left.length + 1)
         );
       }
 
@@ -199,7 +254,7 @@ export default defineComponent({
             rowData,
             index + min,
             right,
-            left.length + centre.length
+            left.length + centre.length + 1
           )
         );
       }

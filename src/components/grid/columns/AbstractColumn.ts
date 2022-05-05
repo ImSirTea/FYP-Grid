@@ -32,6 +32,7 @@ export interface ColumnOptions {
   isSortable: boolean;
   isInteractable: boolean;
   isManageable: boolean;
+  hideColumnName: boolean;
   ascIcon: string;
   descIcon: string;
   useRendererForHeader: boolean;
@@ -65,6 +66,7 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
       isManageable: true,
       ascIcon: "mdi-sort-ascending",
       descIcon: "mdi-sort-descending",
+      hideColumnName: false,
       useRendererForHeader: false,
     } as Partial<O>);
   }
@@ -90,6 +92,7 @@ export abstract class AbstractColumn<T, U, O extends ColumnOptions> {
     return !!this.valueSetter;
   }
 
+  // Converts user-friendly to CSS values
   get alignment() {
     switch (this.options.defaultAlignment) {
       case "left":

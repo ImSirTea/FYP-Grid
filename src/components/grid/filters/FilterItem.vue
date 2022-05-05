@@ -72,7 +72,6 @@ import {
 } from "@vue/composition-api";
 import $tc from "@/textConstants";
 import { debounce } from "lodash";
-import { GridManager } from "@/components/grid/GridManager";
 import { GridState } from "@/components/grid/GridState";
 
 export default defineComponent({
@@ -96,7 +95,7 @@ export default defineComponent({
     const gridState = inject<GridState>("gridState")!;
 
     const updateCondition = (newCondition: FilterCondition<any>) => {
-      context.emit("update:filter-function", newCondition.filterFunction);
+      context.emit("update:condition", newCondition);
       gridState.buildFilterFunctionsForColumn(props.column.key);
     };
 

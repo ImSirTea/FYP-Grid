@@ -18,7 +18,7 @@ export interface FilterConnection {
 }
 
 export interface FilterOption<T> {
-  filterFunction?: FilterFunction<T>;
+  condition?: FilterCondition<T>;
   value?: any;
   operator?: FilterOperator;
 }
